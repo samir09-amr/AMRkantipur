@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Prep Portal</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --danger: #f72585;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Login Portal */
+        .login-portal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            animation: gradientBG 15s ease infinite;
+            background-size: 400% 400%;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .login-box {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 380px;
+            transform: translateY(0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .login-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .login-title {
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .login-form {
+            margin-top: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .login-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .login-btn.admin-btn {
+            background-color: var(--danger);
+        }
+        
+        .login-btn.admin-btn:hover {
+            background-color: #d1145a;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .logout-btn {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background-color: #d1145a;
+            transform: translateY(-2px);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-top: 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Topic Navigation */
+        .topic-container {
+            display: flex;
+            margin-top: 1.5rem;
+            gap: 1.5rem;
+        }
+        
+        .topics-list, .subtopics-list {
+            width: 280px;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+        
+        .questions-container {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        
+        .topic-item, .subtopic-item {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .topic-item:hover, .subtopic-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+        
+        .topic-item.active, .subtopic-item.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* Questions */
+        .question {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #f0f2f5;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .option {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option:hover {
+            background-color: #f8f9fa;
+            border-color: var(--accent);
+        }
+        
+        .option.selected {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        .option.correct {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+        
+        .option.incorrect {
+            background-color: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+        
+        .feedback {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .feedback.correct {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .feedback.incorrect {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        /* Scoreboard */
+        .scoreboard {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+        }
+        
+        .score-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray);
+        }
+        
+        .score-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Admin Panel */
+        .tab-container {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+        }
+        
+        .tab-btn.active:after {
+            width: 100%;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 1.5rem 0;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d1145a;
+            transform: translateY(-2px);
+        }
+        
+        .btn-back {
+            background-color: var(--gray);
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-back:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        /* File Upload */
+        .file-upload {
+            margin: 1.5rem 0;
+        }
+        
+        .file-upload-btn {
+            background-color: var(--accent);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .file-upload-btn:hover {
+            background-color: #3a7bc8;
+            transform: translateY(-2px);
+        }
+        
+        .file-upload-input {
+            display: none;
+        }
+        
+        .file-name {
+            margin-left: 1rem;
+            font-style: italic;
+            color: var(--gray);
+        }
+        
+        /* Utility Classes */
+        .hidden {
+            display: none;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .topic-container {
+                flex-direction: column;
+            }
+            
+            .topics-list, .subtopics-list, .questions-container {
+                width: 100%;
+            }
+            
+            .login-box {
+                width: 90%;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Portal -->
+    <div id="loginPortal" class="login-portal">
+        <div class="login-box">
+            <h1 class="login-title">Exam Prep Portal</h1>
+            <div class="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" class="form-input" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="Enter password">
+                </div>
+                <div id="loginError" style="color: var(--danger); margin-bottom: 1rem;"></div>
+                <button id="userLoginBtn" class="login-btn">Student Login</button>
+                <button id="adminLoginBtn" class="login-btn admin-btn">Admin Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Interface -->
+    <div id="userInterface" class="container hidden">
+        <header class="header">
+            <div class="header-content container">
+                <div class="logo">Exam Prep Portal</div>
+                <button id="userLogoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </header>
+        
+        <main class="main-content">
+            <div class="scoreboard">
+                <div class="score-title">Your Score</div>
+                <div class="score-value" id="scoreValue">0</div>
+            </div>
+            
+            <h1>Practice Tests</h1>
+            
+            <div class="topic-container">
+                <div class="topics-list" id="topicsList">
+                    <h3 class="section-title">Topics</h3>
+                </div>
+                
+                <div class="subtopics-list hidden" id="subtopicsList">
+                    <button class="btn btn-back" id="backToTopics">← Back to Topics</button>
+                    <h3 class="section-title">Subtopics</h3>
+                </div>
+                
+                <div class="questions-container hidden" id="questionsContainer">
+                    <button class="btn btn-back" id="backToSubtopics">← Back to Subtopics</button>
+                    <div id="questionsList"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Admin Interface -->
+    <div id="adminInterface" class="container hidden">
+        <header class="header">
+            <div class="header-content container">
+                <div class="logo">Admin Panel</div>
+                <button id="adminLogoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </header>
+        
+        <main class="main-content">
+            <div class="tab-container">
+                <button class="tab-btn active" data-tab="manageTopics">Manage Topics</button>
+                <button class="tab-btn" data-tab="manageSubtopics">Manage Subtopics</button>
+                <button class="tab-btn" data-tab="importQuestions">Import Questions</button>
+            </div>
+            
+            <div class="admin-controls">
+                <div id="manageTopics" class="tab-content active">
+                    <h3>Add New Topic</h3>
+                    <div class="form-group">
+                        <label class="form-label" for="newTopicName">Topic Name</label>
+                        <input type="text" id="newTopicName" class="form-input" placeholder="Enter topic name">
+                    </div>
+                    <button id="addTopicBtn" class="btn btn-primary">Add Topic</button>
+                    
+                    <h3 style="margin-top: 2rem;">Existing Topics</h3>
+                    <div id="existingTopicsList"></div>
+                </div>
+                
+                <div id="manageSubtopics" class="tab-content">
+                    <h3>Add New Subtopic</h3>
+                    <div class="form-group">
+                        <label class="form-label" for="parentTopic">Parent Topic</label>
+                        <select id="parentTopic" class="form-input"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="newSubtopicName">Subtopic Name</label>
+                        <input type="text" id="newSubtopicName" class="form-input" placeholder="Enter subtopic name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="isFinalSubtopic">
+                            <input type="checkbox" id="isFinalSubtopic"> Final Subtopic (contains questions)
+                        </label>
+                    </div>
+                    <button id="addSubtopicBtn" class="btn btn-primary">Add Subtopic</button>
+                    
+                    <h3 style="margin-top: 2rem;">Existing Subtopics</h3>
+                    <div id="existingSubtopicsList"></div>
+                </div>
+                
+                <div id="importQuestions" class="tab-content">
+                    <h3>Import Questions from CSV</h3>
+                    <p>1. Prepare your questions in CSV format (download template below)</p>
+                    <p>2. Upload the CSV file here:</p>
+                    
+                    <div class="file-upload">
+                        <button class="file-upload-btn" id="uploadCsvBtn">Choose CSV File</button>
+                        <input type="file" id="csvFileInput" class="file-upload-input" accept=".csv">
+                        <span id="fileName" class="file-name">No file selected</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="subtopicForImport">Select Subtopic for Import</label>
+                        <select id="subtopicForImport" class="form-input"></select>
+                    </div>
+                    
+                    <button id="importCsvBtn" class="btn btn-primary">Import Questions</button>
+                    <a href="#" id="downloadTemplate" class="btn" style="margin-left: 1rem;">Download Template</a>
+                    
+                    <div id="importStatus" style="margin-top: 1.5rem;"></div>
+                    
+                    <h4 style="margin-top: 2rem;">CSV Format Requirements:</h4>
+                    <ul>
+                        <li>First row must be headers: question,option1,option2,option3,option4,correct_option</li>
+                        <li>Each subsequent row represents one question</li>
+                        <li>correct_option should be 1-4 (which option is correct)</li>
+                        <li>Filename should match subtopic name (e.g., "Algebra.csv")</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Application state
+        const state = {
+            currentUser: null,
+            isAdmin: false,
+            topics: [],
+            selectedTopic: null,
+            selectedSubtopic: null,
+            questions: [],
+            score: 0,
+            answeredQuestions: {}
+        };
+
+        // Login credentials
+        const credentials = {
+            student: { username: "student", password: "pass123" },
+            admin: { username: "admin", password: "admin123" }
+        };
+
+        // DOM elements
+        const loginPortal = document.getElementById('loginPortal');
+        const userInterface = document.getElementById('userInterface');
+        const adminInterface = document.getElementById('adminInterface');
+        const loginUsername = document.getElementById('loginUsername');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginError = document.getElementById('loginError');
+        const userLoginBtn = document.getElementById('userLoginBtn');
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const userLogoutBtn = document.getElementById('userLogoutBtn');
+        const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+        const topicsList = document.getElementById('topicsList');
+        const subtopicsList = document.getElementById('subtopicsList');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const questionsList = document.getElementById('questionsList');
+        const backToTopics = document.getElementById('backToTopics');
+        const backToSubtopics = document.getElementById('backToSubtopics');
+        const scoreValue = document.getElementById('scoreValue');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const newTopicName = document.getElementById('newTopicName');
+        const addTopicBtn = document.getElementById('addTopicBtn');
+        const existingTopicsList = document.getElementById('existingTopicsList');
+        const parentTopic = document.getElementById('parentTopic');
+        const newSubtopicName = document.getElementById('newSubtopicName');
+        const isFinalSubtopic = document.getElementById('isFinalSubtopic');
+        const addSubtopicBtn = document.getElementById('addSubtopicBtn');
+        const existingSubtopicsList = document.getElementById('existingSubtopicsList');
+        const uploadCsvBtn = document.getElementById('uploadCsvBtn');
+        const csvFileInput = document.getElementById('csvFileInput');
+        const fileName = document.getElementById('fileName');
+        const subtopicForImport = document.getElementById('subtopicForImport');
+        const importCsvBtn = document.getElementById('importCsvBtn');
+        const importStatus = document.getElementById('importStatus');
+        const downloadTemplate = document.getElementById('downloadTemplate');
+
+        // Initialize the app
+        function init() {
+            // Load data from localStorage
+            loadData();
+            
+            // Set up event listeners
+            userLoginBtn.addEventListener('click', () => handleLogin('student'));
+            adminLoginBtn.addEventListener('click', () => handleLogin('admin'));
+            
+            userLogoutBtn.addEventListener('click', logout);
+            adminLogoutBtn.addEventListener('click', logout);
+            
+            backToTopics.addEventListener('click', () => {
+                subtopicsList.classList.add('hidden');
+                questionsContainer.classList.add('hidden');
+                state.selectedTopic = null;
+                state.selectedSubtopic = null;
+            });
+            
+            backToSubtopics.addEventListener('click', () => {
+                questionsContainer.classList.add('hidden');
+                state.selectedSubtopic = null;
+            });
+            
+            // Tab switching
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    btn.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Update subtopic dropdown when import tab is selected
+                    if (tabId === 'importQuestions') {
+                        updateSubtopicImportDropdown();
+                    }
+                });
+            });
+            
+            // Admin controls
+            addTopicBtn.addEventListener('click', addNewTopic);
+            addSubtopicBtn.addEventListener('click', addNewSubtopic);
+            
+            // CSV import setup
+            setupCsvImport();
+            
+            // Download template
+            downloadTemplate.addEventListener('click', (e) => {
+                e.preventDefault();
+                downloadCsvTemplate();
+            });
+        }
+
+        // Handle login
+        function handleLogin(role) {
+            const username = loginUsername.value.trim();
+            const password = loginPassword.value.trim();
+            
+            if (!username || !password) {
+                showLoginError('Please enter both username and password');
+                return;
+            }
+            
+            const creds = credentials[role];
+            
+            if (username === creds.username && password === creds.password) {
+                state.currentUser = role;
+                state.isAdmin = role === 'admin';
+                loginError.textContent = '';
+                loginUsername.value = '';
+                loginPassword.value = '';
+                
+                loginPortal.classList.add('hidden');
+                if (state.isAdmin) {
+                    adminInterface.classList.remove('hidden');
+                    renderAdminInterface();
+                } else {
+                    userInterface.classList.remove('hidden');
+                    renderUserInterface();
+                }
+            } else {
+                showLoginError('Invalid credentials. Please try again.');
+            }
+        }
+
+        // Show login error
+        function showLoginError(message) {
+            loginError.textContent = message;
+            loginError.classList.add('shake');
+            setTimeout(() => loginError.classList.remove('shake'), 500);
+        }
+
+        // Logout function
+        function logout() {
+            state.currentUser = null;
+            state.isAdmin = false;
+            state.selectedTopic = null;
+            state.selectedSubtopic = null;
+            
+            userInterface.classList.add('hidden');
+            adminInterface.classList.add('hidden');
+            loginPortal.classList.remove('hidden');
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('examPrepData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                state.topics = data.topics || [];
+                state.score = data.score || 0;
+                state.answeredQuestions = data.answeredQuestions || {};
+                state.questions = data.questions || [];
+            }
+            
+            // Add some default data if none exists (for demo)
+            if (state.topics.length === 0) {
+                state.topics = [
+                    {
+                        id: 'math',
+                        name: 'Mathematics',
+                        subtopics: [
+                            {
+                                id: 'algebra',
+                                name: 'Algebra',
+                                isFinal: true
+                            },
+                            {
+                                id: 'geometry',
+                                name: 'Geometry',
+                                isFinal: true
+                            }
+                        ]
+                    },
+                    {
+                        id: 'science',
+                        name: 'Science',
+                        subtopics: [
+                            {
+                                id: 'physics',
+                                name: 'Physics',
+                                isFinal: true
+                            },
+                            {
+                                id: 'chemistry',
+                                name: 'Chemistry',
+                                isFinal: true
+                            }
+                        ]
+                    }
+                ];
+                
+                // Add some sample questions
+                state.questions = [
+                    {
+                        id: 'q1',
+                        subtopicId: 'algebra',
+                        text: 'What is 2 + 2?',
+                        options: [
+                            { id: 'o1', text: '3', isCorrect: false, selected: false },
+                            { id: 'o2', text: '4', isCorrect: true, selected: false },
+                            { id: 'o3', text: '5', isCorrect: false, selected: false },
+                            { id: 'o4', text: '6', isCorrect: false, selected: false }
+                        ]
+                    },
+                    {
+                        id: 'q2',
+                        subtopicId: 'algebra',
+                        text: 'Solve for x: x - 5 = 10',
+                        options: [
+                            { id: 'o5', text: '5', isCorrect: false, selected: false },
+                            { id: 'o6', text: '10', isCorrect: false, selected: false },
+                            { id: 'o7', text: '15', isCorrect: true, selected: false },
+                            { id: 'o8', text: '20', isCorrect: false, selected: false }
+                        ]
+                    }
+                ];
+                
+                saveData();
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            const data = {
+                topics: state.topics,
+                score: state.score,
+                answeredQuestions: state.answeredQuestions,
+                questions: state.questions
+            };
+            localStorage.setItem('examPrepData', JSON.stringify(data));
+        }
+
+        // Render user interface
+        function renderUserInterface() {
+            // Render topics
+            const topicsHtml = state.topics.map(topic => `
+                <div class="topic-item" data-id="${topic.id}">${topic.name}</div>
+            `).join('');
+            
+            topicsList.innerHTML = `<h3 class="section-title">Topics</h3>${topicsHtml}`;
+            
+            // Add topic click handlers
+            document.querySelectorAll('.topic-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const topicId = item.getAttribute('data-id');
+                    state.selectedTopic = state.topics.find(t => t.id === topicId);
+                    
+                    // Render subtopics
+                    if (state.selectedTopic.subtopics && state.selectedTopic.subtopics.length > 0) {
+                        const subtopicsHtml = state.selectedTopic.subtopics.map(subtopic => `
+                            <div class="subtopic-item" data-id="${subtopic.id}">${subtopic.name}</div>
+                        `).join('');
+                        
+                        subtopicsList.innerHTML = `
+                            <button class="btn btn-back" id="backToTopics">← Back to Topics</button>
+                            <h3 class="section-title">Subtopics</h3>
+                            ${subtopicsHtml}
+                        `;
+                        
+                        subtopicsList.classList.remove('hidden');
+                        questionsContainer.classList.add('hidden');
+                        
+                        // Add subtopic click handlers
+                        document.querySelectorAll('.subtopic-item').forEach(subItem => {
+                            subItem.addEventListener('click', () => {
+                                const subtopicId = subItem.getAttribute('data-id');
+                                state.selectedSubtopic = state.selectedTopic.subtopics.find(s => s.id === subtopicId);
+                                
+                                if (state.selectedSubtopic.isFinal) {
+                                    // Load questions for this subtopic
+                                    loadQuestionsForSubtopic();
+                                } else {
+                                    // Show nested subtopics (if any)
+                                    alert('Please select a final subtopic that contains questions');
+                                }
+                            });
+                        });
+                    } else {
+                        subtopicsList.innerHTML = `
+                            <button class="btn btn-back" id="backToTopics">← Back to Topics</button>
+                            <h3 class="section-title">No subtopics available</h3>
+                        `;
+                        subtopicsList.classList.remove('hidden');
+                    }
+                    
+                    // Update active states
+                    document.querySelectorAll('.topic-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+            
+            // Update score
+            scoreValue.textContent = state.score;
+        }
+
+        // Load questions for the selected subtopic
+        function loadQuestionsForSubtopic() {
+            // Filter questions for this subtopic
+            const subtopicQuestions = state.questions.filter(q => q.subtopicId === state.selectedSubtopic.id);
+            
+            if (subtopicQuestions.length > 0) {
+                const questionsHtml = subtopicQuestions.map((question, index) => {
+                    const isAnswered = state.answeredQuestions[question.id] !== undefined;
+                    const isCorrect = state.answeredQuestions[question.id] === true;
+                    const selectedOptionId = isAnswered ? 
+                        question.options.find(opt => opt.selected)?.id : null;
+                    const correctOption = question.options.find(opt => opt.isCorrect);
+                    
+                    return `
+                        <div class="question" data-id="${question.id}">
+                            <div class="question-text">${index + 1}. ${question.text}</div>
+                            ${question.options.map(option => `
+                                <div class="option 
+                                    ${isAnswered && option.isCorrect ? 'correct' : ''}
+                                    ${isAnswered && !option.isCorrect && option.id === selectedOptionId ? 'incorrect' : ''}
+                                    ${option.id === selectedOptionId ? 'selected' : ''}"
+                                    data-id="${option.id}">
+                                    ${option.text}
+                                </div>
+                            `).join('')}
+                            ${isAnswered ? `
+                                <div class="feedback ${isCorrect ? 'correct' : 'incorrect'}">
+                                    ${isCorrect ? '✓ Correct!' : `✗ Incorrect! The correct answer is: ${correctOption.text}`}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+                questionsList.innerHTML = `
+                    <button class="btn btn-back" id="backToSubtopics">← Back to Subtopics</button>
+                    <h3 class="section-title">${state.selectedSubtopic.name} Questions</h3>
+                    ${questionsHtml}
+                `;
+                
+                questionsContainer.classList.remove('hidden');
+                
+                // Add option click handlers for unanswered questions
+                document.querySelectorAll('.question').forEach(questionEl => {
+                    const questionId = questionEl.getAttribute('data-id');
+                    if (state.answeredQuestions[questionId] === undefined) {
+                        const question = subtopicQuestions.find(q => q.id === questionId);
+                        
+                        questionEl.querySelectorAll('.option').forEach(optionEl => {
+                            optionEl.addEventListener('click', () => {
+                                const optionId = optionEl.getAttribute('data-id');
+                                const selectedOption = question.options.find(o => o.id === optionId);
+                                
+                                // Mark the selected option
+                                question.options.forEach(o => o.selected = false);
+                                selectedOption.selected = true;
+                                
+                                // Check if correct
+                                const isCorrect = selectedOption.isCorrect;
+                                state.answeredQuestions[questionId] = isCorrect;
+                                
+                                // Update score
+                                if (isCorrect) {
+                                    state.score += 1;
+                                    scoreValue.textContent = state.score;
+                                }
+                                
+                                // Save and re-render
+                                saveData();
+                                loadQuestionsForSubtopic();
+                            });
+                        });
+                    }
+                });
+            } else {
+                questionsList.innerHTML = `
+                    <button class="btn btn-back" id="backToSubtopics">← Back to Subtopics</button>
+                    <h3 class="section-title">No questions available for this subtopic</h3>
+                    <p>Import questions using the admin panel.</p>
+                `;
+                questionsContainer.classList.remove('hidden');
+            }
+        }
+
+        // Render admin interface
+        function renderAdminInterface() {
+            // Render existing topics
+            const topicsHtml = state.topics.map(topic => `
+                <div style="padding: 0.75rem; border-bottom: 1px solid #f0f2f5; display: flex; justify-content: space-between; align-items: center;">
+                    <span>${topic.name}</span>
+                    <button class="btn btn-danger" style="padding: 0.5rem 1rem;" 
+                        onclick="deleteTopic('${topic.id}')">Delete</button>
+                </div>
+            `).join('');
+            
+            existingTopicsList.innerHTML = topicsHtml || '<p>No topics created yet.</p>';
+            
+            // Populate parent topic dropdown
+            parentTopic.innerHTML = state.topics.map(topic => `
+                <option value="${topic.id}">${topic.name}</option>
+            `).join('') || '<option value="">No topics available</option>';
+            
+            // Render existing subtopics
+            const subtopicsHtml = state.topics.flatMap(topic => 
+                (topic.subtopics || []).map(subtopic => `
+                    <div style="padding: 0.75rem; border-bottom: 1px solid #f0f2f5; display: flex; justify-content: space-between; align-items: center;">
+                        <span>${topic.name} → ${subtopic.name} ${subtopic.isFinal ? '(Final)' : ''}</span>
+                        <button class="btn btn-danger" style="padding: 0.5rem 1rem;" 
+                            onclick="deleteSubtopic('${topic.id}', '${subtopic.id}')">Delete</button>
+                    </div>
+                `)
+            ).join('');
+            
+            existingSubtopicsList.innerHTML = subtopicsHtml || '<p>No subtopics created yet.</p>';
+            
+            // Update subtopic import dropdown
+            updateSubtopicImportDropdown();
+        }
+
+        // Update subtopic dropdown for import
+        function updateSubtopicImportDropdown() {
+            const finalSubtopics = state.topics.flatMap(topic => 
+                (topic.subtopics || []).filter(subtopic => subtopic.isFinal)
+            );
+            
+            subtopicForImport.innerHTML = finalSubtopics.map(subtopic => `
+                <option value="${subtopic.id}">${topicName(subtopic.id)} → ${subtopic.name}</option>
+            `).join('') || '<option value="">No final subtopics available</option>';
+        }
+        
+        // Get topic name for a subtopic
+        function topicName(subtopicId) {
+            for (const topic of state.topics) {
+                const subtopic = topic.subtopics?.find(s => s.id === subtopicId);
+                if (subtopic) return topic.name;
+            }
+            return '';
+        }
+
+        // Add new topic
+        function addNewTopic() {
+            const name = newTopicName.value.trim();
+            if (!name) {
+                alert('Please enter a topic name');
+                return;
+            }
+            
+            const newTopic = {
+                id: generateId(),
+                name: name,
+                subtopics: []
+            };
+            
+            state.topics.push(newTopic);
+            saveData();
+            newTopicName.value = '';
+            renderAdminInterface();
+        }
+
+        // Add new subtopic
+        function addNewSubtopic() {
+            const parentTopicId = parentTopic.value;
+            const name = newSubtopicName.value.trim();
+            const final = isFinalSubtopic.checked;
+            
+            if (!parentTopicId) {
+                alert('Please select a parent topic');
+                return;
+            }
+            
+            if (!name) {
+                alert('Please enter a subtopic name');
+                return;
+            }
+            
+            const parent = state.topics.find(t => t.id === parentTopicId);
+            if (!parent) {
+                alert('Invalid parent topic selected');
+                return;
+            }
+            
+            const newSubtopic = {
+                id: generateId(),
+                name: name,
+                isFinal: final
+            };
+            
+            if (!parent.subtopics) {
+                parent.subtopics = [];
+            }
+            
+            parent.subtopics.push(newSubtopic);
+            saveData();
+            newSubtopicName.value = '';
+            isFinalSubtopic.checked = false;
+            renderAdminInterface();
+        }
+
+        // Delete topic
+        function deleteTopic(topicId) {
+            if (confirm('Are you sure you want to delete this topic and all its subtopics?')) {
+                // Remove questions associated with this topic's subtopics
+                const subtopicIds = state.topics.find(t => t.id === topicId)?.subtopics?.map(s => s.id) || [];
+                state.questions = state.questions.filter(q => !subtopicIds.includes(q.subtopicId));
+                
+                // Remove the topic
+                state.topics = state.topics.filter(t => t.id !== topicId);
+                saveData();
+                renderAdminInterface();
+            }
+        }
+
+        // Delete subtopic
+        function deleteSubtopic(topicId, subtopicId) {
+            if (confirm('Are you sure you want to delete this subtopic?')) {
+                const topic = state.topics.find(t => t.id === topicId);
+                if (topic && topic.subtopics) {
+                    // Remove questions associated with this subtopic
+                    state.questions = state.questions.filter(q => q.subtopicId !== subtopicId);
+                    
+                    // Remove the subtopic
+                    topic.subtopics = topic.subtopics.filter(s => s.id !== subtopicId);
+                    saveData();
+                    renderAdminInterface();
+                }
+            }
+        }
+
+        // Setup CSV import functionality
+        function setupCsvImport() {
+            // Handle file selection
+            csvFileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    fileName.textContent = e.target.files[0].name;
+                } else {
+                    fileName.textContent = 'No file selected';
+                }
+            });
+            
+            // Trigger file input click
+            uploadCsvBtn.addEventListener('click', () => {
+                csvFileInput.click();
+            });
+            
+            // Handle import button click
+            importCsvBtn.addEventListener('click', () => {
+                if (!csvFileInput.files || csvFileInput.files.length === 0) {
+                    showImportStatus('Please select a CSV file first', 'error');
+                    return;
+                }
+                
+                const selectedSubtopicId = subtopicForImport.value;
+                if (!selectedSubtopicId) {
+                    showImportStatus('Please select a subtopic to import into', 'error');
+                    return;
+                }
+                
+                const file = csvFileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    try {
+                        const csvData = e.target.result;
+                        const questions = parseCSVToQuestions(csvData, selectedSubtopicId);
+                        
+                        // Remove existing questions for this subtopic
+                        state.questions = state.questions.filter(q => q.subtopicId !== selectedSubtopicId);
+                        
+                        // Add new questions
+                        state.questions.push(...questions);
+                        
+                        saveData();
+                        showImportStatus(`Successfully imported ${questions.length} questions`, 'success');
+                        
+                        // Refresh questions if we're in user view
+                        if (state.currentUser === 'user' && state.selectedSubtopic?.id === selectedSubtopicId) {
+                            loadQuestionsForSubtopic();
+                        }
+                    } catch (error) {
+                        showImportStatus(`Error importing questions: ${error.message}`, 'error');
+                    }
+                };
+                
+                reader.onerror = () => {
+                    showImportStatus('Error reading file', 'error');
+                };
+                
+                reader.readAsText(file);
+            });
+        }
+        
+        // Show import status
+        function showImportStatus(message, type) {
+            importStatus.innerHTML = `<p style="color: ${type === 'error' ? 'var(--danger)' : 'var(--success)'}">${message}</p>`;
+            importStatus.classList.add('fade-in');
+        }
+        
+        // Parse CSV data into questions
+        function parseCSVToQuestions(csvData, subtopicId) {
+            const questions = [];
+            const lines = csvData.split('\n').filter(line => line.trim() !== '');
+            
+            if (lines.length < 2) {
+                throw new Error('CSV file is empty or has no questions');
+            }
+            
+            // Parse header row
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            
+            // Find column indices
+            const questionIndex = headers.indexOf('question');
+            const optionIndices = [
+                headers.indexOf('option1'),
+                headers.indexOf('option2'),
+                headers.indexOf('option3'),
+                headers.indexOf('option4')
+            ].filter(idx => idx !== -1);
+            
+            const correctOptionIndex = headers.indexOf('correct_option');
+            
+            if (questionIndex === -1 || optionIndices.length === 0 || correctOptionIndex === -1) {
+                throw new Error('CSV file is missing required columns (question, option1-4, correct_option)');
+            }
+            
+            // Process each question row
+            for (let i = 1; i < lines.length; i++) {
+                const row = lines[i];
+                // Handle quoted values that might contain commas
+                const values = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"(.*)"$/, '$1'));
+                
+                // Skip empty rows
+                if (values.length === 0 || values.every(v => v === '')) continue;
+                
+                const options = optionIndices.map((colIndex, idx) => ({
+                    id: generateId(),
+                    text: values[colIndex] || `Option ${idx + 1}`,
+                    isCorrect: (parseInt(values[correctOptionIndex]) === (idx + 1)),
+                    selected: false
+                }));
+                
+                questions.push({
+                    id: generateId(),
+                    subtopicId: subtopicId,
+                    text: values[questionIndex] || `Question ${i}`,
+                    options: options
+                });
+            }
+            
+            if (questions.length === 0) {
+                throw new Error('No valid questions found in CSV');
+            }
+            
+            return questions;
+        }
+        
+        // Download CSV template
+        function downloadCsvTemplate() {
+            const csvContent = "question,option1,option2,option3,option4,correct_option\n" +
+                              "\"What is 2 + 2?\",3,4,5,6,2\n" +
+                              "\"Solve for x: x - 5 = 10\",5,10,15,20,3\n" +
+                              "\"What is the capital of France?\",London,Paris,Berlin,Rome,2";
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'questions_template.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Helper function to generate unique IDs
+        function generateId() {
+            return Math.random().toString(36).substr(2, 9);
+        }
+
+        // Make delete functions available globally for the admin interface buttons
+        window.deleteTopic = deleteTopic;
+        window.deleteSubtopic = deleteSubtopic;
+
+        // Initialize the app when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz App - AMR Club of KANTIPUR</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #e3f2fd, #fce4ec);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .quiz-container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 30px;
+      background: #ffffffb0;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      animation: fadeIn 0.8s ease;
+    }
+    .question {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      animation: slideIn 0.5s ease;
+    }
+    .option {
+      background-color: #f1f8e9;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .option:hover {
+      background-color: #aed581;
+    }
+    .option.selected {
+      background-color: #4caf50;
+      color: white;
+    }
+    .btn-group-custom {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .btn-group-custom .btn {
+      flex: 1;
+      margin: 0 10px;
+      border-radius: 20px;
+      transition: transform 0.2s ease;
+    }
+    .btn-group-custom .btn:hover {
+      transform: scale(1.05);
+    }
+    .locked {
+      pointer-events: none;
+      background-color: #ccc !important;
+      color: #fff;
+    }
+    .tick {
+      color: green;
+      font-weight: bold;
+    }
+    #score-popup {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+      z-index: 9999;
+    }
+    #answer-feedback {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      z-index: 10000;
+      text-align: center;
+      display: none;
+    }
+    #transfer-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      z-index: 10002;
+      display: none;
+    }
+    #transfer-popup select {
+      margin: 10px 0;
+    }
+    .badge {
+      font-size: 0.75em;
+    }
+    @keyframes fadeIn {
+      0% {opacity: 0; transform: translateY(-20px);}
+      100% {opacity: 1; transform: translateY(0);}
+    }
+    @keyframes slideIn {
+      0% {opacity: 0; transform: translateX(-30px);}
+      100% {opacity: 1; transform: translateX(0);}
+    }
+    /* Rapid Fire Styles */
+    .rapidfire-letter-btn {
+      font-size: 1.5rem;
+      width: 50px;
+      height: 50px;
+      margin: 5px;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      color: white;
+      border: none;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    .rapidfire-timer {
+      font-size: 2rem;
+      color: #e74c3c;
+      margin: 20px 0;
+    }
+    .rapidfire-question {
+      font-size: 1.5rem;
+      margin: 20px 0;
+      min-height: 100px;
+    }
+    .rapidfire-next-btn {
+      font-size: 1.2rem;
+      padding: 10px 30px;
+    }
+    .completed-letter {
+      background: #95a5a6 !important;
+      animation: none !important;
+    }
+    /* Admin Modal Styles */
+    .modal-admin {
+      display: none;
+      position: fixed;
+      z-index: 10001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 33%;
+      min-width: 400px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .admin-btn {
+      margin: 5px;
+      padding: 10px 15px;
+    }
+    .option-input {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container text-center mt-5">
+    <h1 class="display-5 fw-bold">Welcome to <span class="text-primary">AMR Club of KANTIPUR</span></h1>
+    <p class="lead">Digital Quiz Interface</p>
+    <div id="login-section" class="quiz-container">
+      <input type="text" id="username" class="form-control mb-3" placeholder="Enter Username">
+      <input type="password" id="password" class="form-control mb-3" placeholder="Enter Password">
+      <button class="btn btn-primary w-100" onclick="login()">Login</button>
+      <button class="btn btn-secondary w-100 mt-2" onclick="adminLogin()">Admin Login</button>
+    </div>
+    <div id="main-menu" class="quiz-container d-none">
+      <div class="d-flex justify-content-between mb-3">
+        <select id="round-selector" class="form-select w-50" onchange="roundChanged()">
+          <option value="">-- Select Round --</option>
+          <option value="warmup">Warm-Up Round</option>
+          <option value="general">General Round</option>
+          <option value="audiovisual">Audio Visual Round</option>
+          <option value="health">Health Round</option>
+          <option value="specialized">Specialized Round</option>
+          <option value="rapidfire">Rapid Fire Round</option>
+        </select>
+        <button class="btn btn-outline-dark" onclick="showScoreboard()"><i class="fas fa-chart-line"></i> Scoreboard</button>
+      </div>
+      <div id="group-selection" class="mb-3">
+        <label for="group" class="form-label fw-bold">Select Group:</label>
+        <select id="group" class="form-select">
+          <option value="">-- Choose Group --</option>
+          <option value="A">Group A</option>
+          <option value="B">Group B</option>
+          <option value="C">Group C</option>
+          <option value="D">Group D</option>
+          <option value="E">Group E</option>
+          <option value="F">Group F</option>
+          <option value="G">Group G</option>
+          <option value="H">Group H</option>
+          <option value="I">Group I</option>
+        </select>
+        <button class="btn btn-success mt-2" onclick="proceedToQuestionList()">Proceed</button>
+      </div>
+      <div id="question-buttons" class="d-none">
+        <h5>Choose a question:</h5>
+        <div class="d-flex flex-wrap justify-content-center" id="question-list"></div>
+      </div>
+      <div id="specialized-subclass" class="d-none">
+        <h5>Choose a subclass:</h5>
+        <select id="subclass-selector" class="form-select mb-3">
+          <option value="">-- Select Subclass --</option>
+          <option value="science">Science</option>
+          <option value="history">History</option>
+          <option value="riddle">Riddle</option>
+          <option value="sports">Sports</option>
+          <option value="geography">Geography</option>
+        </select>
+        <button class="btn btn-primary" onclick="loadSpecializedQuestions()">Load Questions</button>
+      </div>
+      <div id="rapidfire-letters" class="d-none">
+        <h5>Select Letter Set:</h5>
+        <div class="d-flex flex-wrap justify-content-center" id="letter-buttons"></div>
+      </div>
+    </div>
+    <div id="question-container" class="quiz-container d-none">
+      <div id="question-content"></div>
+      <div id="options-container" class="mt-4"></div>
+      <div class="btn-group-custom">
+        <button class="btn btn-warning" id="transfer-button" onclick="showTransferPopup()">Transfer</button>
+        <button class="btn btn-success" id="done-button" onclick="lockQuestion()">Done</button>
+      </div>
+    </div>
+    <div id="rapidfire-container" class="quiz-container d-none">
+      <div class="rapidfire-timer" id="rapidfire-timer">30</div>
+      <div class="rapidfire-question" id="rapidfire-question"></div>
+      <button class="btn btn-primary rapidfire-next-btn" onclick="nextRapidFireQuestion()">Next Question</button>
+    </div>
+    <div id="scoreboard" class="quiz-container d-none">
+      <h4 class="mb-4">📊 Scoreboard</h4>
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Group</th>
+            <th>Correct</th>
+            <th>Transferred</th>
+            <th>Wrong</th>
+            <th>Skipped</th>
+            <th>Total Score</th>
+          </tr>
+        </thead>
+        <tbody id="scoreboard-body"></tbody>
+      </table>
+      <button class="btn btn-secondary" onclick="backToMain()">Back</button>
+    </div>
+  </div>
+
+  <div id="score-popup" class="d-none">
+    <p>Mark this question as:</p>
+    <button class="btn btn-success btn-sm me-2" onclick="markAnswer('correct')">Correct</button>
+    <button class="btn btn-danger btn-sm" onclick="markAnswer('wrong')">Incorrect</button>
+  </div>
+
+  <div id="answer-feedback">
+    <div id="feedback-message"></div>
+  </div>
+
+  <div id="transfer-popup">
+    <h5>Transfer Question To:</h5>
+    <select id="transfer-group" class="form-select">
+      <option value="">-- Select Group --</option>
+      <option value="A">Group A</option>
+      <option value="B">Group B</option>
+      <option value="C">Group C</option>
+      <option value="D">Group D</option>
+      <option value="E">Group E</option>
+      <option value="F">Group F</option>
+      <option value="G">Group G</option>
+      <option value="H">Group H</option>
+      <option value="I">Group I</option>
+    </select>
+    <div class="d-flex justify-content-between mt-3">
+      <button class="btn btn-secondary" onclick="cancelTransfer()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmTransfer()">Confirm</button>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div id="admin-modal" class="modal-admin">
+    <div class="modal-content">
+      <span class="close" onclick="closeAdminModal()">&times;</span>
+      <h4 id="admin-modal-title">Admin Controls</h4>
+      <div id="admin-form-container">
+        <!-- Dynamic content will go here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Round Modal -->
+  <div id="add-round-modal" class="modal-admin">
+    <div class="modal-content">
+      <span class="close" onclick="closeAddRoundModal()">&times;</span>
+      <h4>Add New Round</h4>
+      <div class="mb-3">
+        <label class="form-label">Round Name:</label>
+        <input type="text" id="new-round-name" class="form-control">
+      </div>
+      <div class="d-flex justify-content-between">
+        <button class="btn btn-secondary" onclick="closeAddRoundModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="addNewRound()">Save Round</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Google Sheets API configuration
+    const SPREADSHEET_ID = '11xMxjbSU4AlSGXCD_2tUroDULhIGp8GZXclmTr29Ekg'; // REPLACE THIS
+    const API_KEY = 'AIzaSyCf05hRlftn8wD5zSOWxiPzlmhodOpl-mg'; // REPLACE THIS
+    const SHEET_NAMES = {
+      warmup: 'WarmUp',
+      general: 'General',
+      audiovisual: 'AudioVisual',
+      health: 'Health',
+      specialized_science: 'Specialized_Science',
+      specialized_history: 'Specialized_History',
+      specialized_riddle: 'Specialized_Riddle',
+      specialized_sports: 'Specialized_Sports',
+      specialized_geography: 'Specialized_Geography',
+      rapidfire: 'RapidFire'
+    };
+
+    let roundQuestions = {};
+    let lockedQuestions = {};
+    let transferredQuestions = {};
+    let currentQuestionIndex = null;
+    let currentGroup = null;
+    let currentRound = null;
+    let currentSubclass = null;
+    let selectedOption = null;
+    const scores = {};
+    
+    // Rapid Fire variables
+    let rapidFireQuestions = [];
+    let currentRapidFireSet = null;
+    let currentRapidFireIndex = 0;
+    let rapidFireTimer = null;
+    let completedRapidFireSets = new Set();
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const usernameInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+
+      [usernameInput, passwordInput].forEach(input => {
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            login();
+          }
+        });
+      });
+    });
+
+    function initializeDataStructures() {
+      const rounds = ['warmup', 'general', 'audiovisual', 'health', 'specialized', 'rapidfire'];
+      rounds.forEach(round => {
+        if (!lockedQuestions[round]) {
+          lockedQuestions[round] = new Set();
+        }
+        if (!transferredQuestions[round]) {
+          transferredQuestions[round] = {};
+        }
+      });
+    }
+
+    async function fetchQuestionsFromSheet(sheetName) {
+      try {
+        const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${sheetName}?key=${API_KEY}`);
+        const data = await response.json();
+        
+        if (!data.values || data.values.length === 0) {
+          console.error(`No data found in sheet: ${sheetName}`);
+          return [];
+        }
+        
+        const questions = [];
+        const headers = data.values[0];
+        const rows = data.values.slice(1);
+        
+        for (const row of rows) {
+          if (row.length === 0) continue;
+          
+          const question = {
+            question: row[0] || '',
+            options: null,
+            answer: null,
+            timer: row[6] || '30' // Added timer field
+          };
+          
+          if (headers.includes('Option A') && headers.includes('Answer')) {
+            question.options = [
+              `A. ${row[1] || ''}`,
+              `B. ${row[2] || ''}`,
+              `C. ${row[3] || ''}`,
+              `D. ${row[4] || ''}`
+            ];
+            question.answer = row[5] || '';
+          }
+          
+          questions.push(question);
+        }
+        
+        return questions;
+      } catch (error) {
+        console.error(`Error fetching data from sheet ${sheetName}:`, error);
+        return [];
+      }
+    }
+
+    async function loadAllQuestions() {
+      try {
+        roundQuestions.warmup = await fetchQuestionsFromSheet(SHEET_NAMES.warmup);
+        roundQuestions.general = await fetchQuestionsFromSheet(SHEET_NAMES.general);
+        roundQuestions.audiovisual = await fetchQuestionsFromSheet(SHEET_NAMES.audiovisual);
+        roundQuestions.health = await fetchQuestionsFromSheet(SHEET_NAMES.health);
+        
+        roundQuestions.specialized = {
+          science: await fetchQuestionsFromSheet(SHEET_NAMES.specialized_science),
+          history: await fetchQuestionsFromSheet(SHEET_NAMES.specialized_history),
+          riddle: await fetchQuestionsFromSheet(SHEET_NAMES.specialized_riddle),
+          sports: await fetchQuestionsFromSheet(SHEET_NAMES.specialized_sports),
+          geography: await fetchQuestionsFromSheet(SHEET_NAMES.specialized_geography)
+        };
+        
+        rapidFireQuestions = await fetchQuestionsFromSheet(SHEET_NAMES.rapidfire);
+        
+        console.log('Questions loaded successfully');
+        
+        if (currentRound) {
+          if (currentRound === 'specialized') {
+            loadSpecializedQuestions();
+          } else if (currentRound === 'rapidfire') {
+            showRapidFireLetterMenu();
+          } else {
+            loadRegularQuestions();
+          }
+        }
+      } catch (error) {
+        console.error('Error loading questions:', error);
+      }
+    }
+
+    function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      const staticUsername = "samirss";
+      const staticPassword = "samirss";
+
+      if (username === staticUsername && password === staticPassword) {
+        document.getElementById('login-section').classList.add('d-none');
+        document.getElementById('main-menu').classList.remove('d-none');
+        initializeDataStructures();
+        loadAllQuestions();
+      } else {
+        alert('Invalid username or password');
+      }
+    }
+
+    function adminLogin() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      const adminUsername = "admin";
+      const adminPassword = "admin123";
+
+      if (username === adminUsername && password === adminPassword) {
+        document.getElementById('login-section').classList.add('d-none');
+        document.getElementById('main-menu').classList.remove('d-none');
+        initializeDataStructures();
+        loadAllQuestions();
+        enableAdminFeatures();
+      } else {
+        alert('Invalid admin credentials');
+      }
+    }
+
+    function enableAdminFeatures() {
+      const roundSelector = document.getElementById('round-selector');
+      roundSelector.innerHTML = `
+        <option value="">-- Select Round --</option>
+        <option value="warmup">Warm-Up Round</option>
+        <option value="general">General Round</option>
+        <option value="audiovisual">Audio Visual Round</option>
+        <option value="health">Health Round</option>
+        <option value="specialized">Specialized Round</option>
+        <option value="rapidfire">Rapid Fire Round</option>
+      `;
+      
+      const adminControls = `
+        <div id="admin-controls" class="mt-4">
+          <div class="d-flex justify-content-between mb-3">
+            <button class="btn btn-success me-2" onclick="showAddQuestionForm()">
+              <i class="fas fa-plus"></i> Add Question
+            </button>
+            <button class="btn btn-primary" onclick="showAddRoundModal()">
+              <i class="fas fa-plus-circle"></i> Add Round
+            </button>
+          </div>
+          <div class="d-flex">
+            <button class="btn btn-warning me-2" onclick="showEditQuestionForm()">
+              <i class="fas fa-edit"></i> Edit Question
+            </button>
+            <button class="btn btn-danger" onclick="showRemoveQuestionForm()">
+              <i class="fas fa-trash"></i> Remove Question
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('main-menu').insertAdjacentHTML('beforeend', adminControls);
+      setInterval(checkForUpdates, 30000);
+    }
+
+    async function checkForUpdates() {
+      try {
+        await loadAllQuestions();
+        console.log('Questions updated from sheet');
+      } catch (error) {
+        console.error('Error updating questions:', error);
+      }
+    }
+
+    function showAdminModal(title, content) {
+      document.getElementById('admin-modal-title').textContent = title;
+      document.getElementById('admin-form-container').innerHTML = content;
+      document.getElementById('admin-modal').style.display = 'block';
+    }
+
+    function closeAdminModal() {
+      document.getElementById('admin-modal').style.display = 'none';
+    }
+
+    function showAddQuestionForm() {
+      const form = `
+        <div class="mb-3">
+          <label class="form-label">Round:</label>
+          <select id="add-question-round" class="form-select" onchange="toggleSubclassField()">
+            <option value="">-- Select Round --</option>
+            <option value="warmup">Warm-Up</option>
+            <option value="general">General</option>
+            <option value="audiovisual">Audio Visual</option>
+            <option value="health">Health</option>
+            <option value="specialized">Specialized</option>
+            <option value="rapidfire">Rapid Fire</option>
+          </select>
+        </div>
+        <div id="subclass-field" class="mb-3 d-none">
+          <label class="form-label">Subclass:</label>
+          <select id="add-question-subclass" class="form-select">
+            <option value="science">Science</option>
+            <option value="history">History</option>
+            <option value="riddle">Riddle</option>
+            <option value="sports">Sports</option>
+            <option value="geography">Geography</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Question:</label>
+          <textarea id="add-question-text" class="form-control" rows="3" required></textarea>
+        </div>
+        <div id="options-container" class="mb-3">
+          <label class="form-label">Options (leave blank if not applicable):</label>
+          <div class="option-input">
+            <label>A.</label>
+            <input type="text" id="option-a" class="form-control" placeholder="Option A">
+          </div>
+          <div class="option-input">
+            <label>B.</label>
+            <input type="text" id="option-b" class="form-control" placeholder="Option B">
+          </div>
+          <div class="option-input">
+            <label>C.</label>
+            <input type="text" id="option-c" class="form-control" placeholder="Option C">
+          </div>
+          <div class="option-input">
+            <label>D.</label>
+            <input type="text" id="option-d" class="form-control" placeholder="Option D">
+          </div>
+        </div>
+        <div id="answer-field" class="mb-3">
+          <label class="form-label">Correct Answer (A/B/C/D):</label>
+          <input type="text" id="correct-answer" class="form-control" placeholder="Leave blank for no options">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Timer (seconds, 0 for no timer):</label>
+          <input type="number" id="question-timer" class="form-control" min="0" max="120" value="30">
+        </div>
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-secondary" onclick="closeAdminModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="addQuestionToSheet()">Save Question</button>
+        </div>
+      `;
+      showAdminModal('Add New Question', form);
+    }
+
+    function toggleSubclassField() {
+      const round = document.getElementById('add-question-round').value;
+      const subclassField = document.getElementById('subclass-field');
+      
+      if (round === 'specialized') {
+        subclassField.classList.remove('d-none');
+      } else {
+        subclassField.classList.add('d-none');
+      }
+    }
+
+    async function addQuestionToSheet() {
+      const round = document.getElementById('add-question-round').value;
+      const subclass = round === 'specialized' ? document.getElementById('add-question-subclass').value : '';
+      const question = document.getElementById('add-question-text').value;
+      const optionA = document.getElementById('option-a').value;
+      const optionB = document.getElementById('option-b').value;
+      const optionC = document.getElementById('option-c').value;
+      const optionD = document.getElementById('option-d').value;
+      const answer = document.getElementById('correct-answer').value;
+      const timer = document.getElementById('question-timer').value;
+
+      if (!question) {
+        alert("Question text is required");
+        return;
+      }
+
+      const sheetName = round === 'specialized' ? `Specialized_${subclass.charAt(0).toUpperCase() + subclass.slice(1)}` : SHEET_NAMES[round];
+      const range = `${sheetName}!A:G`;
+      
+      const values = [
+        [
+          question,
+          optionA || '',
+          optionB || '',
+          optionC || '',
+          optionD || '',
+          answer || '',
+          timer || '30'
+        ]
+      ];
+
+      try {
+        const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}:append?valueInputOption=USER_ENTERED&key=${API_KEY}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            values: values,
+          }),
+        });
+
+        if (response.ok) {
+          alert('Question added successfully!');
+          closeAdminModal();
+          loadAllQuestions();
+        } else {
+          throw new Error('Failed to add question');
+        }
+      } catch (error) {
+        console.error('Error adding question:', error);
+        alert('Error adding question. Please check console for details.');
+      }
+    }
+
+    function showAddRoundModal() {
+      document.getElementById('add-round-modal').style.display = 'block';
+    }
+
+    function closeAddRoundModal() {
+      document.getElementById('add-round-modal').style.display = 'none';
+    }
+
+    async function addNewRound() {
+      const roundName = document.getElementById('new-round-name').value.trim();
+      
+      if (!roundName) {
+        alert("Please enter a round name");
+        return;
+      }
+
+      // In a real implementation, you would:
+      // 1. Create a new sheet in the Google Sheet
+      // 2. Add the round to your SHEET_NAMES constant
+      // 3. Update the round selector
+      
+      alert(`Round "${roundName}" would be created in a full implementation`);
+      closeAddRoundModal();
+    }
+
+    function showEditQuestionForm() {
+      const form = `
+        <div class="mb-3">
+          <label class="form-label">Round:</label>
+          <select id="edit-round-select" class="form-select" onchange="loadQuestionsForEdit()">
+            <option value="">-- Select Round --</option>
+            <option value="warmup">Warm-Up</option>
+            <option value="general">General</option>
+            <option value="audiovisual">Audio Visual</option>
+            <option value="health">Health</option>
+            <option value="specialized">Specialized</option>
+            <option value="rapidfire">Rapid Fire</option>
+          </select>
+        </div>
+        <div id="edit-subclass-field" class="mb-3 d-none">
+          <label class="form-label">Subclass:</label>
+          <select id="edit-subclass-select" class="form-select" onchange="loadQuestionsForEdit()">
+            <option value="science">Science</option>
+            <option value="history">History</option>
+            <option value="riddle">Riddle</option>
+            <option value="sports">Sports</option>
+            <option value="geography">Geography</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Question:</label>
+          <select id="edit-question-select" class="form-select" onchange="loadQuestionDetails()">
+            <option value="">-- Select Question --</option>
+          </select>
+        </div>
+        <div id="edit-question-details" class="d-none">
+          <!-- Question details will be loaded here -->
+        </div>
+      `;
+      showAdminModal('Edit Question', form);
+    }
+
+    async function loadQuestionsForEdit() {
+      const round = document.getElementById('edit-round-select').value;
+      const subclassField = document.getElementById('edit-subclass-field');
+      
+      if (round === 'specialized') {
+        subclassField.classList.remove('d-none');
+        const subclass = document.getElementById('edit-subclass-select').value;
+        const questions = roundQuestions.specialized[subclass] || [];
+        populateQuestionSelect(questions);
+      } else if (round) {
+        subclassField.classList.add('d-none');
+        const questions = roundQuestions[round] || [];
+        populateQuestionSelect(questions);
+      }
+    }
+
+    function populateQuestionSelect(questions) {
+      const select = document.getElementById('edit-question-select');
+      select.innerHTML = '<option value="">-- Select Question --</option>';
+      
+      questions.forEach((q, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = q.question.substring(0, 50) + (q.question.length > 50 ? '...' : '');
+        select.appendChild(option);
+      });
+    }
+
+    function loadQuestionDetails() {
+      const round = document.getElementById('edit-round-select').value;
+      const questionIndex = document.getElementById('edit-question-select').value;
+      
+      if (!round || questionIndex === '') {
+        document.getElementById('edit-question-details').classList.add('d-none');
+        return;
+      }
+      
+      let question;
+      if (round === 'specialized') {
+        const subclass = document.getElementById('edit-subclass-select').value;
+        question = roundQuestions.specialized[subclass][questionIndex];
+      } else {
+        question = roundQuestions[round][questionIndex];
+      }
+      
+      const details = `
+        <div class="mb-3">
+          <label class="form-label">Edit Question:</label>
+          <textarea id="edit-question-text" class="form-control" rows="3">${question.question}</textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Options:</label>
+          <div class="option-input">
+            <label>A.</label>
+            <input type="text" id="edit-option-a" class="form-control" value="${question.options ? question.options[0].substring(3) : ''}">
+          </div>
+          <div class="option-input">
+            <label>B.</label>
+            <input type="text" id="edit-option-b" class="form-control" value="${question.options ? question.options[1].substring(3) : ''}">
+          </div>
+          <div class="option-input">
+            <label>C.</label>
+            <input type="text" id="edit-option-c" class="form-control" value="${question.options ? question.options[2].substring(3) : ''}">
+          </div>
+          <div class="option-input">
+            <label>D.</label>
+            <input type="text" id="edit-option-d" class="form-control" value="${question.options ? question.options[3].substring(3) : ''}">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Correct Answer:</label>
+          <input type="text" id="edit-correct-answer" class="form-control" value="${question.answer || ''}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Timer (seconds):</label>
+          <input type="number" id="edit-timer" class="form-control" value="${question.timer || '30'}">
+        </div>
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-secondary" onclick="closeAdminModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="updateQuestion()">Save Changes</button>
+        </div>
+      `;
+      
+      document.getElementById('edit-question-details').innerHTML = details;
+      document.getElementById('edit-question-details').classList.remove('d-none');
+    }
+
+    async function updateQuestion() {
+      const round = document.getElementById('edit-round-select').value;
+      const questionIndex = document.getElementById('edit-question-select').value;
+      const questionText = document.getElementById('edit-question-text').value;
+      const optionA = document.getElementById('edit-option-a').value;
+      const optionB = document.getElementById('edit-option-b').value;
+      const optionC = document.getElementById('edit-option-c').value;
+      const optionD = document.getElementById('edit-option-d').value;
+      const answer = document.getElementById('edit-correct-answer').value;
+      const timer = document.getElementById('edit-timer').value;
+
+      if (!questionText) {
+        alert("Question text is required");
+        return;
+      }
+
+      let sheetName;
+      if (round === 'specialized') {
+        const subclass = document.getElementById('edit-subclass-select').value;
+        sheetName = `Specialized_${subclass.charAt(0).toUpperCase() + subclass.slice(1)}`;
+      } else {
+        sheetName = SHEET_NAMES[round];
+      }
+
+      // In a real implementation, you would update the specific row in the sheet
+      // This requires more complex Google Sheets API calls
+      alert("Question would be updated in a full implementation");
+      closeAdminModal();
+      loadAllQuestions();
+    }
+
+    function showRemoveQuestionForm() {
+      const form = `
+        <div class="mb-3">
+          <label class="form-label">Round:</label>
+          <select id="remove-round-select" class="form-select" onchange="loadQuestionsForRemoval()">
+            <option value="">-- Select Round --</option>
+            <option value="warmup">Warm-Up</option>
+            <option value="general">General</option>
+            <option value="audiovisual">Audio Visual</option>
+            <option value="health">Health</option>
+            <option value="specialized">Specialized</option>
+            <option value="rapidfire">Rapid Fire</option>
+          </select>
+        </div>
+        <div id="remove-subclass-field" class="mb-3 d-none">
+          <label class="form-label">Subclass:</label>
+          <select id="remove-subclass-select" class="form-select" onchange="loadQuestionsForRemoval()">
+            <option value="science">Science</option>
+            <option value="history">History</option>
+            <option value="riddle">Riddle</option>
+            <option value="sports">Sports</option>
+            <option value="geography">Geography</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Question:</label>
+          <select id="remove-question-select" class="form-select">
+            <option value="">-- Select Question --</option>
+          </select>
+        </div>
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-secondary" onclick="closeAdminModal()">Cancel</button>
+          <button class="btn btn-danger" onclick="confirmRemoveQuestion()">Delete Question</button>
+        </div>
+      `;
+      showAdminModal('Remove Question', form);
+    }
+
+    function loadQuestionsForRemoval() {
+      const round = document.getElementById('remove-round-select').value;
+      const subclassField = document.getElementById('remove-subclass-field');
+      
+      if (round === 'specialized') {
+        subclassField.classList.remove('d-none');
+        const subclass = document.getElementById('remove-subclass-select').value;
+        const questions = roundQuestions.specialized[subclass] || [];
+        populateRemoveQuestionSelect(questions);
+      } else if (round) {
+        subclassField.classList.add('d-none');
+        const questions = roundQuestions[round] || [];
+        populateRemoveQuestionSelect(questions);
+      }
+    }
+
+    function populateRemoveQuestionSelect(questions) {
+      const select = document.getElementById('remove-question-select');
+      select.innerHTML = '<option value="">-- Select Question --</option>';
+      
+      questions.forEach((q, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = q.question.substring(0, 50) + (q.question.length > 50 ? '...' : '');
+        select.appendChild(option);
+      });
+    }
+
+    function confirmRemoveQuestion() {
+      const round = document.getElementById('remove-round-select').value;
+      const questionIndex = document.getElementById('remove-question-select').value;
+      
+      if (!round || questionIndex === '') {
+        alert("Please select a question to remove");
+        return;
+      }
+
+      // In a real implementation, you would delete the question from the sheet
+      alert("Question would be removed in a full implementation");
+      closeAdminModal();
+      loadAllQuestions();
+    }
+
+    function roundChanged() {
+      currentRound = document.getElementById('round-selector').value;
+      document.getElementById('question-buttons').classList.add('d-none');
+      document.getElementById('specialized-subclass').classList.add('d-none');
+      document.getElementById('rapidfire-letters').classList.add('d-none');
+    }
+
+    function proceedToQuestionList() {
+      currentGroup = document.getElementById('group').value;
+      currentRound = document.getElementById('round-selector').value;
+      
+      if (!currentGroup) {
+        alert("Please select a group before proceeding.");
+        return;
+      }
+      if (!currentRound) {
+        alert("Please select a round before proceeding.");
+        return;
+      }
+
+      if (currentRound === 'specialized') {
+        document.getElementById('specialized-subclass').classList.remove('d-none');
+        document.getElementById('question-buttons').classList.add('d-none');
+      } 
+      else if (currentRound === 'rapidfire') {
+        showRapidFireLetterMenu();
+      }
+      else {
+        document.getElementById('specialized-subclass').classList.add('d-none');
+        loadRegularQuestions();
+      }
+    }
+
+    function loadRegularQuestions() {
+      const container = document.getElementById('question-list');
+      container.innerHTML = "";
+      
+      const questions = roundQuestions[currentRound];
+      for (let i = 0; i < questions.length; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline-primary m-2';
+        btn.textContent = i + 1;
+        
+        const isTransferred = transferredQuestions[currentRound][i + 1] && 
+                             transferredQuestions[currentRound][i + 1] !== currentGroup;
+        btn.disabled = lockedQuestions[currentRound].has(i + 1) || isTransferred;
+        
+        if (transferredQuestions[currentRound][i + 1]) {
+          const badge = document.createElement('span');
+          badge.className = 'badge bg-warning text-dark ms-2';
+          badge.textContent = `→G${transferredQuestions[currentRound][i + 1]}`;
+          btn.appendChild(badge);
+        }
+        
+        btn.onclick = () => showQuestion(i + 1);
+        container.appendChild(btn);
+      }
+      document.getElementById('question-buttons').classList.remove('d-none');
+    }
+
+    function loadSpecializedQuestions() {
+      currentSubclass = document.getElementById('subclass-selector').value;
+      if (!currentSubclass) {
+        alert("Please select a subclass");
+        return;
+      }
+
+      const container = document.getElementById('question-list');
+      container.innerHTML = "";
+      
+      const questions = roundQuestions.specialized[currentSubclass];
+      for (let i = 0; i < questions.length; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline-primary m-2';
+        btn.textContent = i + 1;
+        
+        const questionKey = `${currentSubclass}-${i + 1}`;
+        btn.disabled = lockedQuestions[currentRound].has(questionKey);
+        
+        btn.onclick = () => showSpecializedQuestion(i + 1);
+        container.appendChild(btn);
+      }
+      
+      document.getElementById('specialized-subclass').classList.add('d-none');
+      document.getElementById('question-buttons').classList.remove('d-none');
+    }
+
+    function showQuestion(index) {
+      currentQuestionIndex = index;
+      selectedOption = null;
+      const questionBox = document.getElementById('question-content');
+      const optionsContainer = document.getElementById('options-container');
+      const questions = roundQuestions[currentRound];
+      const currentQ = questions[(index - 1) % questions.length];
+      
+      const isTransferredToUs = transferredQuestions[currentRound][index] === currentGroup;
+      
+      questionBox.innerHTML = `<h5 class='question'>Question ${index}:</h5><p>${currentQ.question}</p>`;
+      if (isTransferredToUs) {
+        questionBox.innerHTML += `<div class="alert alert-warning mt-2">Transferred to your group</div>`;
+      }
+      
+      optionsContainer.innerHTML = '';
+      
+      if (currentQ.options && currentQ.options.length > 0) {
+        currentQ.options.forEach((option, i) => {
+          if (!option || option === 'A. ' || option === 'B. ' || option === 'C. ' || option === 'D. ') return;
+          
+          const optionDiv = document.createElement('div');
+          optionDiv.className = 'option';
+          optionDiv.textContent = option;
+          optionDiv.dataset.value = String.fromCharCode(65 + i);
+          optionDiv.onclick = function() {
+            document.querySelectorAll('.option').forEach(opt => {
+              opt.classList.remove('selected');
+            });
+            this.classList.add('selected');
+            selectedOption = this.dataset.value;
+          };
+          optionsContainer.appendChild(optionDiv);
+        });
+      }
+      
+      if (currentRound === 'specialized') {
+        document.getElementById('transfer-button').classList.add('d-none');
+      } else {
+        document.getElementById('transfer-button').classList.remove('d-none');
+      }
+      
+      document.getElementById('question-buttons').classList.add('d-none');
+      document.getElementById('question-container').classList.remove('d-none');
+    }
+
+    function showSpecializedQuestion(index) {
+      currentQuestionIndex = index;
+      selectedOption = null;
+      const questionBox = document.getElementById('question-content');
+      const optionsContainer = document.getElementById('options-container');
+      const questions = roundQuestions.specialized[currentSubclass];
+      const currentQ = questions[(index - 1) % questions.length];
+      
+      questionBox.innerHTML = `<h5 class='question'>Question ${index} (${currentSubclass}):</h5><p>${currentQ.question}</p>`;
+      
+      optionsContainer.innerHTML = '';
+      
+      const options = ['A. Option 1', 'B. Option 2', 'C. Option 3', 'D. Option 4'];
+      options.forEach((option, i) => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'option';
+        optionDiv.textContent = option;
+        optionDiv.dataset.value = String.fromCharCode(65 + i);
+        optionDiv.onclick = function() {
+          document.querySelectorAll('.option').forEach(opt => {
+            opt.classList.remove('selected');
+          });
+          this.classList.add('selected');
+          selectedOption = this.dataset.value;
+        };
+        optionsContainer.appendChild(optionDiv);
+      });
+      
+      document.getElementById('question-buttons').classList.add('d-none');
+      document.getElementById('question-container').classList.remove('d-none');
+    }
+
+    function showRapidFireLetterMenu() {
+      const container = document.getElementById('letter-buttons');
+      container.innerHTML = '';
+      
+      for (let i = 0; i < 10; i++) {
+        const letter = String.fromCharCode(65 + i);
+        const btn = document.createElement('button');
+        btn.className = `rapidfire-letter-btn ${completedRapidFireSets.has(letter) ? 'completed-letter' : ''}`;
+        btn.textContent = letter;
+        btn.disabled = completedRapidFireSets.has(letter);
+        btn.onclick = () => startRapidFireSet(letter);
+        container.appendChild(btn);
+      }
+      
+      document.getElementById('rapidfire-letters').classList.remove('d-none');
+    }
+
+    function startRapidFireSet(letter) {
+      currentRapidFireSet = letter;
+      currentRapidFireIndex = 0;
+      
+      document.getElementById('rapidfire-letters').classList.add('d-none');
+      document.getElementById('rapidfire-container').classList.remove('d-none');
+      
+      showRapidFireQuestion();
+    }
+
+    function showRapidFireQuestion() {
+      const startIndex = (currentRapidFireSet.charCodeAt(0) - 65) * 10;
+      const questionIndex = startIndex + currentRapidFireIndex;
+      
+      if (questionIndex < rapidFireQuestions.length) {
+        document.getElementById('rapidfire-question').textContent = 
+          `Question ${currentRapidFireIndex + 1}: ${rapidFireQuestions[questionIndex].question}`;
+        startRapidFireTimer();
+      } else {
+        completeRapidFireSet();
+      }
+    }
+
+    function startRapidFireTimer() {
+      clearInterval(rapidFireTimer);
+      let timeLeft = parseInt(rapidFireQuestions[(currentRapidFireSet.charCodeAt(0) - 65) * 10 + currentRapidFireIndex].timer) || 30;
+      document.getElementById('rapidfire-timer').textContent = timeLeft;
+      
+      rapidFireTimer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('rapidfire-timer').textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+          nextRapidFireQuestion();
+        }
+      }, 1000);
+    }
+
+    function nextRapidFireQuestion() {
+      clearInterval(rapidFireTimer);
+      currentRapidFireIndex++;
+      
+      if (currentRapidFireIndex < 10) {
+        showRapidFireQuestion();
+      } else {
+        completeRapidFireSet();
+      }
+    }
+
+    function completeRapidFireSet() {
+      completedRapidFireSets.add(currentRapidFireSet);
+      document.getElementById('rapidfire-container').classList.add('d-none');
+      showRapidFireLetterMenu();
+    }
+
+    function showTransferPopup() {
+      document.getElementById('transfer-popup').style.display = 'block';
+    }
+
+    function cancelTransfer() {
+      document.getElementById('transfer-popup').style.display = 'none';
+    }
+
+    function confirmTransfer() {
+      const transferGroup = document.getElementById('transfer-group').value;
+      if (!transferGroup) {
+        alert("Please select a group to transfer to");
+        return;
+      }
+      if (transferGroup === currentGroup) {
+        alert("You cannot transfer a question to your own group");
+        return;
+      }
+      
+      transferredQuestions[currentRound][currentQuestionIndex] = transferGroup;
+      
+      if (!scores[currentGroup]) {
+        scores[currentGroup] = { correct: 0, transferred: 0, wrong: 0 };
+      }
+      scores[currentGroup].transferred = (scores[currentGroup].transferred || 0) + 5;
+      
+      document.getElementById('transfer-popup').style.display = 'none';
+      
+      const feedback = document.getElementById('answer-feedback');
+      const message = document.getElementById('feedback-message');
+      message.innerHTML = `<div class="correct-feedback">Question transferred to Group ${transferGroup}!</div>`;
+      feedback.style.display = 'block';
+      
+      setTimeout(() => {
+        feedback.style.display = 'none';
+        document.getElementById('question-container').classList.add('d-none');
+        if (currentRound === 'specialized') {
+          loadSpecializedQuestions();
+        } else if (currentRound === 'rapidfire') {
+          showRapidFireLetterMenu();
+        } else {
+          proceedToQuestionList();
+        }
+      }, 3000);
+    }
+
+    function lockQuestion() {
+      if (currentQuestionIndex !== null && currentRound !== null) {
+        const questionKey = currentRound === 'specialized' ? 
+          `${currentSubclass}-${currentQuestionIndex}` : currentQuestionIndex;
+        
+        lockedQuestions[currentRound].add(questionKey);
+        
+        let currentQ;
+        if (currentRound === 'specialized') {
+          currentQ = roundQuestions.specialized[currentSubclass][(currentQuestionIndex - 1)];
+        } else if (currentRound === 'rapidfire') {
+          return;
+        } else {
+          currentQ = roundQuestions[currentRound][(currentQuestionIndex - 1)];
+        }
+        
+        if ((currentRound === 'general' || currentRound === 'health' || currentRound === 'specialized') && currentQ.options) {
+          if (!selectedOption) {
+            alert("Please select an option before submitting");
+            return;
+          }
+          
+          const isCorrect = currentRound === 'specialized' ? true : selectedOption === currentQ.answer;
+          showFeedback(isCorrect);
+          
+          setTimeout(() => {
+            updateScore(isCorrect ? 'correct' : 'wrong');
+            document.getElementById('question-container').classList.add('d-none');
+            if (currentRound === 'specialized') {
+              loadSpecializedQuestions();
+            } else if (currentRound === 'rapidfire') {
+              showRapidFireLetterMenu();
+            } else {
+              proceedToQuestionList();
+            }
+          }, 3000);
+        } else {
+          document.getElementById('score-popup').classList.remove('d-none');
+        }
+      }
+    }
+
+    function showFeedback(isCorrect) {
+      const feedback = document.getElementById('answer-feedback');
+      const message = document.getElementById('feedback-message');
+
+      if (isCorrect) {
+        message.innerHTML = '<div class="correct-feedback"><i class="fas fa-check-circle"></i> Correct Answer!</div>';
+      } else {
+        message.innerHTML = '<div class="wrong-feedback"><i class="fas fa-times-circle"></i> Incorrect Answer!</div>';
+      }
+
+      feedback.style.display = 'block';
+
+      setTimeout(() => {
+        feedback.style.display = 'none';
+      }, 3000);
+    }
+
+    function updateScore(type) {
+      if (!scores[currentGroup]) {
+        scores[currentGroup] = { correct: 0, transferred: 0, wrong: 0 };
+      }
+      if (type === 'correct') {
+        scores[currentGroup].correct += 10;
+      } else if (type === 'transferred') {
+        scores[currentGroup].transferred += 5;
+      } else {
+        scores[currentGroup].wrong += 1;
+      }
+    }
+
+    function markAnswer(type) {
+      updateScore(type);
+      document.getElementById('question-container').classList.add('d-none');
+      document.getElementById('score-popup').classList.add('d-none');
+      if (currentRound === 'specialized') {
+        loadSpecializedQuestions();
+      } else if (currentRound === 'rapidfire') {
+        showRapidFireLetterMenu();
+      } else {
+        proceedToQuestionList();
+      }
+    }
+
+    function showScoreboard() {
+      const tbody = document.getElementById('scoreboard-body');
+      tbody.innerHTML = "";
+      
+      const allGroups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+      
+      allGroups.forEach(group => {
+        const row = document.createElement('tr');
+        const groupScores = scores[group] || { correct: 0, transferred: 0, wrong: 0 };
+        const correct = groupScores.correct || 0;
+        const transferred = groupScores.transferred || 0;
+        const wrong = groupScores.wrong || 0;
+        const total = correct + transferred - wrong;
+        
+        row.innerHTML = `
+          <td>Group ${group}</td>
+          <td>${correct / 10}</td>
+          <td>${transferred / 5}</td>
+          <td>${wrong}</td>
+          <td>0</td>
+          <td>${total}</td>
+        `;
+        tbody.appendChild(row);
+      });
+      
+      document.getElementById('main-menu').classList.add('d-none');
+      document.getElementById('scoreboard').classList.remove('d-none');
+    }
+
+    function backToMain() {
+      document.getElementById('scoreboard').classList.add('d-none');
+      document.getElementById('rapidfire-container').classList.add('d-none');
+      document.getElementById('rapidfire-letters').classList.add('d-none');
+      document.getElementById('main-menu').classList.remove('d-none');
+    }
+  </script>
+</body>
+</html>

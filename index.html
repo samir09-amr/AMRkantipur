@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMR Club of Kantipur - Combating Antimicrobial Resistance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #f59e0b;
+            --accent: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+        
+        /* Optimized Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            pointer-events: none;
+            mix-blend-mode: difference;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease;
+            will-change: transform;
+        }
+        
+        .cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            will-change: transform;
+        }
+        
+        /* Optimized Particle Network */
+        .particle-network {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: rgba(59, 130, 246, 0.5);
+            transform: translate(-50%, -50%);
+            will-change: transform;
+        }
+        
+        /* Header & Navigation */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 50px;
+            margin-right: 15px;
+            transition: transform 0.5s ease;
+        }
+        
+        .logo:hover img {
+            transform: rotate(15deg);
+        }
+        
+        .logo-text h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-text p {
+            font-size: 0.9rem;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin: 0 15px;
+            position: relative;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            padding: 8px 0;
+            position: relative;
+        }
+        
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+            transform: translateX(-50%) scale(1);
+        }
+        
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            z-index: 1001;
+        }
+/* Admin Panel Styles */
+#admin-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+}
+
+#admin-modal > div {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 90%;
+}
+
+#admin-modal h2 {
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+}
+
+#admin-controls {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+#admin-edit-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+#admin-panel {
+    display: none;
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 300px;
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+#admin-panel h3 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+#content-selector, #content-editor {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+#content-editor {
+    height: 100px;
+}
+
+#save-text-btn, #save-logo-btn, #save-hero-btn, #admin-logout {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#admin-logout {
+    background: var(--accent);
+    width: 100%;
+}
+    <div style="background: white; padding: 2rem; border-radius: 10px; max-width: 400px; width: 90%;">
+        <h2 style="margin-bottom: 1.5rem; color: var(--primary);">Admin Login</h2>
+        <form id="admin-login-form">
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--dark);">Password</label>
+                <input type="password" id="admin-password" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px;" required>
+            </div>
+            <button type="submit" style="background: var(--primary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 5px; cursor: pointer; width: 100%;">Login</button>
+        </form>
+    </div>
+</div>
+    <button id="admin-edit-btn" style="background: var(--primary); color: white; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+        <i class="fas fa-edit"></i>
+    </button>
+    <div id="admin-panel" style="display: none; position: absolute; bottom: 70px; right: 0; width: 300px; background: white; border-radius: 10px; padding: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+        <h3 style="margin-bottom: 1rem; color: var(--primary);">Admin Panel</h3>
+        
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem;">Edit Text Content</label>
+            <select id="content-selector" style="width: 100%; padding: 0.5rem; margin-bottom: 1rem;">
+                <option value="">Select element to edit</option>
+                <!-- Options will be populated by JavaScript -->
+            </select>
+            <textarea id="content-editor" style="width: 100%; height: 100px; padding: 0.5rem; margin-bottom: 1rem;"></textarea>
+            <button id="save-text-btn" style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Save Text</button>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem;">Change Logo</label>
+            <input type="file" id="logo-upload" accept="image/*" style="margin-bottom: 1rem;">
+            <button id="save-logo-btn" style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Upload Logo</button>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem;">Change Hero Image</label>
+            <input type="file" id="hero-upload" accept="image/*" style="margin-bottom: 1rem;">
+            <button id="save-hero-btn" style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Upload Hero Image</button>
+        </div>
+        
+        <button id="admin-logout" style="background: var(--accent); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; width: 100%;">Logout</button>
+    </div>
+</div>
+        
+        /* Hero Section */
+        .hero {
+            height: 1000000vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                        url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            padding: 0 50%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            max-width: 80000px;
+            z-index: 10;
+            color: black;
+            transform: translateY(50px);
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards 0.5s;
+        }
+        
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            line-height: 7;
+            text-shadow: 0 5px 15px rgba(0, 0, 10, 0.3);
+            background: linear-gradient(to right, black, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero-content p {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: var(--secondary);
+            color: var(--dark);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: var(--dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Floating Elements (Optimized) */
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(2px);
+            animation: float 15s infinite linear;
+            will-change: transform;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-50px) rotate(180deg);
+            }
+        }
+        
+        /* About Section */
+        .about {
+            padding: 100px 5%;
+            background: white;
+            position: relative;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 4px;
+            background: var(--gradient);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .section-title p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            margin-top: 50px;
+        }
+        
+        .about-image {
+            flex: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+            transform: perspective(1000px) rotateY(-10deg);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            will-change: transform;
+        }
+        
+        .about-image:hover {
+            transform: perspective(1000px) rotateY(0deg);
+        }
+        
+        .about-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.8s ease;
+            will-change: transform;
+        }
+        
+        .about-image:hover img {
+            transform: scale(1.1);
+        }
+        
+        .about-text {
+            flex: 1;
+        }
+        
+        .about-text h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .about-text p {
+            margin-bottom: 20px;
+            line-height: 1.8;
+            color: #555;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            background: var(--light);
+            padding: 25px;
+            border-radius: 15px;
+            min-width: 150px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-10px);
+        }
+        
+        .stat-item h4 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-item p {
+            font-size: 1rem;
+            color: #666;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 100px 5%;
+            background: #f5f9ff;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+            will-change: transform;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            color: white;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            will-change: transform, background;
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, var(--secondary) 0%, #f97316 100%);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            padding: 100px 5%;
+            background: white;
+        }
+        
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: white;
+            padding: 60px 5% 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 3px;
+            background: var(--secondary);
+            bottom: 0;
+            left: 0;
+        }
+        
+        .footer-column p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+            display: block;
+        }
+        
+        .footer-links a:hover {
+            opacity: 1;
+            transform: translateX(5px);
+            color: var(--secondary);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--secondary);
+            color: var(--dark);
+            transform: translateY(-5px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.8;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero-content h1 {
+                font-size: 2.8rem;
+            }
+            
+            .about-content {
+                flex-direction: column;
+            }
+            
+            .about-image, .about-text {
+                flex: none;
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem 5%;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 80%;
+                height: 100vh;
+                background: white;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.5s ease;
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+            }
+            
+            .nav-links.active {
+                left: 0;
+            }
+            
+            .nav-links li {
+                margin: 20px 0;
+            }
+            
+            .hamburger {
+                display: block;
+                font-size: 1.8rem;
+                color: var(--primary);
+            }
+            
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero-content p {
+                font-size: 1rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Admin Login Modal -->
+<div id="admin-modal">
+    <div>
+        <h2>Admin Login</h2>
+        <form id="admin-login-form">
+            <div>
+                <label>Password</label>
+                <input type="password" id="admin-password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</div>
+
+<!-- Admin Controls (hidden by default) -->
+<div id="admin-controls">
+    <button id="admin-edit-btn">
+        <i class="fas fa-edit"></i>
+    </button>
+    <div id="admin-panel">
+        <h3>Admin Panel</h3>
+        
+        <div>
+            <label>Edit Text Content</label>
+            <select id="content-selector">
+                <option value="">Select element to edit</option>
+            </select>
+            <textarea id="content-editor"></textarea>
+            <button id="save-text-btn">Save Text</button>
+        </div>
+        
+        <div>
+            <label>Change Logo</label>
+            <input type="file" id="logo-upload" accept="image/*">
+            <button id="save-logo-btn">Upload Logo</button>
+        </div>
+        
+        <div>
+            <label>Change Hero Image</label>
+            <input type="file" id="hero-upload" accept="image/*">
+            <button id="save-hero-btn">Upload Hero Image</button>
+        </div>
+        
+        <button id="admin-logout">Logout</button>
+    </div>
+</div>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+    
+    <!-- Optimized Particle Network Background -->
+    <div class="particle-network"></div>
+    
+    <!-- Floating Elements -->
+    <div class="floating-elements">
+        <div class="floating-element" style="width: 100px; height: 100px; top: 20%; left: 10%;"></div>
+        <div class="floating-element" style="width: 150px; height: 150px; top: 60%; left: 80%;"></div>
+        <div class="floating-element" style="width: 80px; height: 80px; top: 80%; left: 20%;"></div>
+    </div>
+    
+    <!-- Header & Navigation -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <img src="https://drive.google.com/uc?export=view&id=1QQfC-ez2iZYVoy0-mPZhRBFcX5qrI7aO" alt="Logo">
+
+                <div class="logo-text">
+                    <h1>AMR Kantipur</h1>
+                    <p>Kantipur Health Initiative</p>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#members">Members</a></li>
+                <li><a href="#programs">Programs</a></li>
+                <li><a href="#courses">Courses</a></li>
+                <li><a href="#quiz">Quiz</a></li>
+                <li><a href="#mocktest">Mock Test</a></li>
+                <li><a href="#certification">Certification</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+            </ul>
+            <div class="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Combating Antimicrobial Resistance Together</h1>
+            <p>Join our initiative to promote responsible antibiotic use, conduct health programs, and create a healthier community in Kantipur through education and awareness.</p>
+            <div class="cta-buttons">
+                <a href="#members" class="btn btn-primary">Know Us</a>
+                <a href="#programs" class="btn btn-secondary">Our Programs</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="section-title">
+            <h2>About AMR Club</h2>
+            <p>We are a dedicated group of health professionals and enthusiasts working to combat antimicrobial resistance through education and community engagement.</p>
+        </div>
+        <div class="about-content">
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="AMR Club Members">
+            </div>
+            <div class="about-text">
+                <h3>Our Mission to Combat AMR in Kantipur</h3>
+                <p>The AMR Club of Kantipur was established with the goal of creating awareness about antimicrobial resistance and promoting responsible use of antibiotics in our community.</p>
+                <p>We conduct regular health camps, educational workshops, and awareness programs in schools and colleges to spread knowledge about AMR and its impact on public health.</p>
+                <div class="stats">
+                    <div class="stat-item">
+                        <h4>50+</h4>
+                        <p>Members</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>25+</h4>
+                        <p>Programs</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>1000+</h4>
+                        <p>People Reached</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="section-title">
+            <h2>Our Initiatives</h2>
+            <p>Discover our comprehensive programs designed to educate, engage, and empower the community against antimicrobial resistance.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Community Outreach</h3>
+                <p>Engaging local communities through awareness campaigns, health camps, and interactive sessions about AMR prevention.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>Education Programs</h3>
+                <p>Structured courses and workshops for students, healthcare professionals, and the general public about AMR.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <h3>Research & Data</h3>
+                <p>Conducting research on antibiotic usage patterns and resistance trends in our local community.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Sections -->
+    <section class="main-content" id="members">
+        <div class="content-container">
+            <h2>Our Members</h2>
+            <div id="members-detail">
+                <!-- Content will be loaded from members.html -->
+                <iframe src="members.html" style="width:100%; height:800px; border:none;"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section class="main-content" id="programs">
+        <div class="content-container">
+            <h2>Programs Conducted</h2>
+            <div id="programs-conducted">
+                <!-- Content will be loaded from programs.html -->
+                <iframe src="programs.html" style="width:100%; height:800px; border:none;"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section class="main-content" id="courses">
+        <div class="content-container">
+            <h2>Our Courses</h2>
+            <div id="courses-offered">
+                <!-- Content will be loaded from courses.html -->
+                <iframe src="courses.html" style="width:100%; height:800px; border:none;"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section class="main-content" id="quiz">
+        <div class="content-container">
+            <h2>AMR Quizzes</h2>
+            <div id="quiz-section">
+                <!-- Content will be loaded from quiz.html -->
+                <iframe src="quiz.html" style="width:100%; height:800px; border:none;"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section class="main-content" id="mocktest">
+        <div class="content-container">
+            <h2>Mock Tests</h2>
+            <div id="mock-test-section">
+                <!-- Content will be loaded from mocktest.html -->
+                <iframe src="mocktest.html" style="width:100%; height:800px; border:none;"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section class="main-content" id="certification">
+        <div class="content-container">
+            <h2>Certification</h2>
+            <div id="certification-section">
+                <!-- Content will be loaded from certification.html -->
+                <iframe src="certification.html" style="width:100%; height:800px; border:none;"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section class="main-content" id="contact">
+        <div class="content-container">
+            <h2>Contact Us</h2>
+            <div id="contact-section">
+                <!-- Content will be loaded from contact.html -->
+                <iframe src="contact.html" style="width:100%; height:800px; border:none;"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>About AMR Club</h3>
+                <p>The AMR Club of Kantipur is a student-led initiative focused on combating antimicrobial resistance through education, awareness, and community engagement.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#members">Members</a></li>
+                    <li><a href="#programs">Programs</a></li>
+                    <li><a href="#courses">Courses</a></li>
+                    <li><a href="#quiz">Quiz</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="#mocktest">Mock Tests</a></li>
+                    <li><a href="#certification">Certification</a></li>
+                    <li><a href="#">Research Papers</a></li>
+                    <li><a href="#">AMR Guidelines</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Contact Info</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Kantipur Medical College, Kathmandu</p>
+                <p><i class="fas fa-phone"></i> +977 1234567890</p>
+                <p><i class="fas fa-envelope"></i> info@amrkantipur.edu.np</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 AMR Club of Kantipur. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+// Admin Portal Functionality
+const ADMIN_PASSWORD = "samirss"; // Change this to your desired password
+let isAdmin = false;
+
+// Check for admin session on page load
+document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('adminLoggedIn')) {
+        isAdmin = true;
+        showAdminControls();
+    } else {
+        // Show login modal after 5 seconds (for demo purposes)
+        setTimeout(() => {
+            document.getElementById('admin-modal').style.display = 'flex';
+        }, 5000);
+    }
+});
+
+// Login form handler
+document.getElementById('admin-login-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const password = document.getElementById('admin-password').value;
+    
+    if (password === ADMIN_PASSWORD) {
+        isAdmin = true;
+        localStorage.setItem('adminLoggedIn', 'true');
+        document.getElementById('admin-modal').style.display = 'none';
+        showAdminControls();
+    } else {
+        alert('Incorrect password');
+    }
+});
+
+// Logout handler
+document.getElementById('admin-logout').addEventListener('click', () => {
+    isAdmin = false;
+    localStorage.removeItem('adminLoggedIn');
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('admin-controls').style.display = 'none';
+    document.getElementById('admin-modal').style.display = 'flex';
+});
+
+// Toggle admin panel
+document.getElementById('admin-edit-btn').addEventListener('click', () => {
+    const panel = document.getElementById('admin-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+});
+
+function showAdminControls() {
+    document.getElementById('admin-controls').style.display = 'block';
+    
+    // Populate content selector
+    const selector = document.getElementById('content-selector');
+    selector.innerHTML = '<option value="">Select element to edit</option>';
+    
+    // Add all editable text elements
+    const editableElements = document.querySelectorAll('h1, h2, h3, p:not(.footer-bottom p), li, .hero-content p, .about-text p, .feature-card p');
+    editableElements.forEach((el, index) => {
+        if (el.textContent.trim() && !el.querySelector('i')) { // Skip empty elements and icons
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = el.textContent.substring(0, 30) + (el.textContent.length > 30 ? '...' : '');
+            selector.appendChild(option);
+            
+            // Store reference to element
+            el.dataset.adminId = index;
+        }
+    });
+    
+    // Set up text editor
+    selector.addEventListener('change', (e) => {
+        const id = e.target.value;
+        if (id) {
+            const element = document.querySelector(`[data-admin-id="${id}"]`);
+            document.getElementById('content-editor').value = element.textContent;
+        } else {
+            document.getElementById('content-editor').value = '';
+        }
+    });
+    
+    // Save text handler
+    document.getElementById('save-text-btn').addEventListener('click', () => {
+        const id = document.getElementById('content-selector').value;
+        const newText = document.getElementById('content-editor').value;
+        
+        if (id && newText) {
+            const element = document.querySelector(`[data-admin-id="${id}"]`);
+            element.textContent = newText;
+            alert('Text updated successfully!');
+        }
+    });
+    
+    // Logo upload handler
+    document.getElementById('save-logo-btn').addEventListener('click', () => {
+        const fileInput = document.getElementById('logo-upload');
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                document.querySelector('.logo img').src = e.target.result;
+                alert('Logo updated successfully!');
+            };
+            
+            reader.readAsDataURL(file);
+        } else {
+            alert('Please select a logo image first');
+        }
+    });
+    
+    // Hero image upload handler
+    document.getElementById('save-hero-btn').addEventListener('click', () => {
+        const fileInput = document.getElementById('hero-upload');
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                document.querySelector('.hero').style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${e.target.result})`;
+                alert('Hero image updated successfully!');
+            };
+            
+            reader.readAsDataURL(file);
+        } else {
+            alert('Please select a hero image first');
+        }
+    });
+}
+        // Optimized Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        let mouseX = 0, mouseY = 0;
+        let followerX = 0, followerY = 0;
+        let isMoving = false;
+        
+        // Throttled mousemove handler
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+            
+            if (!isMoving) {
+                isMoving = true;
+                requestAnimationFrame(updateFollower);
+            }
+        });
+        
+        function updateFollower() {
+            followerX += (mouseX - followerX) / 8;
+            followerY += (mouseY - followerY) / 8;
+            
+            cursorFollower.style.left = followerX + 'px';
+            cursorFollower.style.top = followerY + 'px';
+            
+            if (Math.abs(mouseX - followerX) > 0.1 || Math.abs(mouseY - followerY) > 0.1) {
+                requestAnimationFrame(updateFollower);
+            } else {
+                isMoving = false;
+            }
+        }
+        
+        // Interactive cursor effects
+        const interactiveElements = document.querySelectorAll('a, button, .feature-card, .stat-item');
+        
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                cursor.style.backgroundColor = 'var(--accent)';
+                cursorFollower.style.borderColor = 'var(--accent)';
+                cursorFollower.style.transform = 'translate(-50%, -50%) scale(0.8)';
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+                cursor.style.backgroundColor = 'var(--secondary)';
+                cursorFollower.style.borderColor = 'var(--primary)';
+                cursorFollower.style.transform = 'translate(-50%, -50%) scale(1)';
+            });
+        });
+        
+        // Optimized Particle Network
+        const particleNetwork = document.querySelector('.particle-network');
+        const particles = [];
+        const particleCount = 30; // Reduced from 50 for better performance
+        const maxDistance = 150;
+        let animationId;
+        
+        // Create particles
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particleNetwork.appendChild(particle);
+            
+            particles.push({
+                element: particle,
+                x: Math.random() * 100,
+                y: Math.random() * 100,
+                vx: Math.random() * 2 - 1,
+                vy: Math.random() * 2 - 1
+            });
+        }
+        
+        // Optimized particle animation
+        function animateParticles() {
+            const linesToDraw = [];
+            
+            // First pass: update positions and find connections
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                
+                // Update position
+                p.x += p.vx * 0.1;
+                p.y += p.vy * 0.1;
+                
+                // Bounce off edges
+                if (p.x < 0 || p.x > 100) p.vx *= -1;
+                if (p.y < 0 || p.y > 100) p.vy *= -1;
+                
+                // Apply position
+                p.element.style.left = p.x + '%';
+                p.element.style.top = p.y + '%';
+                
+                // Find connections
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = (p.x - p2.x) * window.innerWidth / 100;
+                    const dy = (p.y - p2.y) * window.innerHeight / 100;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < maxDistance) {
+                        linesToDraw.push({
+                            x1: p.x,
+                            y1: p.y,
+                            x2: p2.x,
+                            y2: p2.y,
+                            opacity: 1 - distance / maxDistance
+                        });
+                    }
+                }
+            }
+            
+            // Clear previous frame
+            const existingLines = document.querySelectorAll('.particle-line');
+            existingLines.forEach(line => line.remove());
+            
+            // Draw new connections
+            linesToDraw.forEach(line => {
+                const dx = (line.x2 - line.x1) * window.innerWidth / 100;
+                const dy = (line.y2 - line.y1) * window.innerHeight / 100;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx);
+                
+                const lineElement = document.createElement('div');
+                lineElement.className = 'particle-line';
+                lineElement.style.position = 'absolute';
+                lineElement.style.left = line.x1 + '%';
+                lineElement.style.top = line.y1 + '%';
+                lineElement.style.width = distance + 'px';
+                lineElement.style.height = '1px';
+                lineElement.style.backgroundColor = `rgba(59, 130, 246, ${line.opacity})`;
+                lineElement.style.transformOrigin = '0 0';
+                lineElement.style.transform = `rotate(${angle}rad)`;
+                lineElement.style.zIndex = '-1';
+                particleNetwork.appendChild(lineElement);
+            });
+            
+            animationId = requestAnimationFrame(animateParticles);
+        }
+        
+        // Start particle animation only when tab is visible
+        function handleVisibilityChange() {
+            if (document.visibilityState === 'visible') {
+                if (!animationId) {
+                    animateParticles();
+                }
+            } else {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+            }
+        }
+        
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        animateParticles();
+        
+        // Mobile Navigation Toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('fa-bars');
+            hamburger.classList.toggle('fa-times');
+        });
+        
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                hamburger.classList.add('fa-bars');
+                hamburger.classList.remove('fa-times');
+            });
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Optimized scroll handler for navbar
+        let lastScrollY = window.scrollY;
+        let ticking = false;
+        
+        window.addEventListener('scroll', () => {
+            lastScrollY = window.scrollY;
+            
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const navbar = document.querySelector('.navbar');
+                    if (lastScrollY > 50) {
+                        navbar.style.padding = '1rem 5%';
+                        navbar.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.1)';
+                    } else {
+                        navbar.style.padding = '1.5rem 5%';
+                        navbar.style.boxShadow = 'none';
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        
+        // Animate elements when they come into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.about-content, .feature-card, .section-title').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+            element.style.transition = 'all 0.6s ease';
+            observer.observe(element);
+        });
+        
+        // Logo animation on hover
+        const logoImg = document.getElementById('logo-img');
+        logoImg.addEventListener('mouseenter', () => {
+            logoImg.style.transform = 'rotate(15deg) scale(1.1)';
+        });
+        
+        logoImg.addEventListener('mouseleave', () => {
+            logoImg.style.transform = 'rotate(0) scale(1)';
+        });
+        
+        // Pause animations when tab is not visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                cancelAnimationFrame(animationId);
+            } else {
+                animateParticles();
+            }
+        });
+    </script>
+</body>
+</html>

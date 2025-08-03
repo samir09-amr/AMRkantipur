@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduSphere - Courses</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      animation: fadeIn 1s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    header, .cards { transition: opacity 0.4s ease; }
+    header {
+      background: linear-gradient(90deg, #7f5af0, #6c5ce7);
+      padding: 60px 20px;
+      text-align: center;
+      color: white;
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+    }
+    header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    header p { font-size: 1.1rem; opacity: 0.9; }
+    .cards {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 40px auto;
+      flex-wrap: wrap;
+    }
+    .card {
+      background: white;
+      width: 280px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    .card:hover { transform: translateY(-8px); }
+    .card-top {
+      padding: 40px 0;
+      font-size: 3rem;
+      color: white;
+    }
+    .pink { background-color: #ff6b81; }
+    .blue { background-color: #74b9ff; }
+    .card-content { padding: 20px; }
+    .card-content h3 { margin-bottom: 10px; font-size: 1.2rem; color: #2d3436; }
+    .card-content p { font-size: 0.95rem; color: #636e72; margin-bottom: 15px; }
+    .section {
+      display: none;
+      margin: 30px auto;
+      padding: 30px;
+      max-width: 1000px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      animation: fadeIn 0.5s ease-out;
+    }
+    .section.active { display: block; }
+    .section h2 {
+      color: #6c5ce7;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .folder-title {
+      font-size: 1.1rem;
+      margin: 20px 0 10px;
+      font-weight: bold;
+      color: #2d3436;
+    }
+    .file-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .file-card {
+      width: 320px;
+      background: #f8f9fa;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      text-align: center;
+      padding: 10px;
+    }
+    .file-card iframe {
+      width: 100%;
+      height: 250px;
+      border: none;
+    }
+    .file-card h4 {
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+    .back-btn {
+      display: block;
+      margin: 30px auto 0;
+      background: #6c5ce7;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header id="landing-header">
+    <h1>Welcome to EduSphere</h1>
+    <p>Your gateway to interactive learning experiences</p>
+  </header>
+
+  <div class="cards" id="landing-cards">
+    <div class="card" onclick="toggleSection('club-course')">
+      <div class="card-top pink">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <div class="card-content">
+        <h3>Club Course</h3>
+        <p>Explore our collection of club courses</p>
+      </div>
+    </div>
+    <div class="card" onclick="toggleSection('pharmacy-course')">
+      <div class="card-top blue">
+        <i class="fas fa-flask"></i>
+      </div>
+      <div class="card-content">
+        <h3>Bachelor in Pharmacy</h3>
+        <p>Comprehensive resources for pharmacy students</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="club-course">
+    <h2>Club Course</h2>
+    <div id="club-content"></div>
+    <button class="back-btn" onclick="goBack()">Back to Courses</button>
+  </div>
+
+  <div class="section" id="pharmacy-course">
+    <h2>Bachelor in Pharmacy</h2>
+    <div id="pharmacy-content"></div>
+    <button class="back-btn" onclick="goBack()">Back to Courses</button>
+  </div>
+
+  <script>
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQGEc5M4ADtoZZvp7V08ALtQMQ7rPtAdk6TPV83_tp1h9fQZqJcTETG7Ar0ZX_8GJ-Tu69FBgHg2TyE/pub?output=csv";
+    const folderTargets = {
+      'Club Course': 'club-content',
+      'Pharmacy Course': 'pharmacy-content'
+    };
+
+    fetch(sheetURL)
+      .then(res => res.text())
+      .then(text => {
+        const rows = text.split('\n').slice(1);
+        const data = {};
+        rows.forEach(row => {
+          const columns = row.match(/(?:"[^"]*"|[^,])+/g);
+          if (!columns || columns.length < 4) return;
+          const [folder, subfolder, title, link] = columns.map(col => col.replace(/^"|"$/g, '').trim());
+          if (!folderTargets[folder]) return;
+          if (!data[folder]) data[folder] = {};
+          if (!data[folder][subfolder]) data[folder][subfolder] = [];
+          data[folder][subfolder].push({ title, link });
+        });
+
+        for (const folder in data) {
+          const container = document.getElementById(folderTargets[folder]);
+          for (const sub in data[folder]) {
+            const section = document.createElement('div');
+            section.innerHTML = `<div class="folder-title">${sub}</div>`;
+            const fileList = document.createElement('div');
+            fileList.className = 'file-list';
+            data[folder][sub].forEach(item => {
+              const card = document.createElement('div');
+              card.className = 'file-card';
+              card.innerHTML = `
+                <iframe src="${item.link}"></iframe>
+                <h4>${item.title}</h4>`;
+              fileList.appendChild(card);
+            });
+            section.appendChild(fileList);
+            container.appendChild(section);
+          }
+        }
+      });
+
+    function toggleSection(id) {
+      document.getElementById('landing-header').style.display = 'none';
+      document.getElementById('landing-cards').style.display = 'none';
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goBack() {
+      document.getElementById('landing-header').style.display = 'block';
+      document.getElementById('landing-cards').style.display = 'flex';
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
