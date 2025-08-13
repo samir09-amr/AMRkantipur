@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #000000;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --gold-color: #d4af37;
+            --border-color: #3498db;
+        }
+        
+        body {
+            font-family: 'Times New Roman', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            color: var(--dark-color);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .preview-mode .admin-portal {
+            display: none;
+        }
+        
+        .preview-mode .certificate-preview {
+            display: block;
+        }
+        
+        .certificate-preview {
+            text-align: center;
+            margin: 50px auto;
+            max-width: 800px;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .certificate-preview h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .open-admin-btn {
+            margin: 30px auto;
+            display: inline-flex;
+            padding: 12px 24px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .open-admin-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .open-admin-btn i {
+            font-size: 18px;
+        }
+        
+        .controls {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .controls h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 28px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        input[type="text"], 
+        input[type="date"],
+        textarea,
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            padding: 2px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        input[type="text"]:focus, 
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus,
+        input[type="number"]:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+        
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button i {
+            font-size: 18px;
+        }
+        
+        .primary-btn {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .primary-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .success-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .success-btn:hover {
+            background-color: #219653;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .danger-btn {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .danger-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .secondary-btn {
+            background-color: #bdc3c7;
+            color: var(--dark-color);
+        }
+        
+        .secondary-btn:hover {
+            background-color: #95a5a6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .certificate-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        
+        .certificate {
+            position: relative;
+            width: 297mm;
+            height: 210mm;
+            background: white;
+            padding: 40px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            animation: fadeIn 0.8s ease-out;
+            page-break-after: always;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .certificate:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .certificate-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .certificate-header {
+            text-align: center;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .logo-title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .certificate-logo {
+            max-height: 80px;
+            max-width: 150px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            position: absolute;
+            left: 20px;
+        }
+        
+        .certificate-logo-right {
+            max-height: 80px;
+            max-width: 150px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            position: absolute;
+            right: 20px;
+        }
+        
+        .certificate-title {
+            margin-bottom: 5px;
+            animation: slideInDown 0.8s ease-out;
+            position: relative;
+            text-align: center;
+            flex-grow: 1;
+        }
+        
+        @keyframes slideInDown {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .certificate-title h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 60px;
+            color: #000000;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .certificate-title h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-color), #f1c40f, var(--gold-color));
+            border-radius: 3px;
+        }
+        
+        .certificate-title h2 {
+            font-size: 28px;
+            color: #000000;
+            font-weight: normal;
+            letter-spacing: 2px;
+            font-style: italic;
+            margin-top: 15px;
+        }
+        
+        .certificate-body {
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px 0;
+        }
+        
+        .certificate-presented {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #000000;
+            animation: fadeIn 1s ease-out;
+            font-style: italic;
+        }
+        
+        .certificate-name {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 5px 0;
+            color: #000000;
+            padding: 5px 0;
+            display: inline-block;
+            animation: rubberBand 1s ease-out;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .certificate-name::before, .certificate-name::after {
+            content: "✧";
+            color: var(--gold-color);
+            margin: 0 15px;
+            font-size: 24px;
+        }
+        
+        @keyframes rubberBand {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.1); }
+            40% { transform: scale(0.9); }
+            60% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        
+        .certificate-text {
+            font-size: 20px;
+            line-height: 1.6;
+            margin: 15px 0;
+            color: #000000;
+            animation: fadeIn 1.2s ease-out;
+            position: relative;
+            padding: 0 50px;
+        }
+        
+        .certificate-text::before, .certificate-text::after {
+            content: """;
+            position: absolute;
+            font-size: 60px;
+            color: rgba(212, 175, 55, 0.3);
+            font-family: 'Times New Roman', serif;
+        }
+        
+        .certificate-text::before {
+            top: -30px;
+            left: 10px;
+        }
+        
+        .certificate-text::after {
+            bottom: -50px;
+            right: 10px;
+        }
+        
+        .certificate-details {
+            font-size: 18px;
+            margin-top: 50px;
+            margin-bottom: 30px;
+            color: #000000;
+            animation: fadeIn 1.4s ease-out;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        
+        .certificate-details span {
+            position: relative;
+            padding: 0 15px;
+            color: #000000;
+            font-weight: 600;
+        }
+        
+        .certificate-details span::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: -15px;
+            width: 6px;
+            height: 6px;
+            background-color: var(--gold-color);
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .signatures {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            animation: fadeIn 1.6s ease-out;
+            position: relative;
+        }
+        
+        .signature {
+            text-align: center;
+            position: relative;
+            min-width: 200px;
+        }
+        
+        .signature-image-container {
+            height: 60px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .signature-image {
+            max-height: 60px;
+            max-width: 180px;
+            object-fit: contain;
+        }
+        
+        .signature-line {
+            width: 180px;
+            border-top: 1px solid #000;
+            margin: 0 auto 10px auto;
+        }
+        
+        .signature-name {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #000000;
+        }
+        
+        .signature-title {
+            font-size: 16px;
+            color: #000000;
+            font-style: italic;
+        }
+        
+        .certificate-checkbox-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+        }
+        
+        .certificate-checkbox-label {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--secondary-color);
+            border-radius: 4px;
+            background-color: white;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        .certificate-checkbox {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        .certificate-checkbox:checked + .certificate-checkbox-label {
+            background-color: var(--secondary-color);
+            position: relative;
+        }
+        
+        .certificate-checkbox:checked + .certificate-checkbox-label::after {
+            content: "✓";
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .logo-upload-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .logo-upload-group {
+            flex: 1;
+        }
+        
+        .signature-upload-container {
+            margin-top: 15px;
+        }
+        
+        .spreadsheet-upload {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f1f5f9;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .spreadsheet-upload h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        .file-upload {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .file-upload-label {
+            padding: 12px 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .file-upload-label:hover {
+            background-color: #2980b9;
+        }
+        
+        #spreadsheetFile, .logo-upload, .signature-upload {
+            display: none;
+        }
+        
+        .file-name {
+            font-size: 14px;
+            color: #555;
+        }
+        
+        #spreadsheetData {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 15px;
+            resize: vertical;
+        }
+        
+        .signatory-container {
+            margin-top: 15px;
+        }
+        
+        .signatory {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .signatory input {
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .status-message {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .qr-container {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .qr-code {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 5px;
+            background: white;
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .certificate-id {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #000000;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 1000px) {
+            .certificate {
+                width: 100%;
+                height: auto;
+                padding: 30px;
+            }
+            
+            .certificate-title h1 {
+                font-size: 40px;
+            }
+            
+            .certificate-title h2 {
+                font-size: 22px;
+            }
+            
+            .certificate-name {
+                font-size: 32px;
+            }
+            
+            .certificate-text {
+                padding: 0 20px;
+            }
+            
+            .logo-title-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .certificate-logo, .certificate-logo-right {
+                position: relative;
+                left: auto;
+                right: auto;
+                margin-bottom: 15px;
+            }
+            
+            .qr-container {
+                position: relative;
+                bottom: auto;
+                left: auto;
+                transform: none;
+                margin: 20px auto;
+            }
+        }
+
+        .canva-background-control {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .canva-background-control label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .canva-preview {
+            margin-top: 15px;
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body class="preview-mode">
+    <div class="container">
+        <div class="certificate-preview">
+            <h2>Certificate Generator</h2>
+            <p>Welcome to the certificate generator. Click the button below to access the admin portal and create custom certificates.</p>
+            <button class="open-admin-btn" onclick="openAdminPortal()">
+                <i class="fas fa-lock"></i> Open Admin Portal
+            </button>
+        </div>
+
+        <div class="admin-portal">
+            <div class="controls">
+                <h2>Premium Certificate Generator with Canva</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="idPrefix">Certificate ID Prefix</label>
+                        <input type="text" id="idPrefix" value="TACK" placeholder="Enter prefix for certificate IDs">
+                    </div>
+                </div>
+                
+                <div class="canva-background-control">
+                    <label>Certificate Background Image</label>
+                    <div class="file-upload">
+                        <label for="canvaUpload" class="file-upload-label">
+                            <i class="fas fa-file-upload"></i> Upload Background
+                        </label>
+                        <input type="file" id="canvaUpload" accept="image/*">
+                        <span id="canvaFileName" class="file-name">No background chosen</span>
+                    </div>
+                    <img id="canvaPreview" class="canva-preview" alt="Background Preview">
+                    <p style="margin-top: 10px; font-size: 14px; color: #666;">
+                        <i class="fas fa-info-circle"></i> For best results, download your Canva design and upload it here
+                    </p>
+                </div>
+                
+                <div class="logo-upload-container">
+                    <div class="logo-upload-group">
+                        <label>Left Logo (Organization)</label>
+                        <div class="file-upload">
+                            <label for="logo1" class="file-upload-label">
+                                <i class="fas fa-file-upload"></i> Choose Logo
+                            </label>
+                            <input type="file" id="logo1" class="logo-upload" accept="image/*">
+                            <span id="logo1Name" class="file-name">No logo chosen</span>
+                        </div>
+                    </div>
+                    <div class="logo-upload-group">
+                        <label>Right Logo (Partner/Sponsor)</label>
+                        <div class="file-upload">
+                            <label for="logo2" class="file-upload-label">
+                                <i class="fas fa-file-upload"></i> Choose Logo
+                            </label>
+                            <input type="file" id="logo2" class="logo-upload" accept="image/*">
+                            <span id="logo2Name" class="file-name">No logo chosen</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="templateSelect">Certificate Template</label>
+                        <select id="templateSelect">
+                            <option value="participation">Participation</option>
+                            <option value="achievement">Achievement</option>
+                            <option value="appreciation">Appreciation</option>
+                            <option value="excellence">Excellence</option>
+                            <option value="completion">Completion</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="certificateTitle">Main Title</label>
+                        <input type="text" id="certificateTitle" value="CERTIFICATE">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="certificateType">Certificate Type</label>
+                        <input type="text" id="certificateType" value="OF PARTICIPATION">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="presentedText">Presented Text</label>
+                    <input type="text" id="presentedText" value="This certificate is proudly presented to">
+                </div>
+                
+                <div class="form-group">
+                    <label for="certificateText">Certificate Text</label>
+                    <textarea id="certificateText">for successfully completing the program and demonstrating exceptional commitment and dedication throughout the course duration.</textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="textColor">Text Color</label>
+                        <input type="color" id="textColor" value="#000000">
+                    </div>
+                    <div class="form-group">
+                        <label for="fontFamily">Font Family</label>
+                        <select id="fontFamily">
+                            <option value="'Times New Roman', serif">Times New Roman</option>
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                            <option value="Georgia, serif">Georgia</option>
+                            <option value="'Montserrat', sans-serif">Montserrat</option>
+                            <option value="'Playfair Display', serif">Playfair Display</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="titleFontSize">Title Font Size (px)</label>
+                        <input type="number" id="titleFontSize" value="60" min="10" max="120">
+                    </div>
+                    <div class="form-group">
+                        <label for="nameFontSize">Name Font Size (px)</label>
+                        <input type="number" id="nameFontSize" value="42" min="10" max="100">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bodyFontSize">Body Font Size (px)</label>
+                        <input type="number" id="bodyFontSize" value="20" min="8" max="40">
+                    </div>
+                    <div class="form-group">
+                        <label for="textAlignment">Text Alignment</label>
+                        <select id="textAlignment">
+                            <option value="center">Center</option>
+                            <option value="left">Left</option>
+                            <option value="right">Right</option>
+                            <option value="justify">Justify</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fontWeight">Font Weight</label>
+                        <select id="fontWeight">
+                            <option value="normal">Normal</option>
+                            <option value="bold">Bold</option>
+                            <option value="600">Semi-bold</option>
+                            <option value="700">Bold</option>
+                            <option value="900">Extra bold</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="textShadow">Text Shadow</label>
+                        <select id="textShadow">
+                            <option value="none">None</option>
+                            <option value="1px 1px 2px rgba(0,0,0,0.3)">Subtle</option>
+                            <option value="2px 2px 4px rgba(0,0,0,0.5)">Medium</option>
+                            <option value="3px 3px 6px rgba(0,0,0,0.7)">Strong</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lineHeight">Line Height</label>
+                        <input type="number" id="lineHeight" value="1.6" min="1" max="3" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="letterSpacing">Letter Spacing (px)</label>
+                        <input type="number" id="letterSpacing" value="0" min="-2" max="10" step="0.1">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dateText">Date</label>
+                        <input type="date" id="dateText">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="venueText">Venue</label>
+                        <input type="text" id="venueText" value="Online">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Signatories</label>
+                    <div id="signatoryContainer" class="signatory-container">
+                        <div class="signatory">
+                            <input type="text" class="signatoryName" placeholder="Name" value="John Doe">
+                            <input type="text" class="signatoryTitle" placeholder="Title" value="Director">
+                            <div class="file-upload">
+                                <label for="signature1" class="file-upload-label signature-upload-label">
+                                    <i class="fas fa-signature"></i> Signature
+                                </label>
+                                <input type="file" id="signature1" class="signature-upload" accept="image/*">
+                                <span class="file-name signature-file-name">No signature chosen</span>
+                            </div>
+                        </div>
+                        <div class="signatory">
+                            <input type="text" class="signatoryName" placeholder="Name" value="Jane Smith">
+                            <input type="text" class="signatoryTitle" placeholder="Title" value="Manager">
+                            <div class="file-upload">
+                                <label for="signature2" class="file-upload-label signature-upload-label">
+                                    <i class="fas fa-signature"></i> Signature
+                                </label>
+                                <input type="file" id="signature2" class="signature-upload" accept="image/*">
+                                <span class="file-name signature-file-name">No signature chosen</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="secondary-btn" onclick="addSignatory()"><i class="fas fa-plus"></i> Add Signatory</button>
+                        <button class="secondary-btn" onclick="removeSignatory()"><i class="fas fa-minus"></i> Remove Signatory</button>
+                    </div>
+                </div>
+                
+                <div class="spreadsheet-upload">
+                    <h3>Spreadsheet Data</h3>
+                    <p>Upload your participant data (CSV format):</p>
+                    
+                    <div class="file-upload">
+                        <label for="spreadsheetFile" class="file-upload-label">
+                            <i class="fas fa-file-upload"></i> Choose File
+                        </label>
+                        <input type="file" id="spreadsheetFile" accept=".csv">
+                        <span id="fileName" class="file-name">No file chosen</span>
+                    </div>
+                    
+                    <p>Or paste CSV data below:</p>
+                    <textarea id="spreadsheetData" placeholder="Name,Email,Program,Score&#10;John Doe,john@example.com,Web Development,95%&#10;Jane Smith,jane@example.com,Data Science,98%"></textarea>
+                    
+                    <div class="button-group">
+                        <button class="primary-btn" onclick="loadSpreadsheetData()" id="loadDataBtn">
+                            <i class="fas fa-sync-alt"></i> Load Data
+                        </button>
+                        <button class="secondary-btn" onclick="downloadTemplate()">
+                            <i class="fas fa-file-download"></i> Download Template
+                        </button>
+                    </div>
+                    
+                    <div id="statusMessage" class="status-message"></div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="primary-btn" onclick="updateAllCertificates()">
+                        <i class="fas fa-redo"></i> Update All Certificates
+                    </button>
+                    <button class="secondary-btn" onclick="addNewCertificate()">
+                        <i class="fas fa-plus"></i> Add New Certificate
+                    </button>
+                    <button class="success-btn" onclick="downloadSelectedCertificates()" id="downloadSelectedBtn">
+                        <i class="fas fa-download"></i> Download Selected
+                    </button>
+                    <button class="success-btn" onclick="downloadAllCertificates()" id="downloadAllBtn">
+                        <i class="fas fa-file-download"></i> Download All
+                    </button>
+                    <button class="success-btn" onclick="sendCertificatesByEmail()" id="sendEmailBtn">
+                        <i class="fas fa-envelope"></i> Send by Email
+                    </button>
+                </div>
+            </div>
+            
+            <div class="certificate-container" id="certificateContainer">
+                <!-- Certificates will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize with current date
+        document.getElementById('dateText').valueAsDate = new Date();
+        
+        // Global variables
+        let certificateData = [];
+        let currentLogo = '';
+        let currentLogoRight = '';
+        let currentTemplate = 'participation';
+        let signatureImages = {};
+        let currentCanvaBackground = '';
+        let certificateIds = {};
+        
+        // Open Admin Portal
+        function openAdminPortal() {
+            document.body.classList.remove('preview-mode');
+            generateCertificates();
+        }
+        
+        // Event listeners
+        document.getElementById('canvaUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentCanvaBackground = e.target.result;
+                    document.getElementById('canvaFileName').textContent = file.name;
+                    document.getElementById('canvaPreview').src = currentCanvaBackground;
+                    document.getElementById('canvaPreview').style.display = 'block';
+                    updateAllCertificates();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        document.getElementById('spreadsheetFile').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+            document.getElementById('fileName').textContent = fileName;
+        });
+        
+        document.getElementById('logo1').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentLogo = e.target.result;
+                    document.getElementById('logo1Name').textContent = file.name;
+                    updateAllCertificates();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                currentLogo = '';
+                document.getElementById('logo1Name').textContent = 'No logo chosen';
+                updateAllCertificates();
+            }
+        });
+        
+        document.getElementById('logo2').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentLogoRight = e.target.result;
+                    document.getElementById('logo2Name').textContent = file.name;
+                    updateAllCertificates();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                currentLogoRight = '';
+                document.getElementById('logo2Name').textContent = 'No logo chosen';
+                updateAllCertificates();
+            }
+        });
+        
+        // Signature upload event listeners
+        document.getElementById('signature1').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    signatureImages[0] = e.target.result;
+                    document.querySelector('#signature1').nextElementSibling.textContent = file.name;
+                    updateAllCertificates();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        document.getElementById('signature2').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    signatureImages[1] = e.target.result;
+                    document.querySelector('#signature2').nextElementSibling.textContent = file.name;
+                    updateAllCertificates();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        document.getElementById('templateSelect').addEventListener('change', loadTemplate);
+        
+        // Add event listeners for new styling controls
+        document.getElementById('textColor').addEventListener('change', updateAllCertificates);
+        document.getElementById('fontFamily').addEventListener('change', updateAllCertificates);
+        document.getElementById('titleFontSize').addEventListener('change', updateAllCertificates);
+        document.getElementById('nameFontSize').addEventListener('change', updateAllCertificates);
+        document.getElementById('bodyFontSize').addEventListener('change', updateAllCertificates);
+        document.getElementById('textAlignment').addEventListener('change', updateAllCertificates);
+        document.getElementById('fontWeight').addEventListener('change', updateAllCertificates);
+        document.getElementById('textShadow').addEventListener('change', updateAllCertificates);
+        document.getElementById('lineHeight').addEventListener('change', updateAllCertificates);
+        document.getElementById('letterSpacing').addEventListener('change', updateAllCertificates);
+        
+        function generateCertificates() {
+            const container = document.getElementById('certificateContainer');
+            container.innerHTML = '';
+            
+            if (certificateData.length === 0) {
+                container.innerHTML = '<p style="text-align:center; width:100%; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">No certificates to display. Please load spreadsheet data.</p>';
+                return;
+            }
+            
+            certificateData.forEach((data, index) => {
+                // Generate unique ID if not already exists
+                if (!certificateIds[index]) {
+                    const prefix = document.getElementById('idPrefix').value || 'TACK';
+                    const randomNum = Math.floor(10000 + Math.random() * 90000);
+                    certificateIds[index] = `${prefix}${randomNum}`;
+                }
+                
+                const certDiv = document.createElement('div');
+                certDiv.className = 'certificate';
+                certDiv.id = 'certificate-' + index;
+                certDiv.style.animationDelay = `${index * 0.1}s`;
+                
+                certDiv.innerHTML = `
+                    <div class="certificate-checkbox-container">
+                        <input type="checkbox" class="certificate-checkbox" data-index="${index}" checked id="checkbox-${index}">
+                        <label for="checkbox-${index}" class="certificate-checkbox-label"></label>
+                    </div>
+                    <div class="certificate-content">
+                        <div class="logo-title-container">
+                            ${currentLogo ? `<img src="${currentLogo}" class="certificate-logo" alt="Organization Logo" crossorigin="anonymous">` : ''}
+                            <div class="certificate-title">
+                                <h1 id="title-${index}">CERTIFICATE</h1>
+                                <h2 id="type-${index}">OF PARTICIPATION</h2>
+                            </div>
+                            ${currentLogoRight ? `<img src="${currentLogoRight}" class="certificate-logo-right" alt="Partner Logo" crossorigin="anonymous">` : ''}
+                        </div>
+                        <div class="certificate-body">
+                            <div class="certificate-presented" id="presented-${index}">This certificate is proudly presented to</div>
+                            <div class="certificate-name" id="name-${index}">${data.Name || data.name || 'Recipient Name'}</div>
+                            <div class="certificate-text" id="text-${index}">for successfully completing the program and demonstrating exceptional commitment and dedication throughout the course duration.</div>
+                            <div class="certificate-details" id="date-venue-${index}">
+                                <span id="date-${index}">Date: ${formatDate(new Date())}</span>
+                                <span id="venue-${index}">Venue: Online</span>
+                            </div>
+                            <div class="qr-container" id="qr-container-${index}">
+                                <div class="qr-code" id="qr-code-${index}"></div>
+                                <div class="certificate-id">${certificateIds[index]}</div>
+                            </div>
+                            <div class="signatures" id="signatures-${index}">
+                                <div class="signature">
+                                    <div class="signature-image-container" id="signature-img-0-${index}"></div>
+                                    <div class="signature-line"></div>
+                                    <div class="signature-name">John Doe</div>
+                                    <div class="signature-title">Director</div>
+                                </div>
+                                <div class="signature">
+                                    <div class="signature-image-container" id="signature-img-1-${index}"></div>
+                                    <div class="signature-line"></div>
+                                    <div class="signature-name">Jane Smith</div>
+                                    <div class="signature-title">Manager</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(certDiv);
+                
+                // Generate QR code
+                const qrCodeElement = document.getElementById(`qr-code-${index}`);
+                if (qrCodeElement) {
+                    // Clear previous QR code if exists
+                    qrCodeElement.innerHTML = '';
+                    
+                    // Generate new QR code
+                    const qr = new QRCode(qrCodeElement, {
+                        text: `${window.location.href.split('?')[0]}?verify=${certificateIds[index]}`,
+                        width: 100,
+                        height: 100,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                }
+                
+                // Apply Canva background if set
+                if (currentCanvaBackground) {
+                    certDiv.style.backgroundImage = `url('${currentCanvaBackground}')`;
+                    certDiv.style.backgroundSize = 'cover';
+                    certDiv.style.backgroundPosition = 'center';
+                    certDiv.style.backgroundRepeat = 'no-repeat';
+                    
+                    // Adjust text positioning for Canva
+                    adjustTextForCanva(certDiv);
+                }
+            });
+            
+            updateAllCertificates();
+        }
+        
+        function adjustTextForCanva(certificateElement) {
+            // Position the logo and title container
+            const logoTitleContainer = certificateElement.querySelector('.logo-title-container');
+            if (logoTitleContainer) {
+                logoTitleContainer.style.position = 'absolute';
+                logoTitleContainer.style.top = '5%';
+                logoTitleContainer.style.left = '50%';
+                logoTitleContainer.style.transform = 'translateX(-50%)';
+                logoTitleContainer.style.width = '90%';
+                logoTitleContainer.style.display = 'flex';
+                logoTitleContainer.style.alignItems = 'center';
+                logoTitleContainer.style.justifyContent = 'center';
+            }
+            
+            // Position the title
+            const title = certificateElement.querySelector('.certificate-title h1');
+            if (title) {
+                title.style.color = '#000000';
+                title.style.textShadow = '2px 2px 4px rgba(0,0,0.7)';
+            }
+            
+            // Position the type/subtitle
+            const type = certificateElement.querySelector('.certificate-title h2');
+            if (type) {
+                type.style.color = '#000000';
+                type.style.textShadow = '1px 1px 3px rgba(0,0,0,0.7)';
+            }
+            
+            // Position the "presented to" text
+            const presented = certificateElement.querySelector('.certificate-presented');
+            if (presented) {
+                presented.style.position = 'absolute';
+                presented.style.top = '35%';
+                presented.style.left = '50%';
+                presented.style.transform = 'translateX(-50%)';
+                presented.style.width = '80%';
+                presented.style.textAlign = 'center';
+                presented.style.color = '#000000';
+                presented.style.textShadow = '1px 1px 2px rgba(0,0,0,0.7)';
+            }
+            
+           // Position the recipient name
+            const name = certificateElement.querySelector('.certificate-name');
+            if (name) {
+                name.style.position = 'absolute';
+                name.style.top = '37%';
+                name.style.left = '50%';
+                name.style.transform = 'translateX(-50%)';
+                name.style.width = '80%';
+                name.style.textAlign = 'center';
+                name.style.color = '#000000';
+                name.style.textShadow = '2px 2px 4px rgba(0,0,0,0.7)';
+            }
+
+            // Position the certificate text
+            const text = certificateElement.querySelector('.certificate-text');
+            if (text) {
+                text.style.position = 'absolute';
+                text.style.top = '44%';
+                text.style.left = '48%';
+                text.style.transform = 'translateX(-50%)';
+                text.style.width = '70%';
+                text.style.textAlign = 'center';
+                text.style.color = '#000000';
+                text.style.textShadow = '1px 1px 2px rgba(0,0,0,0.7)';
+                text.style.padding = '0';
+            }
+            
+            // Position the date and venue
+            const dateVenue = certificateElement.querySelector('.certificate-details');
+            if (dateVenue) {
+                dateVenue.style.position = 'absolute';
+                dateVenue.style.bottom = '30%';
+                dateVenue.style.left = '50%';
+                dateVenue.style.transform = 'translateX(-50%)';
+                dateVenue.style.width = '80%';
+                dateVenue.style.textAlign = 'center';
+                dateVenue.style.color = '#000000';
+                dateVenue.style.textShadow = '1px 1px 2px rgba(0,0,0,0.7)';
+            }
+            
+            // Position the QR code
+            const qrContainer = certificateElement.querySelector('.qr-container');
+            if (qrContainer) {
+                qrContainer.style.position = 'absolute';
+                qrContainer.style.bottom = '5%';
+                qrContainer.style.left = '50%';
+                qrContainer.style.transform = 'translateX(-50%)';
+                qrContainer.style.zIndex = '10';
+                
+                const qrCode = qrContainer.querySelector('.qr-code');
+                if (qrCode) {
+                    qrCode.style.backgroundColor = 'white';
+                    qrCode.style.padding = '5px';
+                }
+                
+                const certId = qrContainer.querySelector('.certificate-id');
+                if (certId) {
+                    certId.style.color = '#fff';
+                    certId.style.textShadow = '1px 1px 2px rgba(0,0,0,0.7)';
+                }
+            }
+            
+            // Position the signatures
+            const signatures = certificateElement.querySelector('.signatures');
+            if (signatures) {
+                signatures.style.position = 'absolute';
+                signatures.style.bottom = '12%';
+                signatures.style.left = '50%';
+                signatures.style.transform = 'translateX(-50%)';
+                signatures.style.width = '80%';
+                signatures.style.justifyContent = 'space-around';
+                
+                // Style signature names and titles
+                const signatureNames = certificateElement.querySelectorAll('.signature-name');
+                signatureNames.forEach(name => {
+                    name.style.color = '#000000';
+                    name.style.textShadow = '1px 1px 2px rgba(0,0,0,0.7)';
+                });
+                
+                const signatureTitles = certificateElement.querySelectorAll('.signature-title');
+                signatureTitles.forEach(title => {
+                    title.style.color = '#eee';
+                    title.style.textShadow = '1px 1px 2px rgba(0,0,0,0.7)';
+                });
+            }
+        }
+        
+        function updateAllCertificates() {
+            const title = document.getElementById('certificateTitle').value;
+            const type = document.getElementById('certificateType').value;
+            const presented = document.getElementById('presentedText').value;
+            const text = document.getElementById('certificateText').value;
+            const date = document.getElementById('dateText').value;
+            const venue = document.getElementById('venueText').value;
+            const idPrefix = document.getElementById('idPrefix').value || 'TACK';
+            
+            // Get new styling values
+            const textColor = document.getElementById('textColor').value;
+            const fontFamily = document.getElementById('fontFamily').value;
+            const titleFontSize = document.getElementById('titleFontSize').value + 'px';
+            const nameFontSize = document.getElementById('nameFontSize').value + 'px';
+            const bodyFontSize = document.getElementById('bodyFontSize').value + 'px';
+            const textAlignment = document.getElementById('textAlignment').value;
+            const fontWeight = document.getElementById('fontWeight').value;
+            const textShadow = document.getElementById('textShadow').value;
+            const lineHeight = document.getElementById('lineHeight').value;
+            const letterSpacing = document.getElementById('letterSpacing').value + 'px';
+            
+            // Get signatories
+            const signatories = [];
+            const signatoryElements = document.querySelectorAll('.signatory');
+            signatoryElements.forEach((signatory, index) => {
+                const name = signatory.querySelector('.signatoryName').value;
+                const title = signatory.querySelector('.signatoryTitle').value;
+                if (name && title) {
+                    signatories.push({ 
+                        name, 
+                        title,
+                        signature: signatureImages[index] || ''
+                    });
+                }
+            });
+            
+            certificateData.forEach((data, index) => {
+                const certDiv = document.getElementById(`certificate-${index}`);
+                
+                // Update logo
+                const logoContainer = certDiv.querySelector('.logo-title-container');
+                if (currentLogo) {
+                    const logoImg = logoContainer.querySelector('.certificate-logo');
+                    if (!logoImg) {
+                        const img = document.createElement('img');
+                        img.className = 'certificate-logo';
+                        img.src = currentLogo;
+                        img.crossOrigin = 'anonymous';
+                        logoContainer.insertBefore(img, logoContainer.firstChild);
+                    } else {
+                        logoImg.src = currentLogo;
+                    }
+                } else {
+                    const logoImg = logoContainer.querySelector('.certificate-logo');
+                    if (logoImg) {
+                        logoImg.remove();
+                    }
+                }
+                
+                // Update right logo
+                if (currentLogoRight) {
+                    const logoImgRight = logoContainer.querySelector('.certificate-logo-right');
+                    if (!logoImgRight) {
+                        const img = document.createElement('img');
+                        img.className = 'certificate-logo-right';
+                        img.src = currentLogoRight;
+                        img.crossOrigin = 'anonymous';
+                        logoContainer.appendChild(img);
+                    } else {
+                        logoImgRight.src = currentLogoRight;
+                    }
+                } else {
+                    const logoImgRight = logoContainer.querySelector('.certificate-logo-right');
+                    if (logoImgRight) {
+                        logoImgRight.remove();
+                    }
+                }
+                
+                // Update content
+                document.getElementById(`title-${index}`).textContent = title;
+                document.getElementById(`type-${index}`).textContent = type;
+                document.getElementById(`presented-${index}`).textContent = presented;
+                
+                // Use Name or name field from spreadsheet
+                const recipientName = data.Name || data.name || 'Recipient Name';
+                document.getElementById(`name-${index}`).textContent = recipientName;
+                
+                // Replace placeholders in certificate text
+                let customizedText = text;
+                for (const key in data) {
+                    customizedText = customizedText.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'gi'), data[key]);
+                }
+                document.getElementById(`text-${index}`).textContent = customizedText;
+                
+                document.getElementById(`date-${index}`).textContent = `Date: ${formatDate(date)}`;
+                document.getElementById(`venue-${index}`).textContent = `Venue: ${venue}`;
+                
+                // Update certificate ID if prefix changed
+                const currentId = certificateIds[index] || '';
+                if (currentId && !currentId.startsWith(idPrefix)) {
+                    const randomNum = Math.floor(10000 + Math.random() * 90000);
+                    certificateIds[index] = `${prefix}${randomNum}`;
+                    document.querySelector(`#qr-container-${index} .certificate-id`).textContent = certificateIds[index];
+                    
+                    // Regenerate QR code with new ID
+                    const qrCodeElement = document.getElementById(`qr-code-${index}`);
+                    if (qrCodeElement) {
+                        qrCodeElement.innerHTML = '';
+                        const qr = new QRCode(qrCodeElement, {
+                            text: `${window.location.href.split('?')[0]}?verify=${certificateIds[index]}`,
+                            width: 100,
+                            height: 100,
+                            colorDark: "#000000",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+                    }
+                }
+                
+                // Apply text styling
+                const textElements = certDiv.querySelectorAll('h1, h2, div, span, p');
+                textElements.forEach(el => {
+                    el.style.color = textColor;
+                    el.style.fontFamily = fontFamily;
+                    el.style.textAlign = textAlignment;
+                    el.style.fontWeight = fontWeight;
+                    el.style.textShadow = textShadow;
+                    el.style.lineHeight = lineHeight;
+                    el.style.letterSpacing = letterSpacing;
+                });
+                
+                // Specific element styling
+                document.getElementById(`title-${index}`).style.fontSize = titleFontSize;
+                document.getElementById(`name-${index}`).style.fontSize = nameFontSize;
+                document.getElementById(`text-${index}`).style.fontSize = bodyFontSize;
+                
+                // Update signatures
+                signatories.forEach((sig, sigIndex) => {
+                    const sigImgContainer = document.getElementById(`signature-img-${sigIndex}-${index}`);
+                    if (sigImgContainer) {
+                        sigImgContainer.innerHTML = '';
+                        if (sig.signature) {
+                            const img = document.createElement('img');
+                            img.className = 'signature-image';
+                            img.src = sig.signature;
+                            img.crossOrigin = 'anonymous';
+                            sigImgContainer.appendChild(img);
+                        }
+                    }
+                    
+                    // Update names and titles
+                    const signaturesDiv = document.getElementById(`signatures-${index}`);
+                    const signatureDivs = signaturesDiv.querySelectorAll('.signature');
+                    if (signatureDivs[sigIndex]) {
+                        const nameElement = signatureDivs[sigIndex].querySelector('.signature-name');
+                        const titleElement = signatureDivs[sigIndex].querySelector('.signature-title');
+                        if (nameElement) nameElement.textContent = sig.name;
+                        if (titleElement) titleElement.textContent = sig.title;
+                    }
+                });
+            });
+        }
+        
+        function addSignatory() {
+            const container = document.getElementById('signatoryContainer');
+            const index = container.children.length;
+            const div = document.createElement('div');
+            div.className = 'signatory';
+            div.innerHTML = `
+                <input type="text" class="signatoryName" placeholder="Name">
+                <input type="text" class="signatoryTitle" placeholder="Title">
+                <div class="file-upload">
+                    <label for="signature${index+1}" class="file-upload-label signature-upload-label">
+                        <i class="fas fa-signature"></i> Signature
+                    </label>
+                    <input type="file" id="signature${index+1}" class="signature-upload" accept="image/*">
+                    <span class="file-name signature-file-name">No signature chosen</span>
+                </div>
+            `;
+            container.appendChild(div);
+            
+            // Add event listener to new signature upload
+            const upload = div.querySelector('.signature-upload');
+            upload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        signatureImages[index] = e.target.result;
+                        e.target.nextElementSibling.textContent = file.name;
+                        updateAllCertificates();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        function removeSignatory() {
+            const container = document.getElementById('signatoryContainer');
+            if (container.children.length > 1) {
+                const index = container.children.length - 1;
+                delete signatureImages[index];
+                container.removeChild(container.lastChild);
+                updateAllCertificates();
+            }
+        }
+        
+        function loadTemplate() {
+            const template = document.getElementById('templateSelect').value;
+            currentTemplate = template;
+            
+            let title = "CERTIFICATE";
+            let type = "OF PARTICIPATION";
+            let text = "for successfully completing the program and demonstrating exceptional commitment and dedication throughout the course duration.";
+            
+            switch(template) {
+                case 'achievement':
+                    type = "OF ACHIEVEMENT";
+                    text = "for outstanding achievement and exceptional performance in the program. Your dedication and hard work have set a remarkable example for others to follow.\n\n{{Name}} scored {{Score}} in the {{Program}} program.";
+                    break;
+                case 'appreciation':
+                    type = "OF APPRECIATION";
+                    text = "in recognition of your valuable contributions and unwavering support. Your efforts have significantly contributed to the success of our initiative.\n\nWe appreciate {{Name}}'s dedication to {{Program}}.";
+                    break;
+                case 'excellence':
+                    type = "OF EXCELLENCE";
+                    text = "for demonstrating excellence in all aspects of the program. Your commitment to quality and continuous improvement is truly commendable.\n\n{{Name}} achieved {{Score}} in {{Program}}, demonstrating exceptional skills.";
+                    break;
+                case 'completion':
+                    type = "OF COMPLETION";
+                    text = "for successfully completing all requirements of the program. Your perseverance and dedication have led to this significant accomplishment.\n\n{{Name}} completed the {{Program}} program on {{CompletionDate}}.";
+                    break;
+            }
+            
+            document.getElementById('certificateTitle').value = title;
+            document.getElementById('certificateType').value = type;
+            document.getElementById('certificateText').value = text;
+            
+            updateAllCertificates();
+        }
+        
+        function loadSpreadsheetData() {
+            const fileInput = document.getElementById('spreadsheetFile');
+            const textData = document.getElementById('spreadsheetData').value;
+            const statusMessage = document.getElementById('statusMessage');
+            const loadBtn = document.getElementById('loadDataBtn');
+            
+            statusMessage.className = 'status-message';
+            loadBtn.innerHTML = '<div class="loading"></div> Processing...';
+            
+            const processData = (results) => {
+                if (results.errors.length > 0) {
+                    statusMessage.className = 'status-message error-message';
+                    statusMessage.textContent = 'Error parsing CSV: ' + results.errors[0].message;
+                    loadBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Load Data';
+                    return;
+                }
+                
+                if (results.data.length === 0) {
+                    statusMessage.className = 'status-message error-message';
+                    statusMessage.textContent = 'No data found in the spreadsheet';
+                    loadBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Load Data';
+                    return;
+                }
+                
+                // Filter out empty rows
+                certificateData = results.data.filter(row => {
+                    // Check if the row has any non-empty values
+                    return Object.values(row).some(val => val && val.toString().trim() !== '');
+                });
+                
+                // Generate unique IDs for all certificates
+                const prefix = document.getElementById('idPrefix').value || 'TACK';
+                certificateIds = {};
+                certificateData.forEach((_, index) => {
+                    const randomNum = Math.floor(10000 + Math.random() * 90000);
+                    certificateIds[index] = `${prefix}${randomNum}`;
+                });
+                
+                statusMessage.className = 'status-message success-message';
+                statusMessage.textContent = `Successfully loaded ${certificateData.length} records`;
+                loadBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Load Data';
+                
+                generateCertificates();
+            };
+            
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: processData,
+                    error: (error) => {
+                        statusMessage.className = 'status-message error-message';
+                        statusMessage.textContent = 'Error reading file: ' + error.message;
+                        loadBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Load Data';
+                    }
+                });
+            } else if (textData) {
+                Papa.parse(textData, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: processData,
+                    error: (error) => {
+                        statusMessage.className = 'status-message error-message';
+                        statusMessage.textContent = 'Error parsing CSV: ' + error.message;
+                        loadBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Load Data';
+                    }
+                });
+            } else {
+                statusMessage.className = 'status-message error-message';
+                statusMessage.textContent = 'Please upload a CSV file or paste CSV data';
+                loadBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Load Data';
+            }
+        }
+        
+        async function downloadSelectedCertificates() {
+            const checkboxes = document.querySelectorAll('.certificate-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('Please select at least one certificate to download');
+                return;
+            }
+
+            const downloadBtn = document.getElementById('downloadSelectedBtn');
+            const originalBtnHTML = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<div class="loading"></div> Preparing...';
+            downloadBtn.disabled = true;
+
+            try {
+                for (let i = 0; i < checkboxes.length; i++) {
+                    const certIndex = checkboxes[i].getAttribute('data-index');
+                    const element = document.getElementById(`certificate-${certIndex}`);
+                    
+                    // Hide checkbox container before capturing
+                    const checkboxContainer = element.querySelector('.certificate-checkbox-container');
+                    const originalDisplay = checkboxContainer.style.display;
+                    checkboxContainer.style.display = 'none';
+
+                    // Create a clone with all styles preserved
+                    const clone = element.cloneNode(true);
+                    clone.style.position = 'absolute';
+                    clone.style.left = '-9999px';
+                    clone.style.top = '0';
+                    clone.style.width = '297mm';
+                    clone.style.height = '210mm';
+                    document.body.appendChild(clone);
+
+                    // Generate canvas with improved settings
+                    const canvas = await html2canvas(clone, {
+                        scale: 2, // Higher scale for better quality
+                        logging: false,
+                        useCORS: true, // Important for external images
+                        allowTaint: true,
+                        scrollX: 0,
+                        scrollY: 0,
+                        windowWidth: clone.scrollWidth,
+                        windowHeight: clone.scrollHeight,
+                        backgroundColor: null
+                    });
+
+                    // Convert canvas to image and download
+                    const imgData = canvas.toDataURL('image/png', 1.0);
+                    const link = document.createElement('a');
+                    link.download = `certificate_${certificateIds[certIndex] || certIndex}.png`;
+                    link.href = imgData;
+                    link.click();
+
+                    // Clean up
+                    document.body.removeChild(clone);
+                    checkboxContainer.style.display = originalDisplay;
+                    
+                    // Small delay between downloads to prevent browser blocking
+                    if (i < checkboxes.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                }
+            } catch (error) {
+                console.error('Error generating certificates:', error);
+                alert('Error generating certificates. Please check console for details.');
+            } finally {
+                downloadBtn.innerHTML = originalBtnHTML;
+                downloadBtn.disabled = false;
+            }
+        }
+
+        async function downloadAllCertificates() {
+            if (certificateData.length === 0) {
+                alert('No certificates to download. Please load spreadsheet data first.');
+                return;
+            }
+
+            const downloadBtn = document.getElementById('downloadAllBtn');
+            const originalBtnHTML = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<div class="loading"></div> Preparing...';
+            downloadBtn.disabled = true;
+
+            try {
+                for (let i = 0; i < certificateData.length; i++) {
+                    const element = document.getElementById(`certificate-${i}`);
+                    
+                    // Hide checkbox container before capturing
+                    const checkboxContainer = element.querySelector('.certificate-checkbox-container');
+                    const originalDisplay = checkboxContainer.style.display;
+                    checkboxContainer.style.display = 'none';
+
+                    // Create a clone with all styles preserved
+                    const clone = element.cloneNode(true);
+                    clone.style.position = 'absolute';
+                    clone.style.left = '-9999px';
+                    clone.style.top = '0';
+                    clone.style.width = '297mm';
+                    clone.style.height = '210mm';
+                    document.body.appendChild(clone);
+
+                    // Generate canvas with improved settings
+                    const canvas = await html2canvas(clone, {
+                        scale: 2, // Higher scale for better quality
+                        logging: false,
+                        useCORS: true, // Important for external images
+                        allowTaint: true,
+                        scrollX: 0,
+                        scrollY: 0,
+                        windowWidth: clone.scrollWidth,
+                        windowHeight: clone.scrollHeight,
+                        backgroundColor: null
+                    });
+
+                    // Convert canvas to image and download
+                    const imgData = canvas.toDataURL('image/png', 1.0);
+                    const link = document.createElement('a');
+                    link.download = `certificate_${certificateIds[i] || i}.png`;
+                    link.href = imgData;
+                    link.click();
+
+                    // Clean up
+                    document.body.removeChild(clone);
+                    checkboxContainer.style.display = originalDisplay;
+                    
+                    // Small delay between downloads to prevent browser blocking
+                    if (i < certificateData.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                }
+            } catch (error) {
+                console.error('Error generating certificates:', error);
+                alert('Error generating certificates. Please check console for details.');
+            } finally {
+                downloadBtn.innerHTML = originalBtnHTML;
+                downloadBtn.disabled = false;
+            }
+        }
+        
+        async function sendCertificatesByEmail() {
+            if (certificateData.length === 0) {
+                alert('No certificates to send. Please load spreadsheet data first.');
+                return;
+            }
+
+            const sendBtn = document.getElementById('sendEmailBtn');
+            const originalBtnHTML = sendBtn.innerHTML;
+            sendBtn.innerHTML = '<div class="loading"></div> Sending...';
+            sendBtn.disabled = true;
+
+            try {
+                for (let i = 0; i < certificateData.length; i++) {
+                    const data = certificateData[i];
+                    if (!data.Email) continue;
+
+                    const element = document.getElementById(`certificate-${i}`);
+                    
+                    // Hide checkbox container before capturing
+                    const checkboxContainer = element.querySelector('.certificate-checkbox-container');
+                    const originalDisplay = checkboxContainer.style.display;
+                    checkboxContainer.style.display = 'none';
+
+                    // Create a clone with forced white background and explicit dimensions
+                    const clone = element.cloneNode(true);
+                    clone.style.position = 'absolute';
+                    clone.style.left = '-9999px';
+                    clone.style.top = '0';
+                    clone.style.width = '297mm';
+                    clone.style.height = '210mm';
+                    clone.style.backgroundColor = '#FFFFFF';
+                    
+                    // Force all text elements to have black color for printing
+                    const textElements = clone.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, div');
+                    textElements.forEach(el => {
+                        el.style.color = '#000000';
+                        el.style.textShadow = 'none';
+                    });
+                    
+                    document.body.appendChild(clone);
+
+                    // Generate canvas with improved settings
+                    const canvas = await html2canvas(clone, {
+                        scale: 2, // Higher scale for better quality
+                        logging: false,
+                        useCORS: true, // Important for external images
+                        allowTaint: true,
+                        scrollX: 0,
+                        scrollY: 0,
+                        windowWidth: clone.scrollWidth,
+                        windowHeight: clone.scrollHeight,
+                        backgroundColor: '#FFFFFF'
+                    });
+
+                    // Convert canvas to image data
+                    const imgData = canvas.toDataURL('image/png', 1.0);
+                    
+                    // Send email (this is a simulation - in a real app you'd use a server-side script)
+                    await simulateEmailSend(data.Email, imgData, data.Name);
+                    
+                    // Clean up
+                    document.body.removeChild(clone);
+                    checkboxContainer.style.display = originalDisplay;
+                }
+
+                alert('All certificates have been sent to their respective recipients');
+            } catch (error) {
+                console.error('Error sending certificates:', error);
+                alert('Error sending certificates. Please check console for details.');
+            } finally {
+                sendBtn.innerHTML = originalBtnHTML;
+                sendBtn.disabled = false;
+            }
+        }
+
+        function simulateEmailSend(email, imageData, recipientName) {
+            return new Promise((resolve) => {
+                console.log(`Would send email to: ${email} for ${recipientName}`);
+                console.log(`Certificate image data length: ${imageData.length}`);
+                setTimeout(resolve, 1000);
+            });
+        }
+        
+        function addNewCertificate() {
+            // Create a blank certificate entry
+            const newEntry = {
+                "Name": "New Recipient",
+                "Email": "",
+                "Program": "",
+                "Score": ""
+            };
+            
+            certificateData.push(newEntry);
+            
+            // Generate unique ID for the new certificate
+            const prefix = document.getElementById('idPrefix').value || 'TACK';
+            const randomNum = Math.floor(10000 + Math.random() * 90000);
+            certificateIds[certificateData.length - 1] = `${prefix}${randomNum}`;
+            
+            generateCertificates();
+            
+            // Scroll to the new certificate
+            setTimeout(() => {
+                const container = document.getElementById('certificateContainer');
+                container.lastChild.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        function downloadTemplate() {
+            const csv = `Name,Email,Program,CompletionDate,Score,AdditionalInfo
+John Doe,john@example.com,Web Development,2023-06-15,95%,Completed with honors
+Jane Smith,jane@example.com,Data Science,2023-06-18,98%,Top of class
+David Kim,david@example.com,Digital Marketing,2023-06-20,92%,Excellent participation
+Sarah Williams,sarah@example.com,Graphic Design,2023-06-22,90%,Creative standout
+Michael Brown,michael@example.com,Project Management,2023-06-25,97%,Exceptional leadership`;
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'certificate_data_template.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) {
+                return dateString;
+            }
+            
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+    </script>
+</body>
+</html>
