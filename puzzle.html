@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AMR & Dengue Crossword Puzzle</title>
+<style>
+    /* ---------- layout & theme (kept your look mostly) ---------- */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f0f8ff;
+        color: #333;
+    }
+    .section {
+        background-color: white;
+        padding: 25px;
+        margin-bottom: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    h1,h2 { text-align:center; }
+    h1 { color:#2980b9; font-size:2.2em; }
+
+    /* admin floating button */
+    .admin-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #34495e;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        z-index: 1200;
+    }
+
+    /* overlay + modal */
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        backdrop-filter: blur(6px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1100;
+    }
+    .overlay.show { display:flex; }
+
+    .modal {
+        width: 760px;
+        max-width: calc(100% - 40px);
+        background: linear-gradient(180deg,#fff,#fbfdff);
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        position: relative;
+    }
+
+    .modal h3 { margin-top:0; }
+    .close-x {
+        position: absolute;
+        right: 12px;
+        top: 8px;
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .admin-form, .admin-controls {
+        display:flex; flex-direction:column; gap:10px;
+    }
+
+    .file-upload input[type=file] {
+        padding:8px; border-radius:6px; border:1px dashed #3498db; width:100%;
+    }
+
+    .manual-rows { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow:auto; padding-right:6px; }
+
+    .manual-row { display:flex; gap:8px; align-items:center; }
+    .manual-row input { padding:8px; border-radius:6px; border:1px solid #ddd; font-size:14px; }
+    .manual-row input[type=text]{ width: 32%; }
+    .manual-row input[type=select]{ width: 22%; }
+
+    .small { font-size:13px; padding:8px 10px; border-radius:6px; }
+
+    /* leaderboard table */
+    #adminLeaderboard { width:100%; border-collapse:collapse; max-height:220px; overflow:auto; display:block; }
+    #adminLeaderboard th, #adminLeaderboard td { border:1px solid #ddd; padding:8px; text-align:left; background:#fff; }
+    #adminLeaderboard th { background:#3498db; color:#fff; position:sticky; top:0; }
+
+    /* kept your crossword cell styles (copied) */
+    table.crossword { border-collapse:collapse; margin:18px auto; }
+    table.crossword td { width:35px; height:35px; border:1px solid #ddd; text-align:center; vertical-align:middle; position:relative; }
+    .black { background:#34495e; }
+    .number { position:absolute; top:1px; left:2px; font-size:9px; color:#2c3e50; font-weight:bold; }
+
+    input.cell { width:100%; height:100%; border:none; text-align:center; font-size:18px; font-weight:bold; text-transform:uppercase; background:transparent; }
+
+    .hidden { display:none; }
+    .timer { font-weight:bold; color:#e74c3c; background:#fdedec; padding:8px 12px; border-radius:20px; }
+
+    /* download button group */
+    .btn { background:#3498db; color:white; border:none; padding:10px 12px; border-radius:6px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    .btn.secondary { background:#6c757d; }
+
+    /* small responsiveness */
+    @media (max-width:700px) {
+        .manual-row input[type=text]{ width: 100%; }
+        .manual-row { flex-direction:column; align-items:stretch; }
+    }
+
+</style>
+</head>
+<body>
+    <button id="adminAccessBtn" class="admin-btn">Admin Login</button>
+
+    <!-- overlay + floating admin modal -->
+    <div id="overlay" class="overlay" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+            <button class="close-x" id="closeModal">&times;</button>
+            <h3 id="adminTitle">Admin Portal</h3>
+
+            <!-- Login block -->
+            <div id="loginBlock" class="admin-form">
+                <input id="adminUsername" placeholder="Username" class="small" />
+                <input id="adminPassword" placeholder="Password" type="password" class="small" />
+                <div style="display:flex; gap:8px;">
+                    <button id="adminLoginBtn" class="btn">Login</button>
+                    <button id="closeLogin" class="btn secondary">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Controls shown after login -->
+            <div id="adminControls" class="admin-controls hidden" style="margin-top:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong>Admin Panel</strong>
+                    <div style="display:flex; gap:8px;">
+                        <button id="adminViewLeaderboard" class="btn small">View Leaderboard</button>
+                        <button id="downloadAnimBtn" class="btn small">Download Animated Leaderboard</button>
+                        <button id="adminLogoutBtn" class="btn small secondary">Logout</button>
+                    </div>
+                </div>
+
+                <!-- CSV upload -->
+                <div class="file-upload" style="margin-top:8px;">
+                    <label style="font-weight:600;">Upload Questions CSV</label>
+                    <input id="csvUpload" type="file" accept=".csv" />
+                    <div style="display:flex; gap:8px; margin-top:6px;">
+                        <button id="uploadCsvBtn" class="btn">Upload CSV</button>
+                        <button id="clearQuestionsBtn" class="btn secondary">Clear Questions</button>
+                    </div>
+                    <small style="color:#666;">CSV headers: Word,Clue,Difficulty (optional),Category (optional)</small>
+                </div>
+
+                <!-- Manual add rows -->
+                <div style="margin-top:6px;">
+                    <label style="font-weight:600;">Add Questions Manually</label>
+                    <div class="manual-rows" id="manualRows"></div>
+                    <div style="display:flex; gap:8px; margin-top:8px;">
+                        <button id="addRowBtn" class="btn small">Add another</button>
+                        <button id="saveManualBtn" class="btn small">Save Questions</button>
+                    </div>
+                </div>
+
+                <!-- Leaderboard view -->
+                <div id="leaderboardArea" class="hidden" style="margin-top:10px;">
+                    <label style="font-weight:600;">Leaderboard</label>
+                    <div style="max-height:220px; overflow:auto; border:1px solid #eee; border-radius:6px; padding:6px; background:#fafafa;">
+                        <table id="adminLeaderboard"><thead><tr><th>#</th><th>Name</th><th>Club</th><th>Score</th><th>Time</th><th>Date</th></tr></thead><tbody></tbody></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Section -->
+    <div class="section" id="registrationSection">
+        <h1>AMR & Dengue Crossword Challenge</h1>
+        <div id="quizStatus" style="text-align:center; margin-bottom:12px; color:#2ecc71;">Loading quiz...</div>
+        <form id="registrationForm">
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                <div><label style="display:block;font-weight:600">Name</label><input id="playerName" type="text" /></div>
+                <div><label style="display:block;font-weight:600">Club/Organization</label><input id="clubName" type="text" /></div>
+                <div><label style="display:block;font-weight:600">Email</label><input id="email" type="email" /></div>
+                <div><label style="display:block;font-weight:600">Contact</label><input id="contact" type="text" /></div>
+            </div>
+            <div style="text-align:center; margin-top:12px;">
+                <button type="button" id="startGameBtn" class="btn">Start Game</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Game Section -->
+    <div class="section hidden" id="gameSection">
+        <h2>AMR & Dengue Crossword Puzzle</h2>
+        <div style="text-align:center; margin-bottom:10px;">Time: <span id="timer" class="timer">00:00</span></div>
+        <div id="crosswordGrid"></div>
+        <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:260px;">
+                <h3>Across</h3>
+                <ol id="acrossClues"></ol>
+            </div>
+            <div style="flex:1; min-width:260px;">
+                <h3>Down</h3>
+                <ol id="downClues"></ol>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:12px;">
+            <button id="checkAnswersBtn" class="btn">Check Answers</button>
+            <button id="submitGameBtn" class="btn secondary">Submit Answers</button>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="section hidden" id="resultsSection">
+        <h2>Game Results</h2>
+        <div id="playerResult" style="margin-bottom:12px;"></div>
+        <div id="solutionBox" style="display:none; margin-bottom:12px;">
+            <h3>Puzzle Solution</h3>
+            <div id="solutionGrid"></div>
+        </div>
+
+        <h3>Leaderboard</h3>
+        <table id="leaderboard" style="width:100%; border-collapse:collapse; margin-bottom:12px;">
+            <thead><tr style="background:#3498db; color:#fff;"><th>Rank</th><th>Name</th><th>Club</th><th>Score</th><th>Time</th><th>Date</th></tr></thead>
+            <tbody id="leaderboardBody"></tbody>
+        </table>
+        <div style="text-align:center;">
+            <button id="playAgainBtn" class="btn">Play Again</button>
+        </div>
+    </div>
+
+    <!-- Include GIF.js from CDN for animation export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+
+<script>
+/* ---------------------- config & state ---------------------- */
+const config = {
+    adminCredentials: { username: "admin", password: "amrdengue2023" },
+    questionsKey: "crosswordQuestions",
+    leaderboardKey: "crosswordLeaderboard",
+    gridSize: 15
+};
+
+let gameState = {
+    player: {},
+    crossword: {},
+    startTime: null,
+    timerInterval: null,
+    timeElapsed: 0,
+    score: 0,
+    checked: false,
+    words: []
+};
+
+/* ---------------------- element refs ---------------------- */
+const el = {
+    adminAccessBtn: document.getElementById('adminAccessBtn'),
+    overlay: document.getElementById('overlay'),
+    closeModal: document.getElementById('closeModal'),
+    loginBlock: document.getElementById('loginBlock'),
+    adminControls: document.getElementById('adminControls'),
+    adminUsername: document.getElementById('adminUsername'),
+    adminPassword: document.getElementById('adminPassword'),
+    adminLoginBtn: document.getElementById('adminLoginBtn'),
+    adminLogoutBtn: document.getElementById('adminLogoutBtn'),
+    csvUpload: document.getElementById('csvUpload'),
+    uploadCsvBtn: document.getElementById('uploadCsvBtn'),
+    clearQuestionsBtn: document.getElementById('clearQuestionsBtn'),
+    addRowBtn: document.getElementById('addRowBtn'),
+    manualRows: document.getElementById('manualRows'),
+    saveManualBtn: document.getElementById('saveManualBtn'),
+    adminViewLeaderboard: document.getElementById('adminViewLeaderboard'),
+    leaderboardArea: document.getElementById('leaderboardArea'),
+    adminLeaderboardBody: document.querySelector('#adminLeaderboard tbody'),
+    downloadAnimBtn: document.getElementById('downloadAnimBtn'),
+    quizStatus: document.getElementById('quizStatus'),
+
+    // game
+    startGameBtn: document.getElementById('startGameBtn'),
+    registrationSection: document.getElementById('registrationSection'),
+    gameSection: document.getElementById('gameSection'),
+    resultsSection: document.getElementById('resultsSection'),
+    playerName: document.getElementById('playerName'),
+    clubName: document.getElementById('clubName'),
+    email: document.getElementById('email'),
+    contact: document.getElementById('contact'),
+    crosswordGrid: document.getElementById('crosswordGrid'),
+    acrossClues: document.getElementById('acrossClues'),
+    downClues: document.getElementById('downClues'),
+    checkAnswersBtn: document.getElementById('checkAnswersBtn'),
+    submitGameBtn: document.getElementById('submitGameBtn'),
+    playerResult: document.getElementById('playerResult'),
+    solutionBox: document.getElementById('solutionBox'),
+    solutionGrid: document.getElementById('solutionGrid'),
+    showSolutionBtn: document.getElementById('showSolutionBtn'),
+    leaderboardBody: document.getElementById('leaderboardBody'),
+    playAgainBtn: document.getElementById('playAgainBtn'),
+    timer: document.getElementById('timer'),
+    startGameBtn: document.getElementById('startGameBtn')
+};
+
+/* ---------------------- event wiring ---------------------- */
+el.adminAccessBtn.addEventListener('click', () => {
+    el.overlay.classList.add('show');
+    el.overlay.setAttribute('aria-hidden','false');
+});
+document.getElementById('closeModal').addEventListener('click', closeOverlay);
+document.getElementById('closeLogin').addEventListener('click', closeOverlay);
+
+el.adminLoginBtn.addEventListener('click', adminLogin);
+el.adminLogoutBtn.addEventListener('click', adminLogout);
+el.uploadCsvBtn.addEventListener('click', uploadCsv);
+el.clearQuestionsBtn.addEventListener('click', clearQuestions);
+
+el.addRowBtn.addEventListener('click', addManualRow);
+el.saveManualBtn.addEventListener('click', saveManualRows);
+el.adminViewLeaderboard.addEventListener('click', toggleAdminLeaderboard);
+el.downloadAnimBtn.addEventListener('click', downloadAnimatedLeaderboard);
+
+/* game listeners */
+el.startGameBtn.addEventListener('click', startGame);
+el.checkAnswersBtn.addEventListener('click', checkAnswers);
+el.submitGameBtn.addEventListener('click', submitGame);
+el.playAgainBtn.addEventListener('click', playAgain);
+
+/* ---------------------- helper UI functions ---------------------- */
+function closeOverlay(){
+    el.overlay.classList.remove('show');
+    el.overlay.setAttribute('aria-hidden','true');
+    // reset login fields
+    el.adminUsername.value = "";
+    el.adminPassword.value = "";
+}
+
+/* ---------------------- CSV parsing & storage ---------------------- */
+function parseCSV(csv){
+    const lines = csv.split(/\r?\n/).filter(Boolean);
+    if(lines.length === 0) return [];
+    const headers = lines[0].split(',').map(h => h.trim());
+    const idx = h => headers.indexOf(h) >= 0 ? headers.indexOf(h) : -1;
+    const iWord = idx('Word') >=0 ? idx('Word') : idx('word');
+    const iClue = idx('Clue') >=0 ? idx('Clue') : idx('clue');
+    const iDiff = idx('Difficulty') >=0 ? idx('Difficulty') : -1;
+    const iCat = idx('Category') >=0 ? idx('Category') : -1;
+    const out = [];
+    for(let i=1;i<lines.length;i++){
+        const cols = lines[i].split(',').map(c=>c.trim());
+        if(!cols[iWord] || !cols[iClue]) continue;
+        out.push({
+            word: cols[iWord].toUpperCase(),
+            clue: cols[iClue],
+            difficulty: (iDiff>=0 ? cols[iDiff] : 'Medium') || 'Medium',
+            category: (iCat>=0 ? cols[iCat] : 'General') || 'General'
+        });
+    }
+    return out;
+}
+
+function uploadCsv(){
+    const file = el.csvUpload.files[0];
+    if(!file){ alert('Please select a CSV file.'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const questions = parseCSV(e.target.result);
+            if(questions.length){
+                // append to existing questions
+                const existing = JSON.parse(localStorage.getItem(config.questionsKey) || '[]');
+                const merged = existing.concat(questions);
+                localStorage.setItem(config.questionsKey, JSON.stringify(merged));
+                gameState.words = merged;
+                updateQuizStatus();
+                alert(`Uploaded ${questions.length} questions.`);
+            } else {
+                alert('No valid questions found in CSV.');
+            }
+        } catch(err){
+            alert('CSV parse error: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
+function clearQuestions(){
+    if(!confirm('Clear all saved questions? This cannot be undone.')) return;
+    localStorage.removeItem(config.questionsKey);
+    loadQuestions();
+    alert('Questions cleared — default set restored.');
+}
+
+/* ---------------------- manual add rows ---------------------- */
+function addManualRow(prefill){
+    const row = document.createElement('div');
+    row.className = 'manual-row';
+    row.innerHTML = `
+        <input class="m-word" placeholder="Word" />
+        <input class="m-clue" placeholder="Clue" />
+        <input class="m-cat" placeholder="Category" />
+        <input class="m-diff" placeholder="Difficulty" />
+        <button class="remove small">X</button>
+    `;
+    const removeBtn = row.querySelector('.remove');
+    removeBtn.addEventListener('click', ()=> row.remove());
+    if(prefill){
+        row.querySelector('.m-word').value = prefill.word || '';
+        row.querySelector('.m-clue').value = prefill.clue || '';
+        row.querySelector('.m-cat').value = prefill.category || '';
+        row.querySelector('.m-diff').value = prefill.difficulty || '';
+    }
+    el.manualRows.appendChild(row);
+}
+function saveManualRows(){
+    const rows = [...el.manualRows.querySelectorAll('.manual-row')];
+    const newQs = [];
+    for(const r of rows){
+        const w = r.querySelector('.m-word').value.trim();
+        const c = r.querySelector('.m-clue').value.trim();
+        if(!w || !c) continue;
+        newQs.push({ word: w.toUpperCase(), clue: c, category: r.querySelector('.m-cat').value || 'General', difficulty: r.querySelector('.m-diff').value || 'Medium' });
+    }
+    if(newQs.length === 0){ alert('No valid manual questions to save.'); return; }
+    const existing = JSON.parse(localStorage.getItem(config.questionsKey) || '[]');
+    const merged = existing.concat(newQs);
+    localStorage.setItem(config.questionsKey, JSON.stringify(merged));
+    gameState.words = merged;
+    el.manualRows.innerHTML = '';
+    updateQuizStatus();
+    alert(`Saved ${newQs.length} questions.`);
+}
+
+/* ---------------------- admin login/logout ---------------------- */
+function adminLogin(){
+    const u = el.adminUsername.value.trim();
+    const p = el.adminPassword.value;
+    if(u === config.adminCredentials.username && p === config.adminCredentials.password){
+        localStorage.setItem('adminLoggedIn','true');
+        el.loginBlock.classList.add('hidden');
+        el.adminControls.classList.remove('hidden');
+        loadAdminState();
+    } else {
+        alert('Invalid credentials');
+    }
+}
+
+function adminLogout(){
+    localStorage.removeItem('adminLoggedIn');
+    el.adminControls.classList.add('hidden');
+    el.loginBlock.classList.remove('hidden');
+    closeOverlay();
+}
+
+/* ---------------------- load / init questions ---------------------- */
+function getDefaultQuestions(){
+    return [
+        { word: "ANTIBIOTIC", clue: "Medicines used to prevent and treat bacterial infections", category: "AMR" },
+        { word: "RESISTANCE", clue: "The ability of bacteria to withstand the effects of an antibiotic", category: "AMR" },
+        { word: "MOSQUITO", clue: "Insect that transmits dengue virus", category: "Dengue" },
+        { word: "AEDES", clue: "Genus of mosquito that spreads dengue", category: "Dengue" }
+    ];
+}
+
+function loadQuestions(){
+    try {
+        const saved = localStorage.getItem(config.questionsKey);
+        if(saved){
+            gameState.words = JSON.parse(saved);
+        } else {
+            gameState.words = getDefaultQuestions();
+        }
+    } catch(e) {
+        console.error('loadQuestions', e);
+        gameState.words = getDefaultQuestions();
+    }
+    updateQuizStatus();
+}
+
+function updateQuizStatus(){
+    if(gameState.words && gameState.words.length){
+        el.quizStatus.textContent = `Quiz loaded with ${gameState.words.length} questions.`;
+        el.quizStatus.style.color = "#2ecc71";
+    } else {
+        el.quizStatus.textContent = `Quiz is not quizing 😂😂`;
+        el.quizStatus.style.color = "#e74c3c";
+    }
+}
+
+/* ---------------------- Admin leaderboard view & animated export ---------------------- */
+function loadAdminState(){
+    // show up to 5 manual rows prefilled with nothing for fast add
+    el.manualRows.innerHTML = '';
+    for(let i=0;i<4;i++) addManualRow();
+
+    // populate admin leaderboard area if exists
+    displayAdminLeaderboard();
+}
+
+function displayAdminLeaderboard(){
+    try{
+        const data = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
+        data.sort((a,b) => (b.score - a.score) || (a.time - b.time));
+        el.adminLeaderboardBody.innerHTML = '';
+        data.forEach((row,i) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${i+1}</td><td>${row.name}</td><td>${row.club}</td><td>${row.score}%</td><td>${formatTime(row.time)}</td><td>${new Date(row.date).toLocaleString()}</td>`;
+            el.adminLeaderboardBody.appendChild(tr);
+        });
+    }catch(e){ console.error(e); }
+}
+
+function toggleAdminLeaderboard(){
+    const area = document.getElementById('leaderboardArea');
+    area.classList.toggle('hidden');
+    displayAdminLeaderboard();
+}
+
+/* Animated leaderboard export:
+   - Creates a canvas, draws static leaderboard then animates falling flowers and top 3 highlight.
+   - Uses gif.js if available. If gif.js fails, falls back to static PNG. */
+async function downloadAnimatedLeaderboard(){
+    const data = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
+    data.sort((a,b) => (b.score - a.score) || (a.time - b.time));
+    // prepare a list for top entries (cap at 6)
+    const top = data.slice(0,6);
+
+    // canvas drawing size
+    const W = 800, H = 400;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // generate frames for simple animation
+    const frames = [];
+    const totalFrames = 40;
+    // pre-generate flower positions
+    const petals = [];
+    for(let i=0;i<24;i++){
+        petals.push({ x: Math.random()*W, y: -Math.random()*H, vx: (Math.random()-0.5)*1.2, vy: 1+Math.random()*2, r:6+Math.random()*8, rot: Math.random()*360 });
+    }
+
+    function drawFrame(t){
+        // background
+        ctx.clearRect(0,0,W,H);
+        ctx.fillStyle = '#fff8f2';
+        ctx.fillRect(0,0,W,H);
+
+        // big title
+        ctx.fillStyle = '#2b6cb0';
+        ctx.font = '26px Segoe UI Semibold';
+        ctx.fillText('Leaderboard', 20, 40);
+
+        // draw a stylish box for top 3
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(18,54, W-36, 220);
+        ctx.strokeStyle = '#dfe7f2';
+        ctx.strokeRect(18,54, W-36, 220);
+
+        // draw top entries
+        ctx.font = '16px Segoe UI';
+        for(let i=0;i<6;i++){
+            const ent = top[i];
+            const y = 90 + i*30;
+            if(!ent) break;
+            // highlight top 3 with subtle glow that pulses
+            if(i<3){
+                const pulse = 1 + 0.06*Math.sin((t+i)*0.35);
+                ctx.save();
+                ctx.fillStyle = (i===0? '#fde68a' : i===1? '#e6eefc' : '#fde6d6');
+                ctx.globalAlpha = 0.9;
+                ctx.fillRect(36, y-18, W-72, 28*pulse);
+                ctx.restore();
+            }
+            ctx.fillStyle = '#333';
+            ctx.fillText(`${i+1}. ${ent.name} (${ent.club})`, 40, y);
+            ctx.fillText(`${ent.score}%`, W-140, y);
+            ctx.fillText(formatTime(ent.time), W-90, y);
+        }
+
+        // falling flowers
+        for(let p of petals){
+            p.x += p.vx;
+            p.y += p.vy;
+            p.rot += 4;
+            // wrap
+            if(p.y > H+30) { p.y = -40; p.x = Math.random()*W; }
+            drawPetal(ctx, p.x, p.y, p.r, p.rot);
+        }
+
+        // footer celebration text
+        ctx.fillStyle = '#2c7a7b';
+        ctx.font = '14px Segoe UI';
+        ctx.fillText('Congrats to the top players!', 20, H-16);
+    }
+
+    function drawPetal(ctx,x,y,r,rot){
+        ctx.save();
+        ctx.translate(x,y);
+        ctx.rotate(rot*Math.PI/180);
+        ctx.globalAlpha = 0.95;
+        ctx.fillStyle = '#ff6b6b';
+        ctx.beginPath();
+        ctx.ellipse(0,0,r*0.6,r,0,0,Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    // use gif.js if present
+    if(window.GIF){
+        try {
+            const gif = new GIF({ workers: 2, quality: 10, width:W, height:H });
+            for(let f=0; f<totalFrames; f++){
+                drawFrame(f);
+                gif.addFrame(canvas, {copy:true, delay:50});
+            }
+            gif.on('finished', function(blob){
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'leaderboard-celebration.gif';
+                a.click();
+            });
+            gif.render();
+            return;
+        } catch(e){
+            console.warn('gif export failed, falling back to PNG', e);
+        }
+    }
+
+    // fallback: create single PNG snapshot
+    drawFrame(0);
+    canvas.toBlob(function(b){
+        const url = URL.createObjectURL(b);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'leaderboard.png';
+        a.click();
+    }, 'image/png');
+}
+
+/* ---------------------- crossword generation (kept from original, simplified) ---------------------- */
+/* For brevity, I preserved your original crossword placement/render logic with light adjustments. */
+
+function generateCrossword(){
+    const gridSize = config.gridSize;
+    const grid = Array(gridSize).fill().map(()=>Array(gridSize).fill(''));
+    const usedWords = [];
+    const placedWords = [];
+
+    const sorted = [...gameState.words].sort((a,b)=> b.word.length - a.word.length);
+    if(sorted.length === 0) return;
+
+    const first = sorted[0];
+    const fr = Math.floor(gridSize/2);
+    const fc = Math.floor((gridSize - first.word.length)/2);
+    for(let i=0;i<first.word.length;i++){
+        grid[fr][fc+i] = { letter:'', correct:first.word[i], across: i===0? {number:1, clue:first.clue} : null, down:null };
+    }
+    placedWords.push({ word:first.word, clue:first.clue, row:fr, col:fc, direction:'across', number:1 });
+    usedWords.push(first.word);
+    let wordNumber = 2;
+
+    function canPlaceWord(grid,word,row,col,direction){
+        const N = gridSize;
+        if(direction === 'across'){
+            if(col<0 || col+word.length> N) return false;
+        } else {
+            if(row<0 || row+word.length> N) return false;
+        }
+        for(let i=0;i<word.length;i++){
+            const r = direction==='across'? row : row+i;
+            const c = direction==='across'? col+i : col;
+            if(grid[r][c] !== ''){
+                if(grid[r][c].correct !== word[i]) return false;
+            } else {
+                // basic adjacency checks minimal
+            }
+        }
+        return true;
+    }
+    function placeWord(grid,wordObj,wordNumber,row,col,direction){
+        const word = wordObj.word;
+        let hasNumber = false;
+        for(let i=0;i<word.length;i++){
+            const r = direction==='across'? row : row+i;
+            const c = direction==='across'? col+i : col;
+            if(grid[r][c] === ''){
+                grid[r][c] = { letter:'', correct:word[i], across: direction==='across' && i===0? {number:wordNumber, clue:wordObj.clue} : null, down:direction==='down' && i===0? {number:wordNumber, clue:wordObj.clue} : null };
+            } else {
+                if(i===0){
+                    if(direction==='across' && grid[r][c].across === null) grid[r][c].across = {number:wordNumber, clue:wordObj.clue};
+                    if(direction==='down' && grid[r][c].down === null) grid[r][c].down = {number:wordNumber, clue:wordObj.clue};
+                }
+            }
+        }
+        placedWords.push({word:word, clue:wordObj.clue, row, col, direction, number:wordNumber});
+    }
+
+    for(const wordObj of sorted.slice(1)){
+        const word = wordObj.word;
+        if(usedWords.includes(word)) continue;
+        let placed = false;
+        for(let i=0;i<word.length && !placed;i++){
+            const letter = word[i];
+            for(let r=0;r<gridSize && !placed;r++){
+                for(let c=0;c<gridSize && !placed;c++){
+                    if(grid[r][c] !== '' && grid[r][c].correct === letter){
+                        if(canPlaceWord(grid,word, r - i, c, 'down')){
+                            placeWord(grid,wordObj,wordNumber, r - i, c, 'down');
+                            wordNumber++; placed = true;
+                        } else if(canPlaceWord(grid,word, r, c - i, 'across')){
+                            placeWord(grid,wordObj,wordNumber, r, c - i, 'across');
+                            wordNumber++; placed = true;
+                        }
+                    }
+                }
+            }
+        }
+        if(placed) usedWords.push(word);
+    }
+
+    for(let r=0;r<gridSize;r++){
+        for(let c=0;c<gridSize;c++){
+            if(grid[r][c] === '') grid[r][c] = { black:true };
+        }
+    }
+    gameState.crossword = { grid, placedWords, size:gridSize };
+}
+
+/* render crossword */
+function renderCrossword(){
+    const cw = gameState.crossword;
+    if(!cw || !cw.grid) return;
+    el.crosswordGrid.innerHTML = '';
+    el.acrossClues.innerHTML = '';
+    el.downClues.innerHTML = '';
+
+    const table = document.createElement('table');
+    table.className = 'crossword';
+    for(let r=0;r<cw.size;r++){
+        const tr = document.createElement('tr');
+        for(let c=0;c<cw.size;c++){
+            const td = document.createElement('td');
+            const cell = cw.grid[r][c];
+            if(cell.black){ td.classList.add('black'); tr.appendChild(td); continue; }
+            if(cell.across && cell.across.number){ const s = document.createElement('span'); s.className='number'; s.textContent = cell.across.number; td.appendChild(s); }
+            else if(cell.down && cell.down.number){ const s = document.createElement('span'); s.className='number'; s.textContent = cell.down.number; td.appendChild(s); }
+
+            const input = document.createElement('input');
+            input.className = 'cell';
+            input.maxLength = 1;
+            input.dataset.row = r; input.dataset.col = c;
+            input.addEventListener('input', function(){
+                const row = +this.dataset.row; const col = +this.dataset.col;
+                gameState.crossword.grid[row][col].letter = this.value.toUpperCase();
+                saveGameState();
+            });
+            td.appendChild(input);
+            tr.appendChild(td);
+        }
+        table.appendChild(tr);
+    }
+    el.crosswordGrid.appendChild(table);
+
+    // clues
+    const across = cw.placedWords.filter(w => w.direction === 'across').sort((a,b)=>a.number-b.number);
+    const down = cw.placedWords.filter(w => w.direction === 'down').sort((a,b)=>a.number-b.number);
+    across.forEach(w => { const li = document.createElement('li'); li.innerHTML = `<strong>${w.number}.</strong> ${w.clue}`; el.acrossClues.appendChild(li); });
+    down.forEach(w => { const li = document.createElement('li'); li.innerHTML = `<strong>${w.number}.</strong> ${w.clue}`; el.downClues.appendChild(li); });
+}
+
+/* check & scoring */
+function checkAnswers(){
+    if(!gameState.crossword || !gameState.crossword.grid) return;
+    let correctCount = 0; let total = 0;
+    for(let r=0;r<gameState.crossword.size;r++){
+        for(let c=0;c<gameState.crossword.size;c++){
+            const cell = gameState.crossword.grid[r][c];
+            if(cell.black) continue;
+            total++;
+            const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+            if(!input) continue;
+            const val = (input.value||'').toUpperCase();
+            if(val === cell.correct){ input.parentElement.classList.add('correct'); input.parentElement.classList.remove('incorrect'); correctCount++; }
+            else if(val) { input.parentElement.classList.add('incorrect'); input.parentElement.classList.remove('correct'); }
+            else { input.parentElement.classList.remove('correct','incorrect'); }
+        }
+    }
+    gameState.score = Math.floor((correctCount/total)*100);
+    gameState.checked = true;
+    saveGameState();
+    alert(`Checked: ${correctCount} / ${total} letters — Score ${gameState.score}%`);
+}
+
+function submitGame(){
+    if(!gameState.checked){
+        if(!confirm("You haven't checked your answers. Check now?")) return;
+        checkAnswers();
+    }
+    clearInterval(gameState.timerInterval);
+    gameState.timeElapsed = Math.floor((new Date() - gameState.startTime)/1000);
+    submitToLeaderboard();
+    showSection('results');
+    showResults();
+}
+
+function submitToLeaderboard(){
+    const data = {
+        name: gameState.player.name,
+        club: gameState.player.club,
+        email: gameState.player.email,
+        contact: gameState.player.contact,
+        score: gameState.score,
+        time: gameState.timeElapsed,
+        date: gameState.player.date
+    };
+    const lb = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
+    lb.push(data);
+    localStorage.setItem(config.leaderboardKey, JSON.stringify(lb));
+}
+
+/* results & leaderboard display */
+function showResults(){
+    let medal = '', cls = '';
+    if(gameState.score >= 90){ medal='🥇'; cls='gold'; }
+    else if(gameState.score >=75){ medal='🥈'; cls='silver'; }
+    else if(gameState.score >=50){ medal='🥉'; cls='bronze'; }
+    el.playerResult.innerHTML = `<h3>Your Result ${medal ? `<span>${medal}</span>` : ''}</h3>
+        <p><strong>Name:</strong> ${gameState.player.name}</p>
+        <p><strong>Club:</strong> ${gameState.player.club}</p>
+        <p><strong>Score:</strong> ${gameState.score}%</p>
+        <p><strong>Time:</strong> ${formatTime(gameState.timeElapsed)}</p>`;
+
+    el.solutionBox.style.display = 'block';
+    displayLeaderboard();
+}
+
+function displayLeaderboard(){
+    try{
+        const lb = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
+        lb.sort((a,b)=> (b.score - a.score) || (a.time - b.time));
+        el.leaderboardBody.innerHTML = '';
+        lb.forEach((entry,i) => {
+            const tr = document.createElement('tr');
+            if(entry.name === gameState.player.name && entry.date === gameState.player.date) tr.style.backgroundColor = '#e3f2fd';
+            tr.innerHTML = `<td>${i+1}</td><td>${entry.name}</td><td>${entry.club}</td><td>${entry.score}%</td><td>${formatTime(entry.time)}</td><td>${new Date(entry.date).toLocaleString()}</td>`;
+            el.leaderboardBody.appendChild(tr);
+        });
+    }catch(e){ console.error(e); }
+}
+
+/* start / timer / play again */
+function startGame(){
+    if(!el.playerName.value || !el.clubName.value){ alert('Enter name and club'); return; }
+    if(!gameState.words || gameState.words.length === 0){ alert('No questions available. Contact admin.'); return; }
+    gameState.player = {
+        name: el.playerName.value,
+        club: el.clubName.value,
+        email: el.email.value,
+        contact: el.contact.value,
+        date: new Date().toISOString()
+    };
+    generateCrossword();
+    gameState.startTime = new Date();
+    gameState.timerInterval = setInterval(updateTimer, 1000);
+    gameState.checked = false;
+    showSection('game');
+    renderCrossword();
+    saveGameState();
+}
+
+function playAgain(){
+    const player = gameState.player;
+    gameState = { player, crossword: {}, startTime: null, timerInterval: null, timeElapsed: 0, score:0, checked:false, words: gameState.words };
+    el.playerName.value = player.name; el.clubName.value = player.club; el.email.value = player.email; el.contact.value = player.contact;
+    showSection('registration');
+}
+
+/* timer and helpers */
+function updateTimer(){
+    const now = new Date();
+    gameState.timeElapsed = Math.floor((now - gameState.startTime)/1000);
+    el.timer.textContent = formatTime(gameState.timeElapsed);
+}
+function formatTime(sec){
+    const mm = Math.floor(sec/60).toString().padStart(2,'0');
+    const ss = (sec%60).toString().padStart(2,'0');
+    return `${mm}:${ss}`;
+}
+
+/* save/load game */
+function saveGameState(){
+    try { localStorage.setItem('crosswordGame', JSON.stringify(gameState)); } catch(e){}
+}
+function loadGame(){
+    const saved = localStorage.getItem('crosswordGame');
+    if(!saved) { showSection('registration'); return; }
+    try {
+        const s = JSON.parse(saved);
+        gameState = { ...gameState, ...s };
+        if(gameState.crossword && gameState.crossword.grid){
+            // resume
+            gameState.startTime = new Date(new Date() - (gameState.timeElapsed || 0) * 1000);
+            gameState.timerInterval = setInterval(updateTimer, 1000);
+            renderCrossword();
+            showSection('game');
+        } else if(gameState.score > 0){
+            showSection('results');
+            showResults();
+        } else {
+            showSection('registration');
+        }
+    } catch(e){ console.error(e); showSection('registration'); }
+}
+
+function showSection(which){
+    el.registrationSection.classList.add('hidden');
+    el.gameSection.classList.add('hidden');
+    el.resultsSection.classList.add('hidden');
+    if(which === 'registration') el.registrationSection.classList.remove('hidden');
+    else if(which === 'game') el.gameSection.classList.remove('hidden');
+    else if(which === 'results') el.resultsSection.classList.remove('hidden');
+}
+
+/* ---------------------- initialization ---------------------- */
+function init(){
+    loadQuestions();
+    // if admin already logged in (localStorage) show admin controls
+    if(localStorage.getItem('adminLoggedIn') === 'true'){
+        el.loginBlock.classList.add('hidden');
+        el.adminControls.classList.remove('hidden');
+        loadAdminState();
+    }
+    // restore saved game if exists
+    const saved = localStorage.getItem('crosswordGame');
+    if(saved) {
+        try {
+            const s = JSON.parse(saved);
+            // keep loaded words from storage
+            if(s.crossword && s.crossword.grid) {
+                gameState = { ...gameState, ...s };
+                loadGame();
+                return;
+            }
+        } catch(e){}
+    }
+    showSection('registration');
+}
+
+init();
+// Force show registration form on load
+showSection('registration');
+
+</script>
+</body>
+</html>
