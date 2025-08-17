@@ -124,6 +124,7 @@
             height: 50px;
             margin-right: 15px;
             transition: transform 0.5s ease;
+            object-fit: contain;
         }
         
         .logo:hover img {
@@ -337,14 +338,13 @@
     </div>
 </div>
         
-        /* Hero Section */
-        .hero {
-            height: 100vh;
+               .hero {
+            min-height: 100vh;
+            padding: 100px 5% 50px; /* Added top padding to avoid navbar overlap */
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-                        url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center/cover;
+                        url('https://drive.google.com/uc?export=view&id=16xZVv76CfJO6TUw9pRazbb-qxxLHz7jb') no-repeat center center/cover;
             display: flex;
             align-items: center;
-            padding: 0 5%;
             position: relative;
             overflow: hidden;
         }
@@ -353,9 +353,9 @@
             max-width: 800px;
             z-index: 10;
             color: Black;
-            transform: translateY(1000px);
-            opacity: 0;
-            animation: fadeInUp 1s ease forwards 0.5s;
+            transform: translateY(0);
+            opacity: 1;
+            padding-top: 160px; /* Added padding to ensure content is visible */
         }
         
         .hero-content h1 {
@@ -365,7 +365,7 @@
             text-shadow: 0 5px 15px rgba(0, 0, 10, 0.3);
             background: linear-gradient(to right, white, #e2e8f0);
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-text-fill-color: Black;
         }
         
         .hero-content p {
@@ -373,6 +373,7 @@
             margin-bottom: 30px;
             line-height: 1.6;
             opacity: 0.9;
+            color: Black;
         }
         
         .cta-buttons {
@@ -801,6 +802,15 @@
             .section-title h2 {
                 font-size: 2rem;
             }
+
+            /* Mobile hero section adjustments */
+            .hero {
+                padding: 80px 5% 30px;
+            }
+            
+            .hero-content {
+                padding-top: 20px;
+            }
         }
     </style>
 </head>
@@ -872,8 +882,8 @@
     <header>
         <nav class="navbar">
             <div class="logo">
-                <!-- Google Drive logo link -->
-                <img src="https://drive.google.com/file/d/1GvHhHpFUVpGLzbrytPYviNUonVhPTliF" alt="AMR Kantipur Logo">
+                <!-- Updated Google Drive logo link -->
+                <img src="https://drive.google.com/uc?export=view&id=1GvHhHpFUVpGLzbrytPYviNUonVhPTliF" alt="AMR Kantipur Logo">
                 
                 <div class="logo-text">
                     <h1>AMR Kantipur</h1>
@@ -917,7 +927,7 @@
         </div>
         <div class="about-content">
             <div class="about-image">
-                <img src="https://drive.google.com/file/d/1FMytwrlx8MjnlOeElQUBG6_7FNJ2aiG7" alt="AMR Club Members">
+                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="AMR Club Members">
             </div>
             <div class="about-text">
                 <h3>Our Mission to Combat AMR in Kantipur</h3>
