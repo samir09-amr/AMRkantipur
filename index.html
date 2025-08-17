@@ -29,6 +29,17 @@
             overflow-x: hidden;
         }
         
+        /* Admin Trigger Area (top-right corner) */
+        #admin-trigger-area {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 50px;
+            height: 50px;
+            z-index: 10000;
+            display: none; /* Hidden by default */
+        }
+        
         /* Optimized Custom Cursor */
         .cursor {
             position: fixed;
@@ -794,6 +805,9 @@
     </style>
 </head>
 <body>
+<!-- Admin Trigger Area (top-right corner) -->
+<div id="admin-trigger-area"></div>
+
 <!-- Admin Login Modal -->
 <div id="admin-modal">
     <div>
@@ -858,7 +872,8 @@
     <header>
         <nav class="navbar">
             <div class="logo">
-            <a href="https://ibb.co/3m7c9X7Q"><img src="https://i.ibb.co/gZ3JL13h/formal-logo.jpg" alt="formal-logo" border="0"></a>
+                <!-- Google Drive logo link -->
+                <img src="https://drive.google.com/file/d/1GvHhHpFUVpGLzbrytPYviNUonVhPTliF" alt="AMR Kantipur Logo">
                 
                 <div class="logo-text">
                     <h1>AMR Kantipur</h1>
@@ -902,7 +917,7 @@
         </div>
         <div class="about-content">
             <div class="about-image">
-                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="AMR Club Members">
+                <img src="https://drive.google.com/file/d/1FMytwrlx8MjnlOeElQUBG6_7FNJ2aiG7" alt="AMR Club Members">
             </div>
             <div class="about-text">
                 <h3>Our Mission to Combat AMR in Kantipur</h3>
@@ -1077,12 +1092,49 @@
 // Admin Portal Functionality
 const ADMIN_PASSWORD = "samirss"; // Change this to your desired password
 let isAdmin = false;
+let hideAdminTimer = null;
+
+// Create admin trigger area functionality
+function setupAdminTrigger() {
+    const triggerArea = document.getElementById('admin-trigger-area');
+    const adminControls = document.getElementById('admin-controls');
+    
+    // Show admin controls when mouse enters trigger area
+    triggerArea.addEventListener('mouseenter', () => {
+        clearTimeout(hideAdminTimer);
+        adminControls.style.display = 'block';
+    });
+    
+    // Hide admin controls after delay when mouse leaves trigger area
+    triggerArea.addEventListener('mouseleave', () => {
+        hideAdminTimer = setTimeout(() => {
+            if (!adminControls.matches(':hover')) {
+                adminControls.style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'none';
+            }
+        }, 1000);
+    });
+    
+    // Keep admin controls visible when hovering over them
+    adminControls.addEventListener('mouseenter', () => {
+        clearTimeout(hideAdminTimer);
+    });
+    
+    // Hide admin controls when leaving them
+    adminControls.addEventListener('mouseleave', () => {
+        hideAdminTimer = setTimeout(() => {
+            adminControls.style.display = 'none';
+        }, 500);
+    });
+}
 
 // Check for admin session on page load
 document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('adminLoggedIn')) {
         isAdmin = true;
-        showAdminControls();
+        document.getElementById('admin-trigger-area').style.display = 'block';
+        setupAdminTrigger();
+        setupAdminPanel();
     } else {
         // Show login modal after 5 seconds (for demo purposes)
         setTimeout(() => {
@@ -1100,7 +1152,9 @@ document.getElementById('admin-login-form').addEventListener('submit', (e) => {
         isAdmin = true;
         localStorage.setItem('adminLoggedIn', 'true');
         document.getElementById('admin-modal').style.display = 'none';
-        showAdminControls();
+        document.getElementById('admin-trigger-area').style.display = 'block';
+        setupAdminPanel();
+        setupAdminTrigger();
     } else {
         alert('Incorrect password');
     }
@@ -1112,6 +1166,7 @@ document.getElementById('admin-logout').addEventListener('click', () => {
     localStorage.removeItem('adminLoggedIn');
     document.getElementById('admin-panel').style.display = 'none';
     document.getElementById('admin-controls').style.display = 'none';
+    document.getElementById('admin-trigger-area').style.display = 'none';
     document.getElementById('admin-modal').style.display = 'flex';
 });
 
@@ -1121,9 +1176,7 @@ document.getElementById('admin-edit-btn').addEventListener('click', () => {
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
 });
 
-function showAdminControls() {
-    document.getElementById('admin-controls').style.display = 'block';
-    
+function setupAdminPanel() {
     // Populate content selector
     const selector = document.getElementById('content-selector');
     selector.innerHTML = '<option value="">Select element to edit</option>';
