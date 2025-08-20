@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodDonor - Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #dc3545;
+            --secondary: #6c757d;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --background: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --header-bg: #dc3545;
+            --sidebar-bg: #343a40;
+        }
+
+        [data-theme="dark"] {
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #f5f5f5;
+            --header-bg: #8b0000;
+            --sidebar-bg: #000000;
+            --light: #2d2d2d;
+            --dark: #f8f9fa;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .login-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(rgba(220, 53, 69, 0.8), rgba(220, 53, 69, 0.9));
+            background-size: cover;
+        }
+        
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .main-container {
+            display: none;
+        }
+        
+        .blood-header {
+            background-color: var(--header-bg);
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        
+        .sidebar {
+            background-color: var(--sidebar-bg);
+            color: white;
+            height: calc(100vh - 56px);
+            padding-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .sidebar a {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 15px 20px;
+            display: block;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar a:hover, .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .sidebar i {
+            width: 25px;
+        }
+        
+        .donor-card {
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        .donor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .eligible {
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .not-eligible {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .blood-group {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .filter-section {
+            background-color: var(--card-bg);
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: var(--text-color);
+        }
+        
+        .stats-card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        .table {
+            color: var(--text-color);
+        }
+        
+        .form-control, .form-select {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--secondary);
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .sync-status {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            text-align: right;
+            padding: 5px 15px;
+        }
+        
+        .error-alert {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-card">
+            <div class="card">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-tint fa-3x text-danger"></i>
+                        <h2 class="card-title mt-2">BloodDonor</h2>
+                        <p class="text-muted">Sign in to continue</p>
+                    </div>
+                    
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="email" placeholder="admin@blooddonor.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100">Sign In</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application (initially hidden) -->
+    <div class="main-container" id="mainApp">
+        <header class="blood-header py-3">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1><i class="fas fa-tint me-2"></i>BloodDonor</h1>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-end align-items-center">
+                        <span class="me-3" id="lastSync"></span>
+                        <div class="dropdown">
+                            <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i> Admin User
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                <li><a class="dropdown-item" href="#" id="syncNowBtn"><i class="fas fa-sync me-2"></i>Sync Now</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <nav class="col-md-3 col-lg-2 sidebar d-md-block p-0">
+                    <div class="position-sticky">
+                        <div class="list-group list-group-flush">
+                            <a href="#" class="list-group-item list-group-item-action active">
+                                <i class="fas fa-home"></i> Dashboard
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="fas fa-users"></i> Donors
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="fas fa-history"></i> Donation History
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="fas fa-map-marker-alt"></i> Locations
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="fas fa-file-medical"></i> Reports
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="fas fa-chart-line"></i> Analytics
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Main Content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h2>Donor Management Dashboard</h2>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addDonorModal"><i class="fas fa-plus me-1"></i> Add New Donor</button>
+                    </div>
+
+                    <!-- Error Alert -->
+                    <div class="alert alert-warning error-alert" id="errorAlert" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="errorMessage"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card stats-card bg-primary text-white h-100">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-9">
+                                            <h6 class="text-uppercase mb-0">Total Donors</h6>
+                                            <h2 class="my-2" id="totalDonors">0</h2>
+                                        </div>
+                                        <div class="col-3 text-end">
+                                            <i class="fas fa-users fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card stats-card bg-success text-white h-100">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-9">
+                                            <h6 class="text-uppercase mb-0">Eligible Donors</h6>
+                                            <h2 class="my-2" id="eligibleDonors">0</h2>
+                                        </div>
+                                        <div class="col-3 text-end">
+                                            <i class="fas fa-check-circle fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card stats-card bg-warning text-white h-100">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-9">
+                                            <h6 class="text-uppercase mb-0">Pending Donations</h6>
+                                            <h2 class="my-2" id="pendingDonations">0</h2>
+                                        </div>
+                                        <div class="col-3 text-end">
+                                            <i class="fas fa-clock fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card stats-card bg-danger text-white h-100">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-9">
+                                            <h6 class="text-uppercase mb-0">Urgent Needs</h6>
+                                            <h2 class="my-2" id="urgentNeeds">0</h2>
+                                        </div>
+                                        <div class="col-3 text-end">
+                                            <i class="fas fa-exclamation-circle fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Section -->
+                    <div class="filter-section mb-4">
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <label for="locationFilter" class="form-label">Location</label>
+                                <select class="form-select" id="locationFilter">
+                                    <option selected value="">All Locations</option>
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label for="bloodGroupFilter" class="form-label">Blood Group</label>
+                                <select class="form-select" id="bloodGroupFilter">
+                                    <option selected value="">All Blood Groups</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-2 d-flex align-items-end">
+                                <button class="btn btn-danger w-100" id="searchBtn">
+                                    <i class="fas fa-search me-1"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading Spinner -->
+                    <div class="loading-spinner" id="loadingSpinner">
+                        <div class="spinner-border text-danger" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading donor data...</p>
+                    </div>
+
+                    <!-- Donors List -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Donor List</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="donorTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Blood Group</th>
+                                            <th>Phone</th>
+                                            <th>Email</th>
+                                            <th>Location</th>
+                                            <th>Last Donation</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data will be populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="text-muted" id="showingText">Showing 0 of 0 donors</div>
+                                <nav aria-label="Donor list navigation">
+                                    <ul class="pagination justify-content-center mb-0">
+                                        <li class="page-item disabled" id="prevPage">
+                                            <a class="page-link" href="#">Previous</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item disabled" id="nextPage">
+                                            <a class="page-link" href="#">Next</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Donor Modal -->
+    <div class="modal fade" id="addDonorModal" tabindex="-1" aria-labelledby="addDonorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDonorModalLabel">Add New Donor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDonorForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="bloodGroup" class="form-label">Blood Group</label>
+                                <select class="form-select" id="bloodGroup" required>
+                                    <option value="">Select Blood Group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="donorEmail" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tempAddress" class="form-label">Temporary Address</label>
+                                <textarea class="form-control" id="tempAddress" rows="2"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="permAddress" class="form-label">Permanent Address</label>
+                                <textarea class="form-control" id="permAddress" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="location" class="form-label">Location</label>
+                                <select class="form-select" id="donorLocation" required>
+                                    <option value="">Select Location</option>
+                                    <option value="New York">New York</option>
+                                    <option value="Los Angeles">Los Angeles</option>
+                                    <option value="Chicago">Chicago</option>
+                                    <option value="Houston">Houston</option>
+                                    <option value="Phoenix">Phoenix</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastDonation" class="form-label">Last Donation Date</label>
+                                <input type="date" class="form-control" id="lastDonation">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveDonorBtn">Save Donor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">App Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="settingsForm">
+                        <div class="mb-3">
+                            <label for="themeSelect" class="form-label">Theme</label>
+                            <select class="form-select" id="themeSelect">
+                                <option value="light">Light</option>
+                                <option value="dark">Dark</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notifications" class="form-label">Notifications</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="notifications" checked>
+                                <label class="form-check-label" for="notifications">Enable notifications</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="autoSync" class="form-label">Auto Sync</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="autoSync">
+                                <label class="form-check-label" for="autoSync">Automatically sync data</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="syncFrequency" class="form-label">Sync Frequency (minutes)</label>
+                            <input type="number" class="form-control" id="syncFrequency" value="30" min="5" max="1440">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Google Sheets URL and API Key (hardcoded for website deployment)
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS8PoCBa1or5zKsxGGaJA3718HwHObej2i17GXe8oVAgwUy9SpAQ5cVC01cenPcGfNZVNUhBpGuDrv_/pub?output=csv';
+        const API_KEY = 'AIzaSyDyJPPeIMq2V2kO7jO254s3n8pQ';
+        
+        // Global variables
+        let donorData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 5;
+
+        // Login functionality - Only one ID has access
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Only allow one specific login
+            if (email === 'admin@blooddonor.com' && password === 'admin123') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                
+                // Load saved settings
+                loadSettings();
+                
+                // Fetch data from Google Sheets
+                fetchDonorData();
+            } else {
+                alert('Invalid login credentials. Please use admin@blooddonor.com and password admin123');
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        });
+
+        // Fetch data from Google Sheets with CORS proxy
+        async function fetchDonorData() {
+            try {
+                document.getElementById('loadingSpinner').style.display = 'block';
+                hideError();
+                
+                // Use CORS proxy to bypass CORS restrictions
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const response = await fetch(proxyUrl + SHEET_URL, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const csvData = await response.text();
+                
+                // Parse CSV data
+                donorData = parseCSV(csvData);
+                
+                // Update UI with donor data
+                updateDonorList();
+                updateStats();
+                updateLocationFilter();
+                
+                // Update last sync time
+                document.getElementById('lastSync').textContent = `Last sync: ${new Date().toLocaleTimeString()}`;
+            } catch (error) {
+                console.error('Error fetching donor data:', error);
+                showError(`Failed to fetch data from Google Sheets. Error: ${error.message}`);
+                
+                // Use sample data as fallback
+                donorData = getSampleData();
+                updateDonorList();
+                updateStats();
+                updateLocationFilter();
+                document.getElementById('lastSync').textContent = `Last sync: ${new Date().toLocaleTimeString()} (Sample Data)`;
+            } finally {
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorAlert').style.display = 'block';
+        }
+
+        // Hide error message
+        function hideError() {
+            document.getElementById('errorAlert').style.display = 'none';
+        }
+
+        // Parse CSV data
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const result = [];
+            
+            // Skip header row and process data rows
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line) {
+                    // Use regex to handle commas within quoted fields
+                    const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    
+                    // Create donor object
+                    const donor = {
+                        name: values[1] && values[2] ? `${values[1]} ${values[2]}`.replace(/"/g, '') : 'Unknown',
+                        bloodGroup: values[3] ? values[3].replace(/"/g, '') : 'Unknown',
+                        phone: values[4] ? values[4].replace(/"/g, '') : 'N/A',
+                        email: values[5] ? values[5].replace(/"/g, '') : 'N/A',
+                        tempAddress: values[6] ? values[6].replace(/"/g, '') : 'N/A',
+                        permAddress: values[7] ? values[7].replace(/"/g, '') : 'N/A',
+                        location: values[8] ? values[8].replace(/"/g, '') : 'Unknown',
+                        lastDonation: values[9] ? values[9].replace(/"/g, '') : 'Unknown',
+                        status: calculateEligibility(values[9])
+                    };
+                    
+                    result.push(donor);
+                }
+            }
+            
+            return result;
+        }
+
+        // Calculate eligibility based on last donation date
+        function calculateEligibility(lastDonationDate) {
+            if (!lastDonationDate || lastDonationDate === 'Unknown') return 'Unknown';
+            
+            try {
+                const lastDonation = new Date(lastDonationDate);
+                const today = new Date();
+                const threeMonthsAgo = new Date();
+                threeMonthsAgo.setMonth(today.getMonth() - 3);
+                
+                return lastDonation <= threeMonthsAgo ? 'Eligible' : 'Not Eligible';
+            } catch (e) {
+                return 'Unknown';
+            }
+        }
+
+        // Get sample data for fallback
+        function getSampleData() {
+            return [
+                {
+                    name: "John Smith",
+                    bloodGroup: "A+",
+                    phone: "(555) 123-4567",
+                    email: "john.smith@example.com",
+                    tempAddress: "123 Main St, New York, NY",
+                    permAddress: "456 Oak Ave, Boston, MA",
+                    location: "New York",
+                    lastDonation: "2023-05-15",
+                    status: "Eligible"
+                },
+                {
+                    name: "Emily Johnson",
+                    bloodGroup: "O-",
+                    phone: "(555) 987-6543",
+                    email: "emilyj@example.com",
+                    tempAddress: "789 Pine Rd, Los Angeles, CA",
+                    permAddress: "321 Elm St, Seattle, WA",
+                    location: "Los Angeles",
+                    lastDonation: "2023-08-20",
+                    status: "Not Eligible"
+                },
+                {
+                    name: "Michael Brown",
+                    bloodGroup: "B+",
+                    phone: "(555) 456-7890",
+                    email: "mbrown@example.com",
+                    tempAddress: "654 Cedar Ln, Chicago, IL",
+                    permAddress: "987 Maple Dr, Denver, CO",
+                    location: "Chicago",
+                    lastDonation: "2023-03-10",
+                    status: "Eligible"
+                },
+                {
+                    name: "Sarah Williams",
+                    bloodGroup: "AB-",
+                    phone: "(555) 234-5678",
+                    email: "sarahw@example.com",
+                    tempAddress: "321 Oak St, Houston, TX",
+                    permAddress: "654 Pine Ave, Austin, TX",
+                    location: "Houston",
+                    lastDonation: "2023-06-30",
+                    status: "Eligible"
+                },
+                {
+                    name: "Robert Davis",
+                    bloodGroup: "O+",
+                    phone: "(555) 876-5432",
+                    email: "rdavis@example.com",
+                    tempAddress: "987 Elm St, Phoenix, AZ",
+                    permAddress: "123 Birch Rd, Tucson, AZ",
+                    location: "Phoenix",
+                    lastDonation: "2023-09-05",
+                    status: "Not Eligible"
+                },
+                {
+                    name: "Jennifer Miller",
+                    bloodGroup: "A-",
+                    phone: "(555) 345-6789",
+                    email: "jmiller@example.com",
+                    tempAddress: "555 Maple Ave, New York, NY",
+                    permAddress: "888 Cedar St, Buffalo, NY",
+                    location: "New York",
+                    lastDonation: "2023-07-22",
+                    status: "Eligible"
+                },
+                {
+                    name: "David Wilson",
+                    bloodGroup: "AB+",
+                    phone: "(555) 765-4321",
+                    email: "dwilson@example.com",
+                    tempAddress: "222 Pine St, Chicago, IL",
+                    permAddress: "444 Oak Dr, Milwaukee, WI",
+                    location: "Chicago",
+                    lastDonation: "2023-09-15",
+                    status: "Not Eligible"
+                }
+            ];
+        }
+
+        // Update donor list in the table
+        function updateDonorList() {
+            const tableBody = document.querySelector('#donorTable tbody');
+            tableBody.innerHTML = '';
+            
+            // Apply filters if any
+            applyFilters();
+            
+            // Calculate pagination
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            // Update showing text
+            document.getElementById('showingText').textContent = 
+                `Showing ${startIndex + 1}-${endIndex} of ${filteredData.length} donors`;
+            
+            // Update pagination controls
+            updatePaginationControls();
+            
+            // Add rows to table
+            pageData.forEach(donor => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${donor.name}</td>
+                    <td><span class="blood-group">${donor.bloodGroup}</span></td>
+                    <td>${donor.phone}</td>
+                    <td>${donor.email}</td>
+                    <td>${donor.location}</td>
+                    <td>${donor.lastDonation}</td>
+                    <td><span class="${donor.status === 'Eligible' ? 'eligible' : (donor.status === 'Not Eligible' ? 'not-eligible' : 'text-secondary')}">${donor.status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary view-btn"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-success edit-btn"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-outline-danger delete-btn"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            addActionButtonListeners();
+        }
+
+        // Apply filters to donor data
+        function applyFilters() {
+            const locationFilter = document.getElementById('locationFilter').value;
+            const bloodGroupFilter = document.getElementById('bloodGroupFilter').value;
+            
+            filteredData = donorData.filter(donor => {
+                const locationMatch = !locationFilter || donor.location === locationFilter;
+                const bloodGroupMatch = !bloodGroupFilter || donor.bloodGroup === bloodGroupMatch;
+                
+                return locationMatch && bloodGroupMatch;
+            });
+            
+            // Reset to first page when filters change
+            currentPage = 1;
+        }
+
+        // Update pagination controls
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const prevPageBtn = document.getElementById('prevPage');
+            const nextPageBtn = document.getElementById('nextPage');
+            const paginationContainer = document.querySelector('.pagination');
+            
+            // Clear existing page numbers (except prev and next)
+            while (paginationContainer.children.length > 2) {
+                paginationContainer.removeChild(paginationContainer.children[1]);
+            }
+            
+            // Add page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageItem = document.createElement('li');
+                pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                
+                const pageLink = document.createElement('a');
+                pageLink.className = 'page-link';
+                pageLink.href = '#';
+                pageLink.textContent = i;
+                
+                pageLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage = i;
+                    updateDonorList();
+                });
+                
+                pageItem.appendChild(pageLink);
+                paginationContainer.insertBefore(pageItem, nextPageBtn);
+            }
+            
+            // Update prev/next buttons
+            prevPageBtn.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            nextPageBtn.className = `page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`;
+            
+            prevPageBtn.querySelector('a').addEventListener('click', (e) => {
+                if (currentPage > 1) {
+                    e.preventDefault();
+                    currentPage--;
+                    updateDonorList();
+                }
+            });
+            
+            nextPageBtn.querySelector('a').addEventListener('click', (e) => {
+                if (currentPage < totalPages) {
+                    e.preventDefault();
+                    currentPage++;
+                    updateDonorList();
+                }
+            });
+        }
+
+        // Add event listeners to action buttons
+        function addActionButtonListeners() {
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const name = this.closest('tr').querySelector('td:first-child').textContent;
+                    alert(`View details of ${name}`);
+                });
+            });
+
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const name = this.closest('tr').querySelector('td:first-child').textContent;
+                    alert(`Edit donor: ${name}`);
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const name = this.closest('tr').querySelector('td:first-child').textContent;
+                    if (confirm(`Are you sure you want to delete ${name} from donors?`)) {
+                        alert(`${name} has been deleted (simulated)`);
+                    }
+                });
+            });
+        }
+
+        // Update statistics cards
+        function updateStats() {
+            const totalDonors = donorData.length;
+            const eligibleDonors = donorData.filter(d => d.status === 'Eligible').length;
+            const notEligibleDonors = donorData.filter(d => d.status === 'Not Eligible').length;
+            
+            document.getElementById('totalDonors').textContent = totalDonors;
+            document.getElementById('eligibleDonors').textContent = eligibleDonors;
+            document.getElementById('pendingDonations').textContent = notEligibleDonors;
+            document.getElementById('urgentNeeds').textContent = Math.floor(totalDonors * 0.1); // 10% of donors as urgent needs
+        }
+
+        // Update location filter options
+        function updateLocationFilter() {
+            const locationFilter = document.getElementById('locationFilter');
+            const locations = [...new Set(donorData.map(d => d.location))].filter(l => l && l !== 'Unknown');
+            
+            // Clear existing options (keep "All Locations")
+            while (locationFilter.children.length > 1) {
+                locationFilter.removeChild(locationFilter.lastChild);
+            }
+            
+            // Add location options
+            locations.forEach(location => {
+                const option = document.createElement('option');
+                option.value = location;
+                option.textContent = location;
+                locationFilter.appendChild(option);
+            });
+        }
+
+        // Search functionality
+        document.getElementById('searchBtn').addEventListener('click', function() {
+            updateDonorList();
+        });
+
+        // Sync now functionality
+        document.getElementById('syncNowBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            fetchDonorData();
+        });
+
+        // Save donor button
+        document.getElementById('saveDonorBtn').addEventListener('click', function() {
+            alert('Donor saved successfully (simulated)');
+            document.getElementById('addDonorForm').reset();
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addDonorModal'));
+            modal.hide();
+        });
+
+        // Settings functionality
+        document.getElementById('saveSettingsBtn').addEventListener('click', function() {
+            const theme = document.getElementById('themeSelect').value;
+            const notifications = document.getElementById('notifications').checked;
+            const autoSync = document.getElementById('autoSync').checked;
+            const syncFrequency = document.getElementById('syncFrequency').value;
+            
+            // Save settings to localStorage
+            localStorage.setItem('theme', theme);
+            localStorage.setItem('notifications', notifications);
+            localStorage.setItem('autoSync', autoSync);
+            localStorage.setItem('syncFrequency', syncFrequency);
+            
+            // Apply theme
+            document.body.setAttribute('data-theme', theme);
+            
+            alert('Settings saved successfully!');
+            
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
+            modal.hide();
+        });
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const theme = localStorage.getItem('theme') || 'light';
+            const notifications = localStorage.getItem('notifications') !== 'false';
+            const autoSync = localStorage.getItem('autoSync') !== 'false';
+            const syncFrequency = localStorage.getItem('syncFrequency') || '30';
+            
+            // Apply settings to form
+            document.getElementById('themeSelect').value = theme;
+            document.getElementById('notifications').checked = notifications;
+            document.getElementById('autoSync').checked = autoSync;
+            document.getElementById('syncFrequency').value = syncFrequency;
+            
+            // Apply theme
+            document.body.setAttribute('data-theme', theme);
+        }
+
+        // Initialize the application
+        function init() {
+            // Add event listeners and initialize components
+            loadSettings();
+        }
+
+        // Run initialization when page loads
+        window.onload = init;
+    </script>
+</body>
+</html>
