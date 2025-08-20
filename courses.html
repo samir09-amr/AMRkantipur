@@ -311,13 +311,24 @@
       overflow: hidden;
     }
     
-    .document-container iframe {
+    .document-thumbnail {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      border: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #f0f2f5, #e1e5eb);
+      cursor: pointer;
+    }
+    
+    .document-thumbnail i {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 15px;
     }
     
     .file-card h4 {
@@ -327,6 +338,76 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    
+    /* Full screen viewer */
+    .fullscreen-viewer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease;
+    }
+    
+    .fullscreen-viewer.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .viewer-content {
+      width: 90%;
+      height: 90%;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      transform: scale(0.9);
+      transition: transform 0.4s ease;
+    }
+    
+    .fullscreen-viewer.active .viewer-content {
+      transform: scale(1);
+    }
+    
+    .viewer-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .viewer-controls {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+    
+    .viewer-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .viewer-btn:hover {
+      background: rgba(0, 0, 0, 0.7);
+      transform: scale(1.1);
     }
     
     /* Back button */
@@ -347,6 +428,29 @@
     .back-btn:hover {
       transform: translateY(-3px);
       box-shadow: 0 8px 20px rgba(108, 92, 231, 0.5);
+    }
+    
+    /* Modal back button */
+    .modal-back {
+      background: rgba(255, 255, 255, 0.2);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 15px;
+    }
+    
+    .modal-back:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .modal-nav {
+      display: flex;
+      align-items: center;
     }
     
     /* Progress bar */
@@ -437,6 +541,11 @@
       .modal-content {
         padding: 20px;
       }
+      
+      .viewer-content {
+        width: 95%;
+        height: 95%;
+      }
     }
     
     /* Animation classes */
@@ -493,7 +602,12 @@
   <div class="modal-overlay" id="modalOverlay">
     <div class="selection-modal">
       <div class="modal-header">
-        <h2 id="modalTitle">Select Semester</h2>
+        <div class="modal-nav">
+          <div class="modal-back" id="modalBack" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+          </div>
+          <h2 id="modalTitle">Select Semester</h2>
+        </div>
         <div class="close-modal" onclick="closeModal()">
           <i class="fas fa-times"></i>
         </div>
@@ -508,6 +622,18 @@
         
         <div id="modalContent">
           <!-- Content will be inserted here dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full screen viewer -->
+  <div class="fullscreen-viewer" id="fullscreenViewer">
+    <div class="viewer-content">
+      <iframe class="viewer-iframe" id="viewerIframe" src=""></iframe>
+      <div class="viewer-controls">
+        <div class="viewer-btn" onclick="closeFullscreen()">
+          <i class="fas fa-times"></i>
         </div>
       </div>
     </div>
@@ -578,22 +704,34 @@
       subject: null
     };
 
+    let selectionHistory = [];
+
     // DOM elements
     const modalOverlay = document.getElementById('modalOverlay');
     const modalTitle = document.getElementById('modalTitle');
     const modalContent = document.getElementById('modalContent');
+    const modalBack = document.getElementById('modalBack');
     const progressSteps = [
       document.getElementById('step1'),
       document.getElementById('step2'),
       document.getElementById('step3'),
       document.getElementById('step4')
     ];
+    const fullscreenViewer = document.getElementById('fullscreenViewer');
+    const viewerIframe = document.getElementById('viewerIframe');
 
     // Function to open modal with specific content
     function openModal(title, content) {
       modalTitle.textContent = title;
       modalContent.innerHTML = content;
       modalOverlay.classList.add('active');
+      
+      // Show back button if we have history
+      if (selectionHistory.length > 0) {
+        modalBack.style.display = 'flex';
+      } else {
+        modalBack.style.display = 'none';
+      }
     }
 
     // Function to close modal
@@ -605,6 +743,15 @@
         if (index > 1) step.classList.remove('active');
       });
       progressSteps[1].classList.add('active');
+      
+      // Reset selection history
+      selectionHistory = [];
+      currentSelection = {
+        course: null,
+        semester: null,
+        type: null,
+        subject: null
+      };
     }
 
     // Function to update progress steps
@@ -619,9 +766,34 @@
       });
     }
 
+    // Function to go back in selection
+    function goBack() {
+      if (selectionHistory.length === 0) return;
+      
+      const previousState = selectionHistory.pop();
+      
+      if (previousState.action === 'selectCourse') {
+        updateProgress(1);
+        showSemesterSelection();
+      } else if (previousState.action === 'selectSemester') {
+        updateProgress(2);
+        showTypeSelection();
+      } else if (previousState.action === 'selectType') {
+        if (currentSelection.type === 'notes') {
+          updateProgress(3);
+          showSubjectSelection();
+        } else {
+          // For questions, we go directly to files
+          updateProgress(4);
+          showFiles();
+        }
+      }
+    }
+
     // Function to select a course
     function selectCourse(course) {
       currentSelection.course = course;
+      selectionHistory.push({ action: 'selectCourse', course });
       updateProgress(1);
       showSemesterSelection();
     }
@@ -647,6 +819,7 @@
     // Function to select a semester
     function selectSemester(semester) {
       currentSelection.semester = semester;
+      selectionHistory.push({ action: 'selectSemester', semester });
       updateProgress(2);
       showTypeSelection();
     }
@@ -672,6 +845,7 @@
     // Function to select type
     function selectType(type) {
       currentSelection.type = type;
+      selectionHistory.push({ action: 'selectType', type });
       
       if (type === 'questions') {
         // For questions, show files directly
@@ -727,7 +901,10 @@
         content += `
           <div class="file-card">
             <div class="document-container">
-              <iframe src="${file.fileLink}"></iframe>
+              <div class="document-thumbnail" onclick="openFullscreen('${file.fileLink}')">
+                <i class="fas fa-file-pdf"></i>
+                <p>Click to view</p>
+              </div>
             </div>
             <h4>${file.fileName}</h4>
           </div>
@@ -745,6 +922,27 @@
       
       openModal(title, content);
     }
+
+    // Function to open file in fullscreen
+    function openFullscreen(fileLink) {
+      viewerIframe.src = fileLink;
+      fullscreenViewer.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Function to close fullscreen viewer
+    function closeFullscreen() {
+      fullscreenViewer.classList.remove('active');
+      viewerIframe.src = '';
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close fullscreen when clicking outside content
+    fullscreenViewer.addEventListener('click', (e) => {
+      if (e.target === fullscreenViewer) {
+        closeFullscreen();
+      }
+    });
 
     // Initialize with a slight delay for animation
     setTimeout(() => {
