@@ -169,6 +169,13 @@
             margin: 20px 0;
         }
         
+        .sheet-config {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
         @media (max-width: 768px) {
             .sidebar {
                 height: auto;
@@ -203,6 +210,18 @@
                         </div>
                         <button type="submit" class="btn btn-danger w-100">Sign In</button>
                     </form>
+                    
+                    <div class="sheet-config mt-4">
+                        <h6>Google Sheets Configuration</h6>
+                        <p class="small">Ensure your Google Sheet is published to the web:</p>
+                        <ol class="small">
+                            <li>Open your Google Sheet</li>
+                            <li>Click File → Share → Publish to web</li>
+                            <li>Select "Comma-separated values (.csv)"</li>
+                            <li>Click "Publish"</li>
+                            <li>Copy the generated URL</li>
+                        </ol>
+                    </div>
                 </div>
             </div>
         </div>
@@ -543,6 +562,11 @@
                             <label for="syncFrequency" class="form-label">Sync Frequency (minutes)</label>
                             <input type="number" class="form-control" id="syncFrequency" value="30" min="5" max="1440">
                         </div>
+                        <div class="mb-3">
+                            <label for="sheetUrl" class="form-label">Google Sheets URL</label>
+                            <input type="text" class="form-control" id="sheetUrl" placeholder="Paste your Google Sheets CSV URL here">
+                            <div class="form-text">Make sure your Google Sheet is published to the web (File > Share > Publish to web)</div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -555,15 +579,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Google Sheets URL and API Key (hardcoded for website deployment)
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS8PoCBa1or5zKsxGGaJA3718HwHObej2i17GXe8oVAgwUy9SpAQ5cVC01cenPcGfNZVNUhBpGuDrv_/pub?output=csv';
-        const API_KEY = 'AIzaSyDyJPPeIMq2V2kO7jO254s3n8pQ';
+        // Google Sheets URL (hardcoded for your specific sheet)
+        const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS8PoCBa1or5zKsxGGaJA3718HwHObej2i17GXe8oVAgwUy9SpAQ5cVC01cenPcGfNZVNUhBpGuDrv_/pub?output=csv';
         
         // Global variables
         let donorData = [];
         let filteredData = [];
         let currentPage = 1;
         const itemsPerPage = 5;
+        let currentSheetUrl = DEFAULT_SHEET_URL;
 
         // Login functionality - Only one ID has access
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -593,19 +617,25 @@
             document.getElementById('mainApp').style.display = 'none';
         });
 
-        // Fetch data from Google Sheets with CORS proxy
+        // Fetch data from Google Sheets with better error handling
         async function fetchDonorData() {
             try {
                 document.getElementById('loadingSpinner').style.display = 'block';
                 hideError();
                 
-                // Use CORS proxy to bypass CORS restrictions
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                const response = await fetch(proxyUrl + SHEET_URL, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
+                // Use the current sheet URL (either default or user-provided)
+                const sheetUrl = currentSheetUrl;
+                
+                // Try to fetch data directly first
+                let response = await fetch(sheetUrl);
+                
+                // If direct fetch fails, try with CORS proxy
+                if (!response.ok) {
+                    console.log('Direct fetch failed, trying CORS proxy...');
+                    // Use a different CORS proxy approach
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(sheetUrl)}`;
+                    response = await fetch(proxyUrl);
+                }
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -625,7 +655,11 @@
                 document.getElementById('lastSync').textContent = `Last sync: ${new Date().toLocaleTimeString()}`;
             } catch (error) {
                 console.error('Error fetching donor data:', error);
-                showError(`Failed to fetch data from Google Sheets. Error: ${error.message}`);
+                showError(`Failed to fetch data from Google Sheets. Please check: 
+                1. The sheet is published to the web (File > Share > Publish to web)
+                2. The URL is correct
+                3. You have internet connection
+                Error: ${error.message}`);
                 
                 // Use sample data as fallback
                 donorData = getSampleData();
@@ -833,7 +867,7 @@
             
             filteredData = donorData.filter(donor => {
                 const locationMatch = !locationFilter || donor.location === locationFilter;
-                const bloodGroupMatch = !bloodGroupFilter || donor.bloodGroup === bloodGroupMatch;
+                const bloodGroupMatch = !bloodGroupFilter || donor.bloodGroup === bloodGroupFilter;
                 
                 return locationMatch && bloodGroupMatch;
             });
@@ -978,12 +1012,17 @@
             const notifications = document.getElementById('notifications').checked;
             const autoSync = document.getElementById('autoSync').checked;
             const syncFrequency = document.getElementById('syncFrequency').value;
+            const sheetUrl = document.getElementById('sheetUrl').value || DEFAULT_SHEET_URL;
+            
+            // Update the current sheet URL
+            currentSheetUrl = sheetUrl;
             
             // Save settings to localStorage
             localStorage.setItem('theme', theme);
             localStorage.setItem('notifications', notifications);
             localStorage.setItem('autoSync', autoSync);
             localStorage.setItem('syncFrequency', syncFrequency);
+            localStorage.setItem('sheetUrl', sheetUrl);
             
             // Apply theme
             document.body.setAttribute('data-theme', theme);
@@ -993,6 +1032,9 @@
             // Close the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
             modal.hide();
+            
+            // Refresh data with new URL
+            fetchDonorData();
         });
 
         // Load settings from localStorage
@@ -1001,12 +1043,17 @@
             const notifications = localStorage.getItem('notifications') !== 'false';
             const autoSync = localStorage.getItem('autoSync') !== 'false';
             const syncFrequency = localStorage.getItem('syncFrequency') || '30';
+            const sheetUrl = localStorage.getItem('sheetUrl') || DEFAULT_SHEET_URL;
             
             // Apply settings to form
             document.getElementById('themeSelect').value = theme;
             document.getElementById('notifications').checked = notifications;
             document.getElementById('autoSync').checked = autoSync;
             document.getElementById('syncFrequency').value = syncFrequency;
+            document.getElementById('sheetUrl').value = sheetUrl;
+            
+            // Update the current sheet URL
+            currentSheetUrl = sheetUrl;
             
             // Apply theme
             document.body.setAttribute('data-theme', theme);
