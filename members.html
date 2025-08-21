@@ -1,21 +1,12 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Club Members Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Pharmacy Health Club - Members</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #e74c3c;
-            --accent: #f39c12;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-            --text: #333;
-            --text-light: #7f8c8d;
-        }
-        
         * {
             margin: 0;
             padding: 0;
@@ -24,53 +15,38 @@
         
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #f5f7fa;
-            color: var(--text);
-            line-height: 1.6;
+            background: linear-gradient(120deg, #e0f7fa 0%, #bbdefb 50%, #e3f2fd 100%);
+            color: #37474f;
+            min-height: 100vh;
             overflow-x: hidden;
         }
         
-        /* Photo Gallery Page */
-        .gallery-container {
+        .medical-container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
+        }
+        
+        .medical-header {
             text-align: center;
-            animation: fadeIn 0.8s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .gallery-header {
             margin-bottom: 3rem;
             position: relative;
-            animation: fadeInDown 0.8s ease-out;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(30, 136, 229, 0.2);
         }
         
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .gallery-header h1 {
-            font-family: 'Playfair Display', serif;
+        .medical-title {
             font-size: 3.5rem;
-            color: var(--primary);
+            font-weight: 700;
+            color: #1565c0;
             margin-bottom: 1rem;
             position: relative;
             display: inline-block;
         }
         
-        .gallery-header h1:after {
+        .medical-title::after {
             content: '';
             position: absolute;
             bottom: -10px;
@@ -78,1441 +54,769 @@
             transform: translateX(-50%);
             width: 100px;
             height: 4px;
-            background: var(--secondary);
+            background: linear-gradient(90deg, #1565c0, #4fc3f7);
             border-radius: 2px;
-            animation: expandLine 1s ease-out 0.5s both;
         }
         
-        @keyframes expandLine {
-            from { width: 0; }
-            to { width: 100px; }
-        }
-        
-        .gallery-header p {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            max-width: 700px;
+        .medical-subtitle {
+            font-size: 1.3rem;
+            color: #546e7a;
+            max-width: 800px;
             margin: 0 auto;
-            animation: fadeIn 1s ease-out 0.8s both;
+            line-height: 1.6;
         }
         
-        .members-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        .health-stats {
+            display: flex;
+            justify-content: center;
             gap: 2rem;
-            margin-top: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
         }
         
-        .member-card {
+        .stat-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(30, 136, 229, 0.15);
+            min-width: 180px;
+            transition: transform 0.3s;
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1565c0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #546e7a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .medical-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+        
+        .medical-card {
             background: white;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 10px 30px rgba(30, 136, 229, 0.2);
+            transition: all 0.4s ease;
             position: relative;
             cursor: pointer;
             opacity: 0;
-            transform: translateY(20px);
-            animation: cardEntrance 0.6s ease-out forwards;
+            transform: translateY(30px);
+            animation: cardAppear 0.8s forwards;
         }
         
-        @keyframes cardEntrance {
+        @keyframes cardAppear {
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
         
-        .member-card:hover {
-            transform: translateY(-10px) rotate(2deg);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        .medical-card:nth-child(1) { animation-delay: 0.1s; }
+        .medical-card:nth-child(2) { animation-delay: 0.2s; }
+        .medical-card:nth-child(3) { animation-delay: 0.3s; }
+        .medical-card:nth-child(4) { animation-delay: 0.4s; }
+        .medical-card:nth-child(5) { animation-delay: 0.5s; }
+        
+        .medical-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(30, 136, 229, 0.3);
         }
         
-        .member-photo-container {
-            height: 250px;
+        .card-header {
+            height: 180px;
             overflow: hidden;
             position: relative;
+        }
+        
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(25, 118, 210, 0.2), rgba(25, 118, 210, 0.6));
+            z-index: 1;
         }
         
         .member-photo {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: transform 0.5s;
         }
         
-        .member-card:hover .member-photo {
-            transform: scale(1.1) rotate(1deg);
+        .medical-card:hover .member-photo {
+            transform: scale(1.1);
         }
         
-        .member-info {
-            padding: 1.5rem;
-            text-align: center;
-            position: relative;
-        }
-        
-        .member-info:before {
-            content: '';
+        .member-role {
             position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 3px;
-            background: var(--secondary);
-            transition: all 0.3s ease;
+            bottom: 15px;
+            left: 20px;
+            background: #1565c0;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 2;
         }
         
-        .member-card:hover .member-info:before {
-            width: 100px;
-            background: var(--accent);
+        .card-body {
+            padding: 1.5rem;
         }
         
         .member-name {
-            font-family: 'Playfair Display', serif;
             font-size: 1.5rem;
-            color: var(--primary);
+            font-weight: 700;
+            color: #1565c0;
             margin-bottom: 0.5rem;
-            transition: all 0.3s ease;
         }
         
-        .member-card:hover .member-name {
-            color: var(--secondary);
-        }
-        
-        .member-position {
-            color: var(--secondary);
-            font-weight: 600;
+        .member-specialty {
+            color: #78909c;
             font-size: 0.9rem;
             margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
         }
         
-        .member-card:hover .member-position {
-            letter-spacing: 2px;
+        .member-specialty i {
+            margin-right: 8px;
+            color: #4fc3f7;
         }
         
-        /* Staggered animation for cards */
-        .member-card:nth-child(1) { animation-delay: 0.1s; }
-        .member-card:nth-child(2) { animation-delay: 0.2s; }
-        .member-card:nth-child(3) { animation-delay: 0.3s; }
-        .member-card:nth-child(4) { animation-delay: 0.4s; }
-        .member-card:nth-child(5) { animation-delay: 0.5s; }
-        .member-card:nth-child(6) { animation-delay: 0.6s; }
-        .member-card:nth-child(7) { animation-delay: 0.7s; }
-        .member-card:nth-child(8) { animation-delay: 0.8s; }
-        .member-card:nth-child(9) { animation-delay: 0.9s; }
-        .member-card:nth-child(10) { animation-delay: 1s; }
+        .member-bio {
+            color: #546e7a;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
         
-        /* Login Portal Popup */
-        .login-portal-popup {
+        .health-projects {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .project-tag {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .view-profile-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(90deg, #1565c0, #42a5f5);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .view-profile-btn:hover {
+            background: linear-gradient(90deg, #0d47a1, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(21, 101, 192, 0.4);
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-            backdrop-filter: blur(5px);
+            transition: all 0.4s;
         }
         
-        .login-portal-popup.active {
+        .modal-overlay.active {
             opacity: 1;
             visibility: visible;
         }
         
-        .login-portal-content {
+        .medical-modal {
             background: white;
             border-radius: 15px;
             width: 90%;
-            max-width: 400px;
-            padding: 2.5rem;
-            position: relative;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             transform: scale(0.9);
             opacity: 0;
-            transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1) 0.1s;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s;
+            display: flex;
+            flex-direction: column;
         }
         
-        .login-portal-popup.active .login-portal-content {
+        .modal-overlay.active .medical-modal {
             transform: scale(1);
             opacity: 1;
         }
         
-        .close-popup {
+        .modal-header {
+            padding: 2rem;
+            background: linear-gradient(90deg, #1565c0, #42a5f5);
+            color: white;
+            position: relative;
+        }
+        
+        .close-modal {
             position: absolute;
             top: 20px;
             right: 20px;
+            background: rgba(255, 255, 255, 0.2);
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--light);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 1;
+            transition: all 0.3s;
         }
         
-        .close-popup:hover {
-            background: var(--secondary);
-            color: white;
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
             transform: rotate(90deg);
         }
         
-        .login-portal-header {
-            text-align: center;
-            margin-bottom: 2rem;
-            position: relative;
-            animation: fadeIn 0.6s ease-out 0.2s both;
-        }
-        
-        .login-portal-header h2 {
-            font-family: 'Playfair Display', serif;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .login-portal-header p {
-            color: var(--text-light);
-            font-size: 0.9rem;
-        }
-        
-        .login-input {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 1rem;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        .login-input:focus {
-            border-color: var(--accent);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
-        }
-        
-        .login-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            width: 100%;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-        
-        .login-btn:hover {
-            background: var(--secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .login-btn:active {
-            transform: translateY(0);
-        }
-        
-        .error-message {
-            color: var(--secondary);
-            margin-top: 1rem;
-            text-align: center;
-            display: none;
-            animation: shake 0.5s;
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
-        
-        /* Admin Portal */
-        #adminPortal {
-            display: none;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            position: relative;
-            animation: fadeInDown 0.8s ease-out;
-        }
-        
-        .admin-header h1 {
-            font-family: 'Playfair Display', serif;
-            color: var(--primary);
-            margin-bottom: 0;
-        }
-        
-        .logout-btn {
-            background: var(--secondary);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
+        .modal-profile {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 2rem;
         }
         
-        .logout-btn:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .logout-btn:active {
-            transform: translateY(0);
-        }
-        
-        /* Admin Controls */
-        .admin-controls {
-            text-align: center;
-            margin: 2rem 0;
-            animation: fadeInUp 0.8s ease-out 0.5s both;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .add-member-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .add-member-btn:hover {
-            background: var(--secondary);
-            transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(231, 76, 60, 0.3);
-        }
-        
-        .add-member-btn:active {
-            transform: translateY(0);
-        }
-        
-        .add-member-form {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            margin-top: 2rem;
-            display: none;
-            animation: fadeIn 0.5s ease-out;
-            transform-origin: top;
-        }
-        
-        .add-member-form h3 {
-            font-family: 'Playfair Display', serif;
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        
-        .form-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .form-row > div {
-            flex: 1;
-        }
-        
-        .add-member-form input,
-        .add-member-form textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        .add-member-form input:focus,
-        .add-member-form textarea:focus {
-            border-color: var(--accent);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
-        }
-        
-        .add-member-form textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-        
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .form-actions button {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .submit-member-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-        }
-        
-        .submit-member-btn:hover {
-            background: #e67e22;
-            transform: translateY(-2px);
-        }
-        
-        .cancel-member-btn {
-            background: white;
-            color: var(--text-light);
-            border: 2px solid var(--text-light);
-        }
-        
-        .cancel-member-btn:hover {
-            border-color: var(--secondary);
-            color: var(--secondary);
-        }
-        
-        /* Filter Buttons */
-        .filter-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-            animation: fadeInUp 0.8s ease-out 0.5s both;
-        }
-        
-        .filter-btn {
-            padding: 0.8rem 1.5rem;
-            background: white;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            font-weight: 600;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: capitalize;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .filter-btn:hover, .filter-btn.active {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Member Detail Popup */
-        .member-detail-popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-            backdrop-filter: blur(5px);
-        }
-        
-        .member-detail-popup.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .popup-content {
-            background: white;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 2.5rem;
-            position: relative;
-            transform: scale(0.9);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1) 0.1s;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-        
-        .member-detail-popup.active .popup-content {
-            transform: scale(1);
-            opacity: 1;
-        }
-        
-        .popup-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-            position: relative;
-            animation: fadeIn 0.6s ease-out 0.2s both;
-        }
-        
-        .popup-photo {
+        .modal-photo {
             width: 120px;
             height: 120px;
             border-radius: 50%;
             object-fit: cover;
-            border: 5px solid white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-right: 2rem;
-            transform: scale(0);
-            animation: popIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.3s forwards;
+            border: 4px solid rgba(255, 255, 255, 0.3);
         }
         
-        @keyframes popIn {
-            0% { transform: scale(0); }
-            80% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        .popup-header-text h2 {
-            font-family: 'Playfair Display', serif;
-            color: var(--primary);
+        .modal-profile-text h2 {
+            font-size: 2rem;
             margin-bottom: 0.5rem;
-            opacity: 0;
-            transform: translateX(-20px);
-            animation: slideIn 0.5s ease-out 0.4s forwards;
         }
         
-        @keyframes slideIn {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .modal-profile-text p {
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
         
-        .popup-header-text p {
-            color: var(--secondary);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
-            opacity: 0;
-            transform: translateX(-20px);
-            animation: slideIn 0.5s ease-out 0.5s forwards;
-        }
-        
-        .popup-body {
+        .modal-body {
+            padding: 2rem;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
         }
         
-        .bio-section, .achievements-section, .other-clubs-section, .contact-section {
-            margin-bottom: 1.5rem;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.6s ease-out forwards;
+        .modal-section {
+            margin-bottom: 2rem;
         }
         
-        .bio-section { animation-delay: 0.6s; }
-        .achievements-section { animation-delay: 0.7s; }
-        .other-clubs-section { animation-delay: 0.8s; }
-        .contact-section { animation-delay: 0.9s; }
-        
-        .section-title {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-light);
+        .modal-section h3 {
+            color: #1565c0;
             margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e3f2fd;
             display: flex;
             align-items: center;
         }
         
-        .section-title i {
-            margin-right: 0.5rem;
-            color: var(--accent);
+        .modal-section h3 i {
+            margin-right: 10px;
+        }
+        
+        .modal-section p {
+            line-height: 1.6;
+            color: #546e7a;
+        }
+        
+        .health-project-list {
+            list-style: none;
+        }
+        
+        .health-project-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eceff1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .health-project-list li:before {
+            content: '•';
+            color: #42a5f5;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-right: 10px;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
         
         .contact-item {
             display: flex;
             align-items: center;
-            margin-bottom: 0.8rem;
-            font-size: 0.95rem;
+            gap: 1rem;
         }
         
-        .contact-item i {
-            margin-right: 0.8rem;
-            color: var(--accent);
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Edit Button */
-        .edit-member-btn {
-            position: absolute;
-            top: 20px;
-            right: 70px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: #e3f2fd;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        .edit-member-btn:hover {
-            background: #e67e22;
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Edit Form Styles */
-        .edit-form {
-            padding: 1rem;
-        }
-
-        .edit-input, .edit-textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 1rem;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .edit-input:focus, .edit-textarea:focus {
-            border-color: var(--accent);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
-        }
-
-        .edit-textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .photo-upload {
-            margin-bottom: 1rem;
-        }
-
-        .photo-preview {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 50%;
-            display: block;
-            margin-bottom: 10px;
-            border: 3px solid var(--light);
-        }
-
-        .photo-upload-input {
-            display: none;
-        }
-
-        .upload-btn {
-            background: var(--primary);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            display: inline-block;
-            transition: all 0.3s;
-        }
-
-        .upload-btn:hover {
-            background: var(--secondary);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        /* Form actions in edit mode */
-        .edit-form .form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .edit-form .form-actions button {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .save-member-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-        }
-
-        .save-member-btn:hover {
-            background: #e67e22;
-            transform: translateY(-2px);
-        }
-
-        .cancel-edit-btn {
-            background: white;
-            color: var(--text-light);
-            border: 2px solid var(--text-light);
-        }
-
-        .cancel-edit-btn:hover {
-            border-color: var(--secondary);
-            color: var(--secondary);
+            justify-content: center;
+            color: #1565c0;
         }
         
-        /* Watermark */
-        .watermark {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+        /* Health awareness ribbon */
+        .health-ribbon {
+            position: absolute;
+            top: 20px;
+            right: -40px;
+            background: #e53935;
+            color: white;
+            padding: 8px 40px;
             font-size: 0.8rem;
-            color: var(--text-light);
-            opacity: 0.7;
-            animation: fadeIn 2s ease-out 1s both;
+            font-weight: 600;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 10px rgba(229, 57, 53, 0.4);
+            z-index: 2;
         }
         
         /* Responsive styles */
         @media (max-width: 768px) {
-            .gallery-header h1 {
-                font-size: 2.5rem;
-            }
-            
-            .members-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-            
-            .popup-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .popup-photo {
-                margin-right: 0;
-                margin-bottom: 1.5rem;
-            }
-            
-            .popup-body {
+            .medical-grid {
                 grid-template-columns: 1fr;
             }
             
-            .form-row {
-                flex-direction: column;
-                gap: 0;
+            .modal-body {
+                grid-template-columns: 1fr;
             }
             
-            .admin-header {
+            .modal-profile {
                 flex-direction: column;
-                align-items: flex-start;
+                text-align: center;
                 gap: 1rem;
             }
-
-            .edit-member-btn {
-                position: static;
-                margin-top: 1rem;
+            
+            .health-stats {
+                flex-direction: column;
+                align-items: center;
             }
+            
+            .stat-box {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+        /* Loading animation for images */
+        .img-loading {
+            background: #f0f0f0;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
     </style>
 </head>
 <body>
-    <!-- Photo Gallery Page -->
-    <div class="gallery-container" id="galleryPage">
-        <header class="gallery-header">
-            <h1>Our Members</h1>
-            <p>Click on any member to access the admin portal</p>
+    <div class="medical-container">
+        <header class="medical-header">
+            <h1 class="medical-title">Pharmacy Health Club</h1>
+            <p class="medical-subtitle">Meet our dedicated team of pharmacy professionals working on AMR, dengue awareness, and community health initiatives</p>
+            
+            <div class="health-stats">
+                <div class="stat-box">
+                    <div class="stat-value">15+</div>
+                    <div class="stat-label">Health Projects</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">AMR Initiatives</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Dengue Awareness</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">500+</div>
+                    <div class="stat-label">People Reached</div>
+                </div>
+            </div>
         </header>
         
-        <div class="members-grid" id="membersGallery">
-            <!-- Member cards will be inserted here -->
+        <div class="medical-grid" id="membersGrid">
+            <!-- Member cards will be generated by JavaScript -->
         </div>
-    </div>
-    
-    <!-- Login Portal Popup -->
-    <div class="login-portal-popup" id="loginPortal">
-        <div class="login-portal-content">
-            <div class="close-popup" id="closeLoginPopup">
-                <i class="fas fa-times"></i>
-            </div>
-            <div class="login-portal-header">
-                <h2>Admin Portal Login</h2>
-                <p>Please enter your credentials</p>
-            </div>
-            
-            <input type="text" id="username" class="login-input" placeholder="Username">
-            <input type="password" id="password" class="login-input" placeholder="Password">
-            <button class="login-btn" id="loginBtn">Login</button>
-            <p class="error-message" id="errorMsg">Invalid credentials</p>
-            
-            <!-- CHANGE THESE LOGIN CREDENTIALS -->
-            <!-- Admin login: admin / admin123 -->
-            <!-- Regular user login: user / user123 -->
-        </div>
-    </div>
-    
-    <!-- Admin Portal (hidden initially) -->
-    <div id="adminPortal">
-        <!-- Admin content will be inserted here after login -->
     </div>
 
-    <div class="watermark"></div>
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="medical-modal" id="medicalModal">
+            <!-- Modal content will be generated by JavaScript -->
+        </div>
+    </div>
 
     <script>
-        // ===== CHANGE THESE VALUES =====
-        // Login credentials
-        const validLogins = {
-            // Admin credentials (full access)
-            admin: {
-                password: "admin123",
-                isAdmin: true
-            },
-            // Regular user credentials (view only)
-            user: {
-                password: "user123",
-                isAdmin: false
+        // Function to convert Google Drive share link to direct image link
+        function convertGoogleDriveLink(url) {
+            // If it's already a direct link, return as is
+            if (url.includes('drive.google.com/uc?')) {
+                return url;
             }
-            // Add more users as needed
-        };
-        
-        // Full member data (for both gallery and admin portal) - EDIT THIS TO CHANGE MEMBER DATA
-        let membersData = [
-            {
-                "Name": "Alexandra Chen",
-                "Position": "President",
-                "Email": "alexandra.chen@example.com",
-                "Phone": "(555) 123-4567",
-                "Photo": "https://randomuser.me/api/portraits/women/44.jpg",
-                "Bio": "Alexandra is a visionary leader with a passion for community building. She has spearheaded numerous initiatives that have doubled our club's membership and impact.",
-                "Achievements": "Recipient of the 2022 Leadership Excellence Award, Organized the largest charity event in club history raising $50,000",
-                "Other Clubs": "Board Member at Community Foundation, Advisor to Youth Leadership Program"
-            },
-            {
-                "Name": "James Rodriguez",
-                "Position": "Vice President",
-                "Email": "james.rodriguez@example.com",
-                "Phone": "(555) 234-5678",
-                "Photo": "https://randomuser.me/api/portraits/men/32.jpg",
-                "Bio": "James brings strategic thinking and operational expertise to the club. His background in project management ensures our events run smoothly.",
-                "Achievements": "Developed the club's mentorship program, Increased corporate sponsorship by 75%",
-                "Other Clubs": "Treasurer at Professional Networking Association"
-            },
-            {
-                "Name": "Sophia Patel",
-                "Position": "Secretary",
-                "Email": "sophia.patel@example.com",
-                "Phone": "(555) 345-6789",
-                "Photo": "https://randomuser.me/api/portraits/women/68.jpg",
-                "Bio": "Sophia is the organizational backbone of our club. Her attention to detail and communication skills keep everyone informed and connected.",
-                "Achievements": "Implemented new member onboarding system, Created the club's first digital archive",
-                "Other Clubs": "Secretary at Women in Tech, Volunteer Coordinator at Literacy Foundation"
-            },
-            {
-                "Name": "Michael Johnson",
-                "Position": "Treasurer",
-                "Email": "michael.johnson@example.com",
-                "Phone": "(555) 456-7890",
-                "Photo": "https://randomuser.me/api/portraits/men/75.jpg",
-                "Bio": "With a background in finance, Michael ensures our club's fiscal health. He's implemented transparent budgeting processes that members appreciate.",
-                "Achievements": "Reduced operational costs by 30%, Established club scholarship fund",
-                "Other Clubs": "Finance Committee Chair at Alumni Association"
-            },
-            {
-                "Name": "Ethan Wong",
-                "Position": "Member",
-                "Email": "ethan.wong@example.com",
-                "Phone": "(555) 567-8901",
-                "Photo": "https://randomuser.me/api/portraits/men/22.jpg",
-                "Bio": "Ethan is our tech guru, always bringing innovative ideas to leverage technology for club operations and member engagement.",
-                "Achievements": "Developed the club's mobile app, Won regional hackathon representing our club",
-                "Other Clubs": "President of Computer Science Club"
+            
+            // If it's a share link, convert to direct link
+            if (url.includes('drive.google.com/file/d/')) {
+                const fileId = url.match(/file\/d\/(.*?)\//)[1];
+                return `https://drive.google.com/uc?export=view&id=${fileId}`;
             }
-            // Add more members as needed
+            
+            // If it's a shortened link, try to get the file ID
+            if (url.includes('googledrive.com') || url.includes('google.com')) {
+                // This might need a more sophisticated approach
+                // For now, return the original URL
+                return url;
+            }
+            
+            // Return original URL if it doesn't match Google Drive patterns
+            return url;
+        }
+
+        // Member data with medical/pharmacy focus
+        const membersData = [
+            {
+                "Name": "Samir Sapkota",
+                "Position": "Chief Pharmacist",
+                "Specialty": "Infectious Diseases",
+                "Email": "samir.pharma@example.com",
+                "Phone": "+977 9863199343",
+                "Photo": "https://drive.google.com/uc?export=view&id=1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6_1",
+                "Bio": "Dr. Sapkota is a dedicated pharmacist with 10+ years of experience in infectious disease management. He leads our AMR awareness initiatives and community health programs.",
+                "Expertise": "Antimicrobial Resistance, Pharmacy Management",
+                "Projects": "AMR Awareness Campaign, Rural Health Outreach, Medication Therapy Management",
+                "Education": "Pharm.D, MPH in Global Health",
+                "Awards": "National Pharmacy Excellence Award 2022, WHO Health Innovation Grant"
+            },
+ {
+                "Name": "Samir Sapkota",
+                "Position": "Chief Pharmacist",
+                "Specialty": "Infectious Diseases",
+                "Email": "samir.pharma@example.com",
+                "Phone": "+977 9863199343",
+                "Photo": "https://drive.google.com/uc?export=view&id=YOUR_GOOGLE_DRIVE_FILE_ID_2",
+                "Bio": "Dr. Sapkota is a dedicated pharmacist with 10+ years of experience in infectious disease management. He leads our AMR awareness initiatives and community health programs.",
+                "Expertise": "Antimicrobial Resistance, Pharmacy Management",
+                "Projects": "AMR Awareness Campaign, Rural Health Outreach, Medication Therapy Management",
+                "Education": "Pharm.D, MPH in Global Health",
+                "Awards": "National Pharmacy Excellence Award 2022, WHO Health Innovation Grant"
+            }, 
+             {
+                "Name": "Samir Sapkota",
+                "Position": "Chief Pharmacist",
+                "Specialty": "Infectious Diseases",
+                "Email": "samir.pharma@example.com",
+                "Phone": "+977 9863199343",
+                "Photo": "https://drive.google.com/uc?export=view&id=YOUR_GOOGLE_DRIVE_FILE_ID_3",
+                "Bio": "Dr. Sapkota is a dedicated pharmacist with 10+ years of experience in infectious disease management. He leads our AMR awareness initiatives and community health programs.",
+                "Expertise": "Antimicrobial Resistance, Pharmacy Management",
+                "Projects": "AMR Awareness Campaign, Rural Health Outreach, Medication Therapy Management",
+                "Education": "Pharm.D, MPH in Global Health",
+                "Awards": "National Pharmacy Excellence Award 2022, WHO Health Innovation Grant"
+            },
+ {
+                "Name": "Samir Sapkota",
+                "Position": "Chief Pharmacist",
+                "Specialty": "Infectious Diseases",
+                "Email": "samir.pharma@example.com",
+                "Phone": "+977 9863199343",
+                "Photo": "https://drive.google.com/uc?export=view&id=YOUR_GOOGLE_DRIVE_FILE_ID_4",
+                "Bio": "Dr. Sapkota is a dedicated pharmacist with 10+ years of experience in infectious disease management. He leads our AMR awareness initiatives and community health programs.",
+                "Expertise": "Antimicrobial Resistance, Pharmacy Management",
+                "Projects": "AMR Awareness Campaign, Rural Health Outreach, Medication Therapy Management",
+                "Education": "Pharm.D, MPH in Global Health",
+                "Awards": "National Pharmacy Excellence Award 2022, WHO Health Innovation Grant"
+            },
+           
+                {
+                "Name": "Dr. Anita Sharma",
+                "Position": "Clinical Pharmacist",
+                "Specialty": "Dengue Management",
+                "Email": "anita.sharma@example.com",
+                "Phone": "+977 9876543210",
+                "Photo": "https://drive.google.com/uc?export=view&id=YOUR_GOOGLE_DRIVE_FILE_ID_5",
+                "Bio": "Dr. Sharma specializes in vector-borne diseases and has been instrumental in our dengue prevention and management programs across the region.",
+                "Expertise": "Dengue Management, Public Health, Vaccination Programs",
+                "Projects": "Dengue Awareness Drive, Community Mosquito Control, Fever Management Clinics",
+                "Education": "Pharm.D, Diploma in Tropical Medicine",
+                "Awards": "Public Health Champion Award 2021"
+            },
+ {
+                "Name": "Samir Sapkota",
+                "Position": "Chief Pharmacist",
+                "Specialty": "Infectious Diseases",
+                "Email": "samir.pharma@example.com",
+                "Phone": "+977 9863199343",
+                "Photo": "https://drive.google.com/uc?export=view&id=YOUR_GOOGLE_DRIVE_FILE_ID_6",
+                "Bio": "Dr. Sapkota is a dedicated pharmacist with 10+ years of experience in infectious disease management. He leads our AMR awareness initiatives and community health programs.",
+                "Expertise": "Antimicrobial Resistance, Pharmacy Management",
+                "Projects": "AMR Awareness Campaign, Rural Health Outreach, Medication Therapy Management",
+                "Education": "Pharm.D, MPH in Global Health",
+                "Awards": "National Pharmacy Excellence Award 2022, WHO Health Innovation Grant"
+            },
+ {
+                "Name": "Samir Sapkota",
+                "Position": "Chief Pharmacist",
+                "Specialty": "Infectious Diseases",
+                "Email": "samir.pharma@example.com",
+                "Phone": "+977 9863199343",
+                "Photo": "https://drive.google.com/uc?export=view&id=YOUR_GOOGLE_DRIVE_FILE_ID_7",
+                "Bio": "Dr. Sapkota is a dedicated pharmacist with 10+ years of experience in infectious disease management. He leads our AMR awareness initiatives and community health programs.",
+                "Expertise": "Antimicrobial Resistance, Pharmacy Management",
+                "Projects": "AMR Awareness Campaign, Rural Health Outreach, Medication Therapy Management",
+                "Education": "Pharm.D, MPH in Global Health",
+                "Awards": "National Pharmacy Excellence Award 2022, WHO Health Innovation Grant"
+            },
+            {
+                "Name": "Rajesh Kumar",
+                "Position": "Medication Safety Officer",
+                "Specialty": "AMR Stewardship",
+                "Email": "rajesh.kumar@example.com",
+                "Phone": "+977 9812345678",
+                "Photo": "https://drive.google.com/uc?export=view&id=YOUR_GOOGLE_DRIVE_FILE_ID_8",
+                "Bio": "Rajesh focuses on antimicrobial stewardship programs and helps implement protocols for rational antibiotic use in community settings.",
+                "Expertise": "Antibiotic Stewardship, Medication Safety, Infection Control",
+                "Projects": "AMR Surveillance Program, Antibiotic Awareness Workshops, Hospital Formulary Development",
+                "Education": "M.Pharm (Pharmacy Practice), BPS Certified",
+                "Awards": "AMR Champion Award 2022"
+            },
+            {
+                "Name": "Priya Patel",
+                "Position": "Community Health Pharmacist",
+                "Specialty": "Health Education",
+                "Email": "priya.patel@example.com",
+                "Phone": "+977 9801234567",
+                "Photo": "https://drive.google.com/uc?export=view&id=YOUR_GOOGLE_DRIVE_FILE_ID_9",
+                "Bio": "Priya develops and implements health education programs for communities, with special focus on preventive measures for dengue and other infectious diseases.",
+                "Expertise": "Health Education, Community Outreach, Preventive Care",
+                "Projects": "School Health Program, Community Awareness Sessions, Health Material Development",
+                "Education": "B.Pharm, MPH Health Education",
+                "Awards": "Health Educator of the Year 2020"
+            },
+            {
+                "Name": "Dr. Alisha Gurung",
+                "Position": "Research Pharmacist",
+                "Specialty": "Pharmacoepidemiology",
+                "Email": "alisha.gurung@example.com",
+                "Phone": "+977 9813456789",
+                "Photo": "https://drive.google.com/uc?export=view&id=YOUR_GOOGLE_DRIVE_FILE_ID_10",
+                "Bio": "Dr. Gurung leads research initiatives on medication use patterns and resistance profiles, providing evidence for our AMR containment strategies.",
+                "Expertise": "Research Methodology, Data Analysis, Epidemiology",
+                "Projects": "AMR Surveillance Study, Drug Utilization Research, Awareness Program Evaluation",
+                "Education": "Pharm.D, PhD in Pharmacoepidemiology",
+                "Awards": "Young Researcher Award 2022"
+            }
         ];
-        // ===== END OF EDITABLE VALUES =====
-        
-        // Track current admin status
-        let isAdmin = false;
-        
-        // Initialize photo gallery with member cards
-        function initializePhotoGallery() {
-            const gallery = document.getElementById('membersGallery');
-            gallery.innerHTML = '';
+
+        // Initialize the medical gallery
+        function initializeMedicalGallery() {
+            const grid = document.getElementById('membersGrid');
+            grid.innerHTML = '';
             
             membersData.forEach((member, index) => {
-                const memberCard = document.createElement('div');
-                memberCard.className = 'member-card';
-                memberCard.style.animationDelay = `${index * 0.1}s`;
+                const card = document.createElement('div');
+                card.className = 'medical-card';
+                card.style.animationDelay = `${index * 0.1}s`;
                 
-                memberCard.innerHTML = `
-                    <div class="member-photo-container">
-                        <img src="${member.Photo || 'https://via.placeholder.com/300x300?text=No+Photo'}" alt="${member.Name}" class="member-photo">
+                // Convert Google Drive link if needed
+                const photoUrl = convertGoogleDriveLink(member.Photo);
+                
+                // Health projects for tags
+                const projects = member.Projects.split(', ');
+                const projectTags = projects.map(proj => 
+                    `<span class="project-tag">${proj}</span>`
+                ).join('');
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        <img src="${photoUrl}" alt="${member.Name}" class="member-photo img-loading" onload="this.classList.remove('img-loading')">
+                        <div class="member-role">${member.Position}</div>
+                        <div class="health-ribbon">Health Advocate</div>
                     </div>
-                    <div class="member-info">
+                    <div class="card-body">
                         <h3 class="member-name">${member.Name}</h3>
-                        <p class="member-position">${member.Position}</p>
+                        <p class="member-specialty"><i class="fas fa-stethoscope"></i> ${member.Specialty}</p>
+                        <p class="member-bio">${member.Bio}</p>
+                        
+                        <div class="health-projects">
+                            ${projectTags}
+                        </div>
+                        
+                        <button class="view-profile-btn" data-index="${index}">View Full Profile</button>
                     </div>
                 `;
                 
-                memberCard.addEventListener('click', () => {
-                    openLoginPortal();
+                // Add click event to the button
+                const button = card.querySelector('.view-profile-btn');
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showMemberModal(parseInt(this.getAttribute('data-index')));
                 });
                 
-                gallery.appendChild(memberCard);
+                grid.appendChild(card);
             });
         }
         
-        // Open login portal
-        function openLoginPortal() {
-            const loginPortal = document.getElementById('loginPortal');
-            loginPortal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        // Close login portal
-        document.getElementById('closeLoginPopup').addEventListener('click', () => {
-            const loginPortal = document.getElementById('loginPortal');
-            loginPortal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        });
-        
-        // Login functionality
-        document.getElementById('loginBtn').addEventListener('click', function() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorMsg = document.getElementById('errorMsg');
+        // Show member modal
+        function showMemberModal(index) {
+            const member = membersData[index];
+            const modal = document.getElementById('medicalModal');
+            const overlay = document.getElementById('modalOverlay');
             
-            if (validLogins[username] && validLogins[username].password === password) {
-                // Successful login
-                const loginPortal = document.getElementById('loginPortal');
-                loginPortal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-                
-                // Set admin status
-                isAdmin = validLogins[username].isAdmin;
-                
-                // Initialize admin portal
-                initializeAdminPortal(isAdmin);
-            } else {
-                // Failed login
-                errorMsg.style.display = 'block';
-                setTimeout(() => {
-                    errorMsg.style.display = 'none';
-                }, 3000);
-            }
-        });
-        
-        // Allow login on Enter key
-        document.getElementById('password').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('loginBtn').click();
-            }
-        });
-        
-        // Logout functionality
-        function setupLogout() {
-            document.getElementById('logoutBtn').addEventListener('click', function() {
-                // Hide admin portal
-                document.getElementById('adminPortal').style.display = 'none';
-                
-                // Show gallery page
-                document.getElementById('galleryPage').style.display = 'block';
-                
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-        
-        // Initialize admin portal
-        function initializeAdminPortal(adminStatus) {
-            const adminPortal = document.getElementById('adminPortal');
-            adminPortal.style.display = 'block';
+            // Convert Google Drive link if needed
+            const photoUrl = convertGoogleDriveLink(member.Photo);
             
-            // Hide gallery page
-            document.getElementById('galleryPage').style.display = 'none';
+            // Health projects as list items
+            const projects = member.Projects.split(', ');
+            const projectList = projects.map(proj => 
+                `<li>${proj}</li>`
+            ).join('');
             
-            // Create admin portal content
-            adminPortal.innerHTML = `
-                <div class="admin-header">
-                    <h1>Admin Portal</h1>
-                    <button id="logoutBtn" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </div>
-                
-                <p>${adminStatus ? 'Full administrative access' : 'View-only access'}</p>
-                
-                ${adminStatus ? `
-                <div class="admin-controls">
-                    <button class="add-member-btn" id="addMemberBtn">
-                        <i class="fas fa-plus"></i> Add New Member
-                    </button>
-                    
-                    <div class="add-member-form" id="addMemberForm">
-                        <h3>Add New Member</h3>
-                        <div class="form-row">
-                            <div>
-                                <input type="text" id="newName" placeholder="Full Name" required>
-                            </div>
-                            <div>
-                                <input type="text" id="newPosition" placeholder="Position" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div>
-                                <input type="email" id="newEmail" placeholder="Email">
-                            </div>
-                            <div>
-                                <input type="tel" id="newPhone" placeholder="Phone">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Photo</label>
-                            <div class="photo-upload">
-                                <img src="https://via.placeholder.com/300x300?text=No+Photo" id="newPhotoPreview" class="photo-preview">
-                                <input type="file" id="newPhotoUpload" accept="image/*" class="photo-upload-input">
-                                <label for="newPhotoUpload" class="upload-btn">Choose Photo</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Bio</label>
-                            <textarea id="newBio" placeholder="Biography" rows="3"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Achievements</label>
-                            <textarea id="newAchievements" placeholder="Achievements" rows="2"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Other Clubs</label>
-                            <textarea id="newOtherClubs" placeholder="Other Club Positions" rows="2"></textarea>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button class="submit-member-btn" id="submitMemberBtn">Submit</button>
-                            <button class="cancel-member-btn" id="cancelMemberBtn">Cancel</button>
+            modal.innerHTML = `
+                <div class="modal-header">
+                    <div class="close-modal" id="closeModal">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <div class="modal-profile">
+                        <img src="${photoUrl}" alt="${member.Name}" class="modal-photo">
+                        <div class="modal-profile-text">
+                            <h2>${member.Name}</h2>
+                            <p>${member.Position} | ${member.Specialty}</p>
                         </div>
                     </div>
                 </div>
-                ` : ''}
                 
-                <div class="filter-container">
-                    <button class="filter-btn active" data-filter="all">All Members</button>
-                    <button class="filter-btn" data-filter="president">Presidents</button>
-                    <button class="filter-btn" data-filter="vice president">Vice Presidents</button>
-                    <button class="filter-btn" data-filter="secretary">Secretaries</button>
-                    <button class="filter-btn" data-filter="treasurer">Treasurers</button>
-                    <button class="filter-btn" data-filter="member">Members</button>
-                </div>
-                
-                <div class="members-grid" id="membersContainer">
-                    <!-- Members will be loaded here -->
-                </div>
-                
-                <div class="member-detail-popup" id="memberPopup">
-                    <div class="popup-content">
-                        <div class="close-popup" id="closePopup">
-                            <i class="fas fa-times"></i>
+                <div class="modal-body">
+                    <div>
+                        <div class="modal-section">
+                            <h3><i class="fas fa-user-md"></i> Professional Bio</h3>
+                            <p>${member.Bio}</p>
                         </div>
-                        <div id="popupContent"></div>
+                        
+                        <div class="modal-section">
+                            <h3><i class="fas fa-graduation-cap"></i> Education</h3>
+                            <p>${member.Education}</p>
+                        </div>
+                        
+                        <div class="modal-section">
+                            <h3><i class="fas fa-trophy"></i> Awards & Recognition</h3>
+                            <p>${member.Awards}</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="modal-section">
+                            <h3><i class="fas fa-briefcase-medical"></i> Areas of Expertise</h3>
+                            <p>${member.Expertise}</p>
+                        </div>
+                        
+                        <div class="modal-section">
+                            <h3><i class="fas fa-hand-holding-medical"></i> Health Projects</h3>
+                            <ul class="health-project-list">
+                                ${projectList}
+                            </ul>
+                        </div>
+                        
+                        <div class="modal-section">
+                            <h3><i class="fas fa-address-card"></i> Contact Information</h3>
+                            <div class="contact-info">
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div>${member.Email}</div>
+                                </div>
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                    <div>${member.Phone}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
             
-            // Setup logout button
-            setupLogout();
+            // Show the modal
+            overlay.classList.add('active');
             
-            // Now initialize the member display functionality
-            initializeMemberDisplay(adminStatus);
-        }
-        
-        // Initialize member display in admin portal
-        function initializeMemberDisplay(adminStatus) {
-            // Function to display members
-            function displayMembers(members) {
-                const container = document.getElementById('membersContainer');
-                container.innerHTML = '';
-                
-                if (members.length === 0) {
-                    container.innerHTML = `
-                        <div class="no-results">
-                            <i class="fas fa-user-slash"></i>
-                            <h3>No members found</h3>
-                            <p>Try selecting a different filter</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                members.forEach((member, index) => {
-                    const memberCard = document.createElement('div');
-                    memberCard.className = 'member-card';
-                    memberCard.dataset.position = member.Position.toLowerCase();
-                    memberCard.style.animationDelay = `${index * 0.1}s`;
-                    
-                    memberCard.innerHTML = `
-                        <div class="member-photo-container">
-                            <img src="${member.Photo || 'https://via.placeholder.com/300x300?text=No+Photo'}" alt="${member.Name}" class="member-photo">
-                        </div>
-                        <div class="member-info">
-                            <h3 class="member-name">${member.Name}</h3>
-                            <p class="member-position">${member.Position}</p>
-                        </div>
-                    `;
-                    
-                    memberCard.addEventListener('click', () => {
-                        showMemberPopup(member);
-                    });
-                    
-                    container.appendChild(memberCard);
-                });
-            }
-            
-            // Show member popup
-            function showMemberPopup(member) {
-                const popup = document.getElementById('memberPopup');
-                const popupContent = document.getElementById('popupContent');
-                
-                popupContent.innerHTML = `
-                    <div class="popup-header">
-                        <img src="${member.Photo || 'https://via.placeholder.com/300x300?text=No+Photo'}" alt="${member.Name}" class="popup-photo" id="memberPhoto">
-                        <div class="popup-header-text">
-                            <h2 id="memberName">${member.Name}</h2>
-                            <p id="memberPosition">${member.Position}</p>
-                        </div>
-                        ${adminStatus ? `
-                        <button class="edit-member-btn" id="editMemberBtn">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        ` : ''}
-                    </div>
-                    <div class="popup-body" id="popupBody">
-                        <div class="bio-section">
-                            <div class="section-title">
-                                <i class="fas fa-user"></i>
-                                <span>About</span>
-                            </div>
-                            <p id="memberBio">${member.Bio || 'No biography available'}</p>
-                        </div>
-                        
-                        <div class="achievements-section">
-                            <div class="section-title">
-                                <i class="fas fa-trophy"></i>
-                                <span>Achievements</span>
-                            </div>
-                            <p id="memberAchievements">${member.Achievements || 'No achievements listed'}</p>
-                        </div>
-                        
-                        <div class="other-clubs-section">
-                            <div class="section-title">
-                                <i class="fas fa-users"></i>
-                                <span>Other Leadership</span>
-                            </div>
-                            <p id="memberOtherClubs">${member['Other Clubs'] || 'No other positions listed'}</p>
-                        </div>
-                        
-                        <div class="contact-section">
-                            <div class="section-title">
-                                <i class="fas fa-address-card"></i>
-                                <span>Contact</span>
-                            </div>
-                            <div class="contact-item">
-                                <i class="fas fa-envelope"></i>
-                                <span id="memberEmail">${member.Email || 'No email provided'}</span>
-                            </div>
-                            <div class="contact-item">
-                                <i class="fas fa-phone"></i>
-                                <span id="memberPhone">${member.Phone || 'No phone provided'}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // Add click handler for edit button if admin
-                if (adminStatus) {
-                    document.getElementById('editMemberBtn').addEventListener('click', () => {
-                        enableMemberEditing(member);
-                    });
-                }
-                
-                popup.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-            
-            // Enable editing of member details
-            function enableMemberEditing(member) {
-                const popupBody = document.getElementById('popupBody');
-                const memberIndex = membersData.findIndex(m => m.Name === member.Name);
-                
-                popupBody.innerHTML = `
-                    <div class="edit-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Name</label>
-                                <input type="text" id="editName" value="${member.Name}" class="edit-input">
-                            </div>
-                            <div class="form-group">
-                                <label>Position</label>
-                                <input type="text" id="editPosition" value="${member.Position}" class="edit-input">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" id="editEmail" value="${member.Email || ''}" class="edit-input">
-                            </div>
-                            <div class="form-group">
-                                <label>Phone</label>
-                                <input type="tel" id="editPhone" value="${member.Phone || ''}" class="edit-input">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Photo</label>
-                            <div class="photo-upload">
-                                <img src="${member.Photo || 'https://via.placeholder.com/300x300?text=No+Photo'}" id="editPhotoPreview" class="photo-preview">
-                                <input type="file" id="editPhotoUpload" accept="image/*" class="photo-upload-input">
-                                <label for="editPhotoUpload" class="upload-btn">Choose Photo</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Bio</label>
-                            <textarea id="editBio" class="edit-textarea">${member.Bio || ''}</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Achievements</label>
-                            <textarea id="editAchievements" class="edit-textarea">${member.Achievements || ''}</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Other Clubs</label>
-                            <textarea id="editOtherClubs" class="edit-textarea">${member['Other Clubs'] || ''}</textarea>
-                        </div>
-                        <div class="form-actions">
-                            <button class="save-member-btn" id="saveMemberBtn">Save Changes</button>
-                            <button class="cancel-edit-btn" id="cancelEditBtn">Cancel</button>
-                        </div>
-                    </div>
-                `;
-
-                // Handle photo upload preview
-                document.getElementById('editPhotoUpload').addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(event) {
-                            document.getElementById('editPhotoPreview').src = event.target.result;
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-
-                // Save changes handler
-                document.getElementById('saveMemberBtn').addEventListener('click', function() {
-                    // Get the updated values
-                    const updatedMember = {
-                        Name: document.getElementById('editName').value,
-                        Position: document.getElementById('editPosition').value,
-                        Email: document.getElementById('editEmail').value,
-                        Phone: document.getElementById('editPhone').value,
-                        Photo: document.getElementById('editPhotoPreview').src,
-                        Bio: document.getElementById('editBio').value,
-                        Achievements: document.getElementById('editAchievements').value,
-                        "Other Clubs": document.getElementById('editOtherClubs').value
-                    };
-
-                    // Update the member data
-                    membersData[memberIndex] = updatedMember;
-
-                    // Refresh the popup with updated data
-                    showMemberPopup(updatedMember);
-
-                    // Refresh the member list display
-                    const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-                    let filteredMembers = membersData;
-                    
-                    if (activeFilter !== 'all') {
-                        filteredMembers = membersData.filter(m => 
-                            m.Position.toLowerCase().includes(activeFilter)
-                        );
-                    }
-                    
-                    displayMembers(filteredMembers);
-                    
-                    // Also update the main gallery view
-                    initializePhotoGallery();
-                });
-
-                // Cancel edit handler
-                document.getElementById('cancelEditBtn').addEventListener('click', function() {
-                    showMemberPopup(member);
-                });
-            }
-            
-            // Close popup
-            document.getElementById('closePopup').addEventListener('click', () => {
-                const popup = document.getElementById('memberPopup');
-                popup.classList.remove('active');
-                document.body.style.overflow = 'auto';
+            // Close modal event
+            document.getElementById('closeModal').addEventListener('click', function() {
+                overlay.classList.remove('active');
             });
             
-            // Filter functionality
-            const filterButtons = document.querySelectorAll('.filter-btn');
-            filterButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    
-                    const filter = button.dataset.filter;
-                    let filteredMembers = membersData;
-                    
-                    if (filter !== 'all') {
-                        filteredMembers = membersData.filter(member => 
-                            member.Position.toLowerCase().includes(filter)
-                        );
-                    }
-                    
-                    displayMembers(filteredMembers);
-                });
+            // Close modal when clicking outside
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
             });
-            
-            // Add member functionality (only for admin)
-            if (adminStatus) {
-                // Handle photo upload for new member
-                document.getElementById('newPhotoUpload').addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(event) {
-                            document.getElementById('newPhotoPreview').src = event.target.result;
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-                
-                document.getElementById('addMemberBtn').addEventListener('click', function() {
-                    document.getElementById('addMemberForm').style.display = 'block';
-                });
-                
-                document.getElementById('cancelMemberBtn').addEventListener('click', function() {
-                    document.getElementById('addMemberForm').style.display = 'none';
-                    // Clear form
-                    document.querySelectorAll('#addMemberForm input, #addMemberForm textarea').forEach(el => {
-                        el.value = '';
-                    });
-                    // Reset photo preview
-                    document.getElementById('newPhotoPreview').src = 'https://via.placeholder.com/300x300?text=No+Photo';
-                });
-                
-                document.getElementById('submitMemberBtn').addEventListener('click', function() {
-                    const name = document.getElementById('newName').value;
-                    const position = document.getElementById('newPosition').value;
-                    
-                    if (!name || !position) {
-                        alert('Name and Position are required fields');
-                        return;
-                    }
-                    
-                    // Create new member object with photo preview as the photo
-                    const newMember = {
-                        Name: name,
-                        Position: position,
-                        Email: document.getElementById('newEmail').value,
-                        Phone: document.getElementById('newPhone').value,
-                        Photo: document.getElementById('newPhotoPreview').src,
-                        Bio: document.getElementById('newBio').value,
-                        Achievements: document.getElementById('newAchievements').value,
-                        "Other Clubs": document.getElementById('newOtherClubs').value
-                    };
-                    
-                    // Add to members array
-                    membersData.push(newMember);
-                    
-                    // Refresh displays
-                    initializePhotoGallery(); // Update the gallery view
-                    
-                    const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-                    let filteredMembers = membersData;
-                    
-                    if (activeFilter !== 'all') {
-                        filteredMembers = membersData.filter(member => 
-                            member.Position.toLowerCase().includes(activeFilter)
-                        );
-                    }
-                    
-                    displayMembers(filteredMembers);
-                    
-                    // Hide and clear form
-                    document.getElementById('addMemberForm').style.display = 'none';
-                    document.querySelectorAll('#addMemberForm input, #addMemberForm textarea').forEach(el => {
-                        el.value = '';
-                    });
-                    // Reset photo preview
-                    document.getElementById('newPhotoPreview').src = 'https://via.placeholder.com/300x300?text=No+Photo';
-                });
-            }
-            
-            // Initial display
-            displayMembers(membersData);
         }
         
-        // Initialize the photo gallery when page loads
-        window.addEventListener('DOMContentLoaded', initializePhotoGallery);
+        // Initialize the gallery when page loads
+        window.addEventListener('DOMContentLoaded', initializeMedicalGallery);
     </script>
 </body>
 </html>
