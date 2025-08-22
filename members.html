@@ -4,99 +4,562 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pharmacy Health Club - Members</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {margin: 0;padding: 0;box-sizing: border-box;}
+        :root {
+            --primary: #2A6AC1;
+            --primary-light: #E8F1FD;
+            --secondary: #FF6B6B;
+            --accent: #42B883;
+            --dark: #2D3748;
+            --gray: #718096;
+            --light-gray: #E2E8F0;
+            --white: #FFFFFF;
+            --card-shadow: 0 10px 20px rgba(42, 106, 193, 0.15);
+            --hover-shadow: 0 15px 30px rgba(42, 106, 193, 0.25);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(120deg, #e0f7fa 0%, #bbdefb 50%, #e3f2fd 100%);
-            color: #37474f;min-height: 100vh;overflow-x: hidden;
+            font-family: 'Open Sans', sans-serif;
+            background-color: #F7FAFC;
+            color: var(--dark);
+            line-height: 1.6;
         }
-        .medical-container {max-width: 1400px;margin: 0 auto;padding: 2rem;}
-        .medical-header {text-align: center;margin-bottom: 3rem;position: relative;padding: 2rem;background: rgba(255, 255, 255, 0.9);border-radius: 15px;box-shadow: 0 10px 30px rgba(30, 136, 229, 0.2);}
-        .medical-title {font-size: 3.5rem;font-weight: 700;color: #1565c0;margin-bottom: 1rem;position: relative;display: inline-block;}
-        .medical-title::after {content: '';position: absolute;bottom: -10px;left: 50%;transform: translateX(-50%);width: 100px;height: 4px;background: linear-gradient(90deg, #1565c0, #4fc3f7);border-radius: 2px;}
-        .medical-subtitle {font-size: 1.3rem;color: #546e7a;max-width: 800px;margin: 0 auto;line-height: 1.6;}
-        .health-stats {display: flex;justify-content: center;gap: 2rem;margin: 2rem 0;flex-wrap: wrap;}
-        .stat-box {background: white;padding: 1.5rem;border-radius: 12px;text-align: center;box-shadow: 0 5px 15px rgba(30, 136, 229, 0.15);min-width: 180px;transition: transform 0.3s;}
-        .stat-box:hover {transform: translateY(-5px);}
-        .stat-value {font-size: 2.5rem;font-weight: 700;color: #1565c0;margin-bottom: 0.5rem;}
-        .stat-label {font-size: 0.9rem;color: #546e7a;text-transform: uppercase;letter-spacing: 1px;}
-        .medical-grid {display: grid;grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));gap: 2.5rem;margin-top: 3rem;}
-        .medical-card {background: white;border-radius: 15px;overflow: hidden;box-shadow: 0 10px 30px rgba(30, 136, 229, 0.2);transition: all 0.4s ease;position: relative;cursor: pointer;opacity: 0;transform: translateY(30px);animation: cardAppear 0.8s forwards;}
-        @keyframes cardAppear {to {opacity: 1;transform: translateY(0);}}
-        .medical-card:hover {transform: translateY(-10px) scale(1.02);box-shadow: 0 15px 40px rgba(30, 136, 229, 0.3);}
-        .card-header {height: 180px;overflow: hidden;position: relative;}
-        .card-header::before {content: '';position: absolute;top: 0;left: 0;width: 100%;height: 100%;background: linear-gradient(to bottom, rgba(25, 118, 210, 0.2), rgba(25, 118, 210, 0.6));z-index: 1;}
-        .member-photo {width: 100%;height: 100%;object-fit: cover;transition: transform 0.5s;}
-        .medical-card:hover .member-photo {transform: scale(1.1);}
-        .member-role {position: absolute;bottom: 15px;left: 20px;background: #1565c0;color: white;padding: 5px 15px;border-radius: 20px;font-size: 0.8rem;font-weight: 600;z-index: 2;}
-        .card-body {padding: 1.5rem;}
-        .member-name {font-size: 1.5rem;font-weight: 700;color: #1565c0;margin-bottom: 0.5rem;}
-        .member-specialty {color: #78909c;font-size: 0.9rem;margin-bottom: 1rem;display: flex;align-items: center;}
-        .member-specialty i {margin-right: 8px;color: #4fc3f7;}
-        .member-bio {color: #546e7a;line-height: 1.6;margin-bottom: 1.5rem;display: -webkit-box;-webkit-line-clamp: 3;-webkit-box-orient: vertical;overflow: hidden;}
-        .health-projects {display: flex;flex-wrap: wrap;gap: 0.5rem;margin-bottom: 1.5rem;}
-        .project-tag {background: #e3f2fd;color: #1565c0;padding: 4px 10px;border-radius: 15px;font-size: 0.8rem;font-weight: 600;}
-        .view-profile-btn {display: block;width: 100%;background: linear-gradient(90deg, #1565c0, #42a5f5);color: white;border: none;padding: 12px;border-radius: 8px;font-weight: 600;cursor: pointer;transition: all 0.3s;text-align: center;}
-        .view-profile-btn:hover {background: linear-gradient(90deg, #0d47a1, #1e88e5);transform: translateY(-2px);box-shadow: 0 5px 15px rgba(21, 101, 192, 0.4);}
-        .modal-overlay {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0, 0, 0, 0.7);display: flex;justify-content: center;align-items: center;z-index: 1000;opacity: 0;visibility: hidden;transition: all 0.4s;}
-        .modal-overlay.active {opacity: 1;visibility: visible;}
-        .medical-modal {background: white;border-radius: 15px;width: 90%;max-width: 900px;max-height: 90vh;overflow-y: auto;box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);transform: scale(0.9);opacity: 0;transition: all 0.4s;display: flex;flex-direction: column;}
-        .modal-overlay.active .medical-modal {transform: scale(1);opacity: 1;}
-        .modal-header {padding: 2rem;background: linear-gradient(90deg, #1565c0, #42a5f5);color: white;position: relative;}
-        .close-modal {position: absolute;top: 20px;right: 20px;background: rgba(255, 255, 255, 0.2);width: 40px;height: 40px;border-radius: 50%;display: flex;align-items: center;justify-content: center;cursor: pointer;transition: all 0.3s;}
-        .close-modal:hover {background: rgba(255, 255, 255, 0.3);transform: rotate(90deg);}
-        .modal-profile {display: flex;align-items: center;gap: 2rem;}
-        .modal-photo {width: 120px;height: 120px;border-radius: 50%;object-fit: cover;border: 4px solid rgba(255, 255, 255, 0.3);}
-        .modal-profile-text h2 {font-size: 2rem;margin-bottom: 0.5rem;}
-        .modal-profile-text p {font-size: 1.1rem;opacity: 0.9;}
-        .modal-body {padding: 2rem;display: grid;grid-template-columns: 1fr 1fr;gap: 2rem;}
-        .modal-section {margin-bottom: 2rem;}
-        .modal-section h3 {color: #1565c0;margin-bottom: 1rem;padding-bottom: 0.5rem;border-bottom: 2px solid #e3f2fd;display: flex;align-items: center;}
-        .modal-section h3 i {margin-right: 10px;}
-        .modal-section p {line-height: 1.6;color: #546e7a;}
-        .health-project-list {list-style: none;}
-        .health-project-list li {padding: 10px 0;border-bottom: 1px solid #eceff1;display: flex;align-items: center;}
-        .health-project-list li:before {content: '•';color: #42a5f5;font-weight: bold;display: inline-block;width: 1em;margin-right: 10px;}
-        .contact-info {display: flex;flex-direction: column;gap: 1rem;}
-        .contact-item {display: flex;align-items: center;gap: 1rem;}
-        .contact-icon {width: 40px;height: 40px;background: #e3f2fd;border-radius: 50%;display: flex;align-items: center;justify-content: center;color: #1565c0;}
-        .health-ribbon {position: absolute;top: 20px;right: -40px;background: #e53935;color: white;padding: 8px 40px;font-size: 0.8rem;font-weight: 600;transform: rotate(45deg);box-shadow: 0 2px 10px rgba(229, 57, 53, 0.4);z-index: 2;}
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 2rem;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
+        .title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 800px;
+            margin: 0 auto 2.5rem;
+        }
+        
+        /* Stats Section */
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            min-width: 180px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--light-gray);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        /* Members Grid */
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .member-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: cardAppear 0.6s forwards;
+            border: 1px solid var(--light-gray);
+        }
+        
+        @keyframes cardAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .member-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .card-image {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .card-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+            z-index: 1;
+        }
+        
+        .member-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .member-card:hover .member-photo {
+            transform: scale(1.05);
+        }
+        
+        .member-badge {
+            position: absolute;
+            bottom: 15px;
+            left: 20px;
+            background: var(--primary);
+            color: var(--white);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+        
+        .card-content {
+            padding: 1.5rem;
+        }
+        
+        .member-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .member-specialty {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .member-specialty i {
+            margin-right: 8px;
+            color: var(--accent);
+        }
+        
+        .member-bio {
+            color: var(--dark);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .projects-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .project-tag {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .view-profile-btn {
+            display: block;
+            width: 100%;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .view-profile-btn:hover {
+            background: var(--secondary);
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 1rem;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: var(--white);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .modal-header {
+            padding: 2rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: var(--white);
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .modal-profile {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .modal-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-profile-text h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal-profile-text p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .modal-body {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .modal-section {
+            margin-bottom: 2rem;
+        }
+        
+        .modal-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .modal-section h3 i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        .modal-section p {
+            line-height: 1.6;
+            color: var(--dark);
+        }
+        
+        .project-list {
+            list-style: none;
+        }
+        
+        .project-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+        }
+        
+        .project-list li:before {
+            content: '•';
+            color: var(--accent);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-right: 10px;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        .expert-badge {
+            position: absolute;
+            top: 15px;
+            right: -35px;
+            background: var(--secondary);
+            color: var(--white);
+            padding: 8px 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 10px rgba(255, 107, 107, 0.4);
+            z-index: 2;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .modal-body {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+        
         @media (max-width: 768px) {
-            .medical-grid {grid-template-columns: 1fr;}
-            .modal-body {grid-template-columns: 1fr;}
-            .modal-profile {flex-direction: column;text-align: center;gap: 1rem;}
-            .health-stats {flex-direction: column;align-items: center;}
-            .stat-box {width: 100%;max-width: 300px;}
+            .container {
+                padding: 1rem;
+            }
+            
+            .title {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .members-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-profile {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat-card {
+                width: 100%;
+                max-width: 300px;
+            }
         }
-        .img-loading {background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);background-size: 200% 100%;animation: loading 1.5s infinite;}
-        @keyframes loading {0% {background-position: 200% 0;}100% {background-position: -200% 0;}}
+        
+        .img-loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="medical-container">
-        <header class="medical-header">
-            <h1 class="medical-title">Pharmacy Health Club</h1>
-            <p class="medical-subtitle">Meet our dedicated team of pharmacy professionals working on AMR, dengue awareness, and community health initiatives</p>
-            <div class="health-stats">
-                <div class="stat-box"><div class="stat-value">15+</div><div class="stat-label">Health Projects</div></div>
-                <div class="stat-box"><div class="stat-value">5</div><div class="stat-label">AMR Initiatives</div></div>
-                <div class="stat-box"><div class="stat-value">8</div><div class="stat-label">Dengue Awareness</div></div>
-                <div class="stat-box"><div class="stat-value">500+</div><div class="stat-label">People Reached</div></div>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Pharmacy Health Club</h1>
+            <p class="subtitle">Meet our dedicated team of pharmacy professionals working on AMR, dengue awareness, and community health initiatives</p>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-value">15+</div>
+                    <div class="stat-label">Health Projects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">AMR Initiatives</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Dengue Awareness</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">500+</div>
+                    <div class="stat-label">People Reached</div>
+                </div>
             </div>
         </header>
-        <div class="medical-grid" id="membersGrid"></div>
+        
+        <div class="members-grid" id="membersGrid"></div>
     </div>
-    <div class="modal-overlay" id="modalOverlay"><div class="medical-modal" id="medicalModal"></div></div>
+    
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="medicalModal"></div>
+    </div>
 
     <script>
+        // Function to convert Google Drive shareable links to direct image links
         function convertGoogleDriveLink(url) {
-            if (url.includes('drive.google.com/file/d/')) {
-                const fileId = url.match(/file\/d\/(.*?)\//)[1];
-                return `https://drive.google.com/uc?export=view&id=${fileId}`;
+            // Check if it's a Google Drive URL
+            if (url.includes('drive.google.com')) {
+                // Extract file ID from different Google Drive URL formats
+                let fileId;
+                
+                if (url.includes('/file/d/')) {
+                    // Format: https://drive.google.com/file/d/{fileId}/view
+                    fileId = url.split('/file/d/')[1].split('/')[0];
+                } else if (url.includes('id=')) {
+                    // Format: https://drive.google.com/open?id={fileId}
+                    fileId = url.split('id=')[1];
+                    // Remove any additional parameters
+                    fileId = fileId.split('&')[0];
+                }
+                
+                if (fileId) {
+                    return `https://lh3.googleusercontent.com/d/${fileId}=s400?authuser=0`;
+                }
             }
+            
+            // Return original URL if not a Google Drive link or if extraction failed
             return url;
         }
 
@@ -108,11 +571,11 @@
                 "Email": "samir.pharma@example.com",
                 "Phone": "+977 9863199343",
                 "Photo": "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link",
-                "Bio": "Dr. Sapkota is a dedicated pharmacist with 10+ years of experience.",
-                "Expertise": "Antimicrobial Resistance, Pharmacy Management",
-                "Projects": "AMR Awareness Campaign, Rural Health Outreach",
+                "Bio": "Dr. Sapkota is a dedicated pharmacist with 10+ years of experience specializing in antimicrobial resistance and public health initiatives. He has led multiple community health programs and is passionate about improving access to quality healthcare in rural areas.",
+                "Expertise": "Antimicrobial Resistance, Pharmacy Management, Public Health",
+                "Projects": "AMR Awareness Campaign, Rural Health Outreach, Medication Safety Program",
                 "Education": "Pharm.D, MPH in Global Health",
-                "Awards": "National Pharmacy Excellence Award 2022"
+                "Awards": "National Pharmacy Excellence Award 2022, Global Health Leadership Prize 2020"
             },
             {
                 "Name": "Dr. Anita Sharma",
@@ -121,42 +584,73 @@
                 "Email": "anita.sharma@example.com",
                 "Phone": "+977 9876543210",
                 "Photo": "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link",
-                "Bio": "Specializes in vector-borne diseases and dengue prevention.",
-                "Expertise": "Dengue Management, Public Health",
-                "Projects": "Dengue Awareness Drive, Fever Management Clinics",
+                "Bio": "Specializes in vector-borne diseases and dengue prevention. With over 8 years of clinical experience, she has developed innovative approaches to community-based dengue management and prevention strategies.",
+                "Expertise": "Dengue Management, Public Health, Tropical Medicine",
+                "Projects": "Dengue Awareness Drive, Fever Management Clinics, Community Mosquito Control",
                 "Education": "Pharm.D, Diploma in Tropical Medicine",
-                "Awards": "Public Health Champion Award 2021"
+                "Awards": "Public Health Champion Award 2021, Innovation in Healthcare 2019"
+            },
+            {
+                "Name": "Rajiv Kumar",
+                "Position": "Pharmacology Specialist",
+                "Specialty": "AMR Research",
+                "Email": "rajiv.kumar@example.com",
+                "Phone": "+977 9823456712",
+                "Photo": "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link",
+                "Bio": "Focused on antimicrobial resistance research and developing new protocols for responsible antibiotic use in clinical settings. Published over 15 papers in international journals.",
+                "Expertise": "Antimicrobial Resistance, Clinical Research, Pharmacology",
+                "Projects": "AMR Surveillance Program, Antibiotic Stewardship, Clinical Guidelines Development",
+                "Education": "Ph.D in Pharmacology, M.Pharm",
+                "Awards": "Research Excellence Award 2022, Young Scientist Grant 2020"
+            },
+            {
+                "Name": "Priya Patel",
+                "Position": "Community Health Pharmacist",
+                "Specialty": "Health Education",
+                "Email": "priya.patel@example.com",
+                "Phone": "+977 9812345678",
+                "Photo": "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link",
+                "Bio": "Dedicated to community health education and preventive care. Develops and implements health literacy programs for diverse communities with a focus on accessible healthcare information.",
+                "Expertise": "Health Education, Community Outreach, Preventive Care",
+                "Projects": "Health Literacy Program, School Health Initiative, Preventive Care Campaign",
+                "Education": "Pharm.D, Certificate in Health Education",
+                "Awards": "Community Health Hero 2021, Excellence in Patient Education 2020"
             }
-            // Add more members here...
         ];
 
         function initializeMedicalGallery() {
             const grid = document.getElementById('membersGrid');
             grid.innerHTML = '';
+            
             membersData.forEach((member, index) => {
                 const card = document.createElement('div');
-                card.className = 'medical-card';
+                card.className = 'member-card';
                 card.style.animationDelay = `${index * 0.1}s`;
+                
                 const photoUrl = convertGoogleDriveLink(member.Photo);
                 const projects = member.Projects.split(', ');
                 const projectTags = projects.map(proj => `<span class="project-tag">${proj}</span>`).join('');
+                
                 card.innerHTML = `
-                    <div class="card-header">
-                        <img src="${photoUrl}" alt="${member.Name}" class="member-photo img-loading" onload="this.classList.remove('img-loading')">
-                        <div class="member-role">${member.Position}</div>
-                        <div class="health-ribbon">Health Advocate</div>
+                    <div class="card-image">
+                        <img src="${photoUrl}" alt="${member.Name}" class="member-photo" onerror="this.onerror=null; this.src='https://placehold.co/400x400/2A6AC1/FFFFFF?text=${member.Name.split(' ').map(n => n[0]).join('')}'">
+                        <div class="member-badge">${member.Position}</div>
+                        <div class="expert-badge">Expert</div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-content">
                         <h3 class="member-name">${member.Name}</h3>
                         <p class="member-specialty"><i class="fas fa-stethoscope"></i> ${member.Specialty}</p>
                         <p class="member-bio">${member.Bio}</p>
-                        <div class="health-projects">${projectTags}</div>
+                        <div class="projects-container">${projectTags}</div>
                         <button class="view-profile-btn" data-index="${index}">View Full Profile</button>
                     </div>
                 `;
+                
                 card.querySelector('.view-profile-btn').addEventListener('click', e => {
-                    e.stopPropagation();showMemberModal(index);
+                    e.stopPropagation();
+                    showMemberModal(index);
                 });
+                
                 grid.appendChild(card);
             });
         }
@@ -165,14 +659,16 @@
             const member = membersData[index];
             const modal = document.getElementById('medicalModal');
             const overlay = document.getElementById('modalOverlay');
+            
             const photoUrl = convertGoogleDriveLink(member.Photo);
             const projects = member.Projects.split(', ');
             const projectList = projects.map(proj => `<li>${proj}</li>`).join('');
+            
             modal.innerHTML = `
                 <div class="modal-header">
                     <div class="close-modal" id="closeModal"><i class="fas fa-times"></i></div>
                     <div class="modal-profile">
-                        <img src="${photoUrl}" alt="${member.Name}" class="modal-photo">
+                        <img src="${photoUrl}" alt="${member.Name}" class="modal-photo" onerror="this.onerror=null; this.src='https://placehold.co/400x400/2A6AC1/FFFFFF?text=${member.Name.split(' ').map(n => n[0]).join('')}'">
                         <div class="modal-profile-text">
                             <h2>${member.Name}</h2>
                             <p>${member.Position} | ${member.Specialty}</p>
@@ -181,25 +677,56 @@
                 </div>
                 <div class="modal-body">
                     <div>
-                        <div class="modal-section"><h3><i class="fas fa-user-md"></i> Professional Bio</h3><p>${member.Bio}</p></div>
-                        <div class="modal-section"><h3><i class="fas fa-graduation-cap"></i> Education</h3><p>${member.Education}</p></div>
-                        <div class="modal-section"><h3><i class="fas fa-trophy"></i> Awards & Recognition</h3><p>${member.Awards}</p></div>
+                        <div class="modal-section">
+                            <h3><i class="fas fa-user-md"></i> Professional Bio</h3>
+                            <p>${member.Bio}</p>
+                        </div>
+                        <div class="modal-section">
+                            <h3><i class="fas fa-graduation-cap"></i> Education</h3>
+                            <p>${member.Education}</p>
+                        </div>
+                        <div class="modal-section">
+                            <h3><i class="fas fa-trophy"></i> Awards & Recognition</h3>
+                            <p>${member.Awards}</p>
+                        </div>
                     </div>
                     <div>
-                        <div class="modal-section"><h3><i class="fas fa-briefcase-medical"></i> Areas of Expertise</h3><p>${member.Expertise}</p></div>
-                        <div class="modal-section"><h3><i class="fas fa-hand-holding-medical"></i> Health Projects</h3><ul class="health-project-list">${projectList}</ul></div>
-                        <div class="modal-section"><h3><i class="fas fa-address-card"></i> Contact Information</h3>
+                        <div class="modal-section">
+                            <h3><i class="fas fa-briefcase-medical"></i> Areas of Expertise</h3>
+                            <p>${member.Expertise}</p>
+                        </div>
+                        <div class="modal-section">
+                            <h3><i class="fas fa-hand-holding-medical"></i> Health Projects</h3>
+                            <ul class="project-list">${projectList}</ul>
+                        </div>
+                        <div class="modal-section">
+                            <h3><i class="fas fa-address-card"></i> Contact Information</h3>
                             <div class="contact-info">
-                                <div class="contact-item"><div class="contact-icon"><i class="fas fa-envelope"></i></div><div>${member.Email}</div></div>
-                                <div class="contact-item"><div class="contact-icon"><i class="fas fa-phone"></i></div><div>${member.Phone}</div></div>
+                                <div class="contact-item">
+                                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                                    <div>${member.Email}</div>
+                                </div>
+                                <div class="contact-item">
+                                    <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                                    <div>${member.Phone}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
+            
             overlay.classList.add('active');
-            document.getElementById('closeModal').addEventListener('click', () => overlay.classList.remove('active'));
-            overlay.addEventListener('click', e => {if (e.target === overlay) overlay.classList.remove('active');});
+            
+            document.getElementById('closeModal').addEventListener('click', () => {
+                overlay.classList.remove('active');
+            });
+            
+            overlay.addEventListener('click', e => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
         }
 
         window.addEventListener('DOMContentLoaded', initializeMedicalGallery);
