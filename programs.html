@@ -16,7 +16,7 @@
             --light: #f9fafb;
             --gray: #6b7280;
             --light-gray: #e5e7eb;
-            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-bg: rgba(255, 255, 255, 0.9);
             --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             --hover-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.4);
         }
@@ -55,54 +55,6 @@
             background-color: rgba(255, 255, 255, 0.5);
             border-radius: 50%;
             animation: float 15s infinite ease-in-out;
-        }
-        
-        .dot:nth-child(1) {
-            top: 20%;
-            left: 20%;
-            animation-delay: 0s;
-        }
-        
-        .dot:nth-child(2) {
-            top: 60%;
-            left: 80%;
-            animation-delay: 2s;
-        }
-        
-        .dot:nth-child(3) {
-            top: 40%;
-            left: 40%;
-            animation-delay: 4s;
-        }
-        
-        .dot:nth-child(4) {
-            top: 80%;
-            left: 30%;
-            animation-delay: 6s;
-        }
-        
-        .dot:nth-child(5) {
-            top: 30%;
-            left: 70%;
-            animation-delay: 8s;
-        }
-        
-        .dot:nth-child(6) {
-            top: 70%;
-            left: 60%;
-            animation-delay: 10s;
-        }
-        
-        .dot:nth-child(7) {
-            top: 50%;
-            left: 10%;
-            animation-delay: 12s;
-        }
-        
-        .dot:nth-child(8) {
-            top: 10%;
-            left: 50%;
-            animation-delay: 14s;
         }
         
         .connecting-line {
@@ -184,12 +136,6 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
-        .program-card:nth-child(1) { animation-delay: 0.1s; }
-        .program-card:nth-child(2) { animation-delay: 0.2s; }
-        .program-card:nth-child(3) { animation-delay: 0.3s; }
-        .program-card:nth-child(4) { animation-delay: 0.4s; }
-        .program-card:nth-child(5) { animation-delay: 0.5s; }
         
         @keyframes cardAppear {
             0% {
@@ -343,6 +289,8 @@
             color: white;
             position: relative;
             transform-style: preserve-3d;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
         }
         
         .close-modal {
@@ -397,14 +345,14 @@
         
         .modal-body {
             padding: 2rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 2rem;
             transform-style: preserve-3d;
         }
         
         .modal-section {
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             transform: translateZ(10px);
         }
         
@@ -429,9 +377,16 @@
             color: var(--dark);
         }
         
+        .content-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        /* Enhanced Gallery Styles */
         .program-gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 1.5rem;
             margin-top: 1.5rem;
         }
@@ -442,7 +397,7 @@
             border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
-            height: 150px;
+            height: 200px;
             cursor: pointer;
             transform-style: preserve-3d;
         }
@@ -470,15 +425,11 @@
             right: 0;
             background: rgba(0, 0, 0, 0.7);
             color: white;
-            padding: 10px;
-            font-size: 0.9rem;
+            padding: 12px;
+            font-size: 1rem;
             text-align: center;
-            transform: translateY(100%);
-            transition: all 0.3s ease;
-        }
-        
-        .gallery-item:hover .gallery-caption {
             transform: translateY(0);
+            transition: all 0.3s ease;
         }
         
         .location-info {
@@ -521,6 +472,7 @@
             position: relative;
             transform: scale(0.9);
             transition: all 0.4s ease;
+            text-align: center;
         }
         
         .image-preview-modal.active .image-preview-content {
@@ -529,7 +481,7 @@
         
         .preview-image {
             max-width: 100%;
-            max-height: 80vh;
+            max-height: 70vh;
             object-fit: contain;
             border-radius: 10px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
@@ -539,23 +491,64 @@
             color: white;
             text-align: center;
             margin-top: 20px;
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            padding: 0 20px;
         }
         
         .close-preview {
             position: absolute;
-            top: -40px;
-            right: -40px;
+            top: 20px;
+            right: 20px;
             color: white;
             font-size: 2.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            z-index: 1002;
+            background: rgba(0, 0, 0, 0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .close-preview:hover {
             color: var(--accent);
             transform: rotate(90deg);
+        }
+        
+        /* Navigation arrows */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1002;
+            background: rgba(0, 0, 0, 0.5);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-arrow:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .prev-arrow {
+            left: 20px;
+        }
+        
+        .next-arrow {
+            right: 20px;
         }
         
         /* Animations */
@@ -571,14 +564,9 @@
             75% { transform: translateY(10px) translateX(-5px); }
         }
         
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
         /* Responsive Design */
         @media (max-width: 1024px) {
-            .modal-body {
+            .content-columns {
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
             }
@@ -591,6 +579,10 @@
             .program-header-image {
                 width: 100%;
                 max-width: 300px;
+            }
+            
+            .program-gallery {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             }
         }
         
@@ -615,33 +607,46 @@
                 font-size: 1.8rem;
             }
             
-            .modal-content, .admin-content {
+            .modal {
                 width: 95%;
                 margin: 2% auto;
                 padding: 15px;
             }
             
             .close-preview {
-                top: -30px;
+                top: 10px;
                 right: 10px;
+                font-size: 2rem;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .nav-arrow {
+                font-size: 2rem;
+                width: 50px;
+                height: 50px;
             }
             
             .program-gallery {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .gallery-item {
+                height: 180px;
             }
         }
     </style>
 </head>
 <body>
     <div class="bg-animation">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+        <div class="dot" style="top: 20%; left: 20%; animation-delay: 0s;"></div>
+        <div class="dot" style="top: 60%; left: 80%; animation-delay: 2s;"></div>
+        <div class="dot" style="top: 40%; left: 40%; animation-delay: 4s;"></div>
+        <div class="dot" style="top: 80%; left: 30%; animation-delay: 6s;"></div>
+        <div class="dot" style="top: 30%; left: 70%; animation-delay: 8s;"></div>
+        <div class="dot" style="top: 70%; left: 60%; animation-delay: 10s;"></div>
+        <div class="dot" style="top: 50%; left: 10%; animation-delay: 12s;"></div>
+        <div class="dot" style="top: 10%; left: 50%; animation-delay: 14s;"></div>
     </div>
     
     <div class="container">
@@ -676,8 +681,10 @@
     
     <!-- Image Preview Modal -->
     <div class="image-preview-modal" id="imagePreviewModal">
+        <div class="nav-arrow prev-arrow" id="prevArrow"><i class="fas fa-chevron-left"></i></div>
+        <div class="nav-arrow next-arrow" id="nextArrow"><i class="fas fa-chevron-right"></i></div>
+        <span class="close-preview" id="closePreview"><i class="fas fa-times"></i></span>
         <div class="image-preview-content">
-            <span class="close-preview" id="closePreview"><i class="fas fa-times"></i></span>
             <img id="previewImage" class="preview-image" src="" alt="">
             <p id="previewCaption" class="preview-caption"></p>
         </div>
@@ -702,7 +709,7 @@
                 }
                 
                 if (fileId) {
-                    return `https://lh3.googleusercontent.com/d/${fileId}=s400?authuser=0`;
+                    return `https://lh3.googleusercontent.com/d/${fileId}=s600?authuser=0`;
                 }
             }
             
@@ -725,7 +732,8 @@
                 additionalPhotos: [
                     {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Community workshop on antibiotic use"},
                     {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Healthcare professional training session"},
-                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Public awareness event at local health fair"}
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Public awareness event at local health fair"},
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Educational materials distribution"}
                 ]
             },
             {
@@ -741,7 +749,8 @@
                 additionalPhotos: [
                     {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Community clean-up activity to eliminate breeding sites"},
                     {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Educational session at local school"},
-                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Distribution of prevention materials door-to-door"}
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Distribution of prevention materials door-to-door"},
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Mosquito larvae monitoring and elimination"}
                 ]
             },
             {
@@ -757,7 +766,8 @@
                 additionalPhotos: [
                     {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Mobile health clinic in action"},
                     {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Health screening for community members"},
-                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Distribution of health information materials"}
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Distribution of health information materials"},
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Vaccination drive in rural community"}
                 ]
             }
         ];
@@ -774,6 +784,12 @@
         const modalProgramImage = document.getElementById('modalProgramImage');
         const modalProgramTitle = document.getElementById('modalProgramTitle');
         const modalProgramDescription = document.getElementById('modalProgramDescription');
+        const prevArrow = document.getElementById('prevArrow');
+        const nextArrow = document.getElementById('nextArrow');
+
+        // Global variables for gallery navigation
+        let currentGallery = [];
+        let currentImageIndex = 0;
 
         // Display all programs
         function displayPrograms() {
@@ -826,62 +842,67 @@
             modalProgramTitle.textContent = program.title;
             modalProgramDescription.textContent = program.shortDescription;
             
-            // Set modal body content
+            // Set modal body content with new layout
             programDetails.innerHTML = `
-                <div>
-                    <div class="modal-section">
-                        <h3><i class="fas fa-info-circle"></i> Introduction</h3>
-                        <p>${program.introduction.replace(/\n/g, '<br>')}</p>
+                <div class="content-columns">
+                    <div>
+                        <div class="modal-section">
+                            <h3><i class="fas fa-info-circle"></i> Introduction</h3>
+                            <p>${program.introduction.replace(/\n/g, '<br>')}</p>
+                        </div>
+                        
+                        <div class="modal-section">
+                            <h3><i class="fas fa-bullseye"></i> Objectives</h3>
+                            <p>${program.objectives.replace(/\n/g, '<br>')}</p>
+                        </div>
+                        
+                        <div class="modal-section">
+                            <h3><i class="fas fa-users"></i> Target Group</h3>
+                            <p>${program.targetGroup.replace(/\n/g, '<br>')}</p>
+                        </div>
                     </div>
                     
-                    <div class="modal-section">
-                        <h3><i class="fas fa-bullseye"></i> Objectives</h3>
-                        <p>${program.objectives.replace(/\n/g, '<br>')}</p>
-                    </div>
-                    
-                    <div class="modal-section">
-                        <h3><i class="fas fa-users"></i> Target Group</h3>
-                        <p>${program.targetGroup.replace(/\n/g, '<br>')}</p>
+                    <div>
+                        <div class="modal-section">
+                            <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
+                            <div class="location-info">
+                                <span class="location-icon">📍</span>
+                                <p>${program.location}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-section">
+                            <h3><i class="fas fa-chart-line"></i> Outcomes</h3>
+                            <p>${program.outcomes.replace(/\n/g, '<br>')}</p>
+                        </div>
                     </div>
                 </div>
                 
-                <div>
-                    <div class="modal-section">
-                        <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
-                        <div class="location-info">
-                            <span class="location-icon">📍</span>
-                            <p>${program.location}</p>
-                        </div>
+                ${program.additionalPhotos && program.additionalPhotos.length > 0 ? `
+                <div class="modal-section">
+                    <h3><i class="fas fa-images"></i> Program Gallery</h3>
+                    <div class="program-gallery">
+                        ${program.additionalPhotos.map(photo => {
+                            const photoUrl = convertGoogleDriveLink(photo.url);
+                            return `
+                                <div class="gallery-item" data-url="${photoUrl}" data-caption="${photo.caption}">
+                                    <img src="${photoUrl}" alt="${photo.caption}" class="gallery-image" onerror="this.onerror=null; this.src='https://placehold.co/600x400/6366f1/ffffff?text=Photo'">
+                                    <div class="gallery-caption">${photo.caption}</div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
-                    
-                    <div class="modal-section">
-                        <h3><i class="fas fa-chart-line"></i> Outcomes</h3>
-                        <p>${program.outcomes.replace(/\n/g, '<br>')}</p>
-                    </div>
-                    
-                    ${program.additionalPhotos && program.additionalPhotos.length > 0 ? `
-                    <div class="modal-section">
-                        <h3><i class="fas fa-images"></i> Program Gallery</h3>
-                        <div class="program-gallery">
-                            ${program.additionalPhotos.map(photo => {
-                                const photoUrl = convertGoogleDriveLink(photo.url);
-                                return `
-                                    <div class="gallery-item">
-                                        <img src="${photoUrl}" alt="${photo.caption}" class="gallery-image" data-url="${photoUrl}" data-caption="${photo.caption}" onerror="this.onerror=null; this.src='https://placehold.co/600x400/6366f1/ffffff?text=Photo'">
-                                        <div class="gallery-caption">${photo.caption}</div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                    ` : ''}
                 </div>
+                ` : ''}
             `;
             
-            // Add event listeners to gallery images
-            document.querySelectorAll('.gallery-item img').forEach(img => {
-                img.addEventListener('click', function() {
-                    showImagePreview(this.getAttribute('data-url'), this.getAttribute('data-caption'));
+            // Store current gallery for navigation
+            currentGallery = program.additionalPhotos || [];
+            
+            // Add event listeners to gallery items (both image and caption)
+            document.querySelectorAll('.gallery-item').forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    showImagePreview(index);
                 });
             });
             
@@ -890,14 +911,50 @@
         }
 
         // Show image preview modal
-        function showImagePreview(url, caption) {
-            previewImage.src = url;
+        function showImagePreview(index) {
+            if (currentGallery.length === 0) return;
+            
+            currentImageIndex = index;
+            const photo = currentGallery[index];
+            const photoUrl = convertGoogleDriveLink(photo.url);
+            
+            previewImage.src = photoUrl;
             previewImage.onerror = function() {
                 this.src = 'https://placehold.co/800x600/6366f1/ffffff?text=Image+Not+Found';
             };
-            previewCaption.textContent = caption;
+            previewCaption.textContent = photo.caption;
             imagePreviewModal.classList.add('active');
             document.body.style.overflow = 'hidden';
+        }
+
+        // Navigate to previous image
+        function showPrevImage() {
+            if (currentGallery.length === 0) return;
+            
+            currentImageIndex = (currentImageIndex - 1 + currentGallery.length) % currentGallery.length;
+            const photo = currentGallery[currentImageIndex];
+            const photoUrl = convertGoogleDriveLink(photo.url);
+            
+            previewImage.src = photoUrl;
+            previewImage.onerror = function() {
+                this.src = 'https://placehold.co/800x600/6366f1/ffffff?text=Image+Not+Found';
+            };
+            previewCaption.textContent = photo.caption;
+        }
+
+        // Navigate to next image
+        function showNextImage() {
+            if (currentGallery.length === 0) return;
+            
+            currentImageIndex = (currentImageIndex + 1) % currentGallery.length;
+            const photo = currentGallery[currentImageIndex];
+            const photoUrl = convertGoogleDriveLink(photo.url);
+            
+            previewImage.src = photoUrl;
+            previewImage.onerror = function() {
+                this.src = 'https://placehold.co/800x600/6366f1/ffffff?text=Image+Not+Found';
+            };
+            previewCaption.textContent = photo.caption;
         }
 
         // Close image preview modal
@@ -916,6 +973,9 @@
         function createConnectingLines() {
             const dots = document.querySelectorAll('.dot');
             const container = document.querySelector('.bg-animation');
+            
+            // Clear existing lines
+            document.querySelectorAll('.connecting-line').forEach(line => line.remove());
             
             dots.forEach(dot => {
                 dots.forEach(otherDot => {
@@ -951,6 +1011,21 @@
         // Event Listeners
         closeModal.addEventListener('click', closeModalFunc);
         closePreview.addEventListener('click', closeImagePreview);
+        prevArrow.addEventListener('click', showPrevImage);
+        nextArrow.addEventListener('click', showNextImage);
+
+        // Keyboard navigation for gallery
+        document.addEventListener('keydown', (e) => {
+            if (imagePreviewModal.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') {
+                    showPrevImage();
+                } else if (e.key === 'ArrowRight') {
+                    showNextImage();
+                } else if (e.key === 'Escape') {
+                    closeImagePreview();
+                }
+            }
+        });
 
         // Close modals when clicking outside
         window.addEventListener('click', (e) => {
@@ -972,7 +1047,6 @@
         
         // Update connecting lines on window resize
         window.addEventListener('resize', () => {
-            document.querySelectorAll('.connecting-line').forEach(line => line.remove());
             setTimeout(createConnectingLines, 500);
         });
     </script>
