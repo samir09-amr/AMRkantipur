@@ -3,265 +3,460 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Program Activity Display</title>
+    <title>Pharmacy Health Club Programs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2ecc71;
-            --dark-color: #2c3e50;
-            --light-color: #ecf0f1;
-            --accent-color: #e74c3c;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --gray: #6b7280;
+            --light-gray: #e5e7eb;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --hover-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.4);
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
             min-height: 100vh;
-            padding: 20px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            animation: fadeIn 1s ease-in-out;
-        }
-        
-        h1 {
-            color: var(--dark-color);
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .admin-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-        
-        .admin-btn:hover {
-            background-color: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
-        .programs-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            padding: 20px;
-        }
-        
-        .program-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            transform-style: preserve-3d;
-            transform: perspective(1000px);
             position: relative;
         }
         
-        .program-card:hover {
-            transform: perspective(1000px) rotateY(10deg) translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-        }
-        
-        .program-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            transition: all 0.5s;
-        }
-        
-        .program-card:hover .program-image {
-            transform: scale(1.05);
-        }
-        
-        .program-info {
-            padding: 20px;
-        }
-        
-        .program-title {
-            font-size: 1.5rem;
-            color: var(--dark-color);
-            margin-bottom: 10px;
-        }
-        
-        .program-description {
-            color: #7f8c8d;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-        
-        .read-more {
-            display: inline-block;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .read-more:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
-        
-        .edit-btn {
-            display: inline-block;
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s;
-            margin-top: 10px;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .edit-btn:hover {
-            background-color: #27ae60;
-            transform: translateY(-2px);
-        }
-        
-        /* Modal Styles */
-        .modal {
-            display: none;
+        /* Animated Background */
+        .bg-animation {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            z-index: 1001;
-            overflow-y: auto;
-            animation: fadeIn 0.3s;
+            z-index: -1;
+            overflow: hidden;
         }
         
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 900px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
-            animation: slideDown 0.5s;
-        }
-        
-        .close-btn {
+        .dot {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.5rem;
-            color: #7f8c8d;
+            width: 6px;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .dot:nth-child(1) {
+            top: 20%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+        
+        .dot:nth-child(2) {
+            top: 60%;
+            left: 80%;
+            animation-delay: 2s;
+        }
+        
+        .dot:nth-child(3) {
+            top: 40%;
+            left: 40%;
+            animation-delay: 4s;
+        }
+        
+        .dot:nth-child(4) {
+            top: 80%;
+            left: 30%;
+            animation-delay: 6s;
+        }
+        
+        .dot:nth-child(5) {
+            top: 30%;
+            left: 70%;
+            animation-delay: 8s;
+        }
+        
+        .dot:nth-child(6) {
+            top: 70%;
+            left: 60%;
+            animation-delay: 10s;
+        }
+        
+        .dot:nth-child(7) {
+            top: 50%;
+            left: 10%;
+            animation-delay: 12s;
+        }
+        
+        .dot:nth-child(8) {
+            top: 10%;
+            left: 50%;
+            animation-delay: 14s;
+        }
+        
+        .connecting-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            transform-origin: 0 0;
+            height: 1px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 2rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+        
+        .title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--gray);
+            max-width: 800px;
+            margin: 0 auto 2.5rem;
+        }
+        
+        /* Programs Grid */
+        .programs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
+        }
+        
+        .program-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s ease;
+            position: relative;
             cursor: pointer;
-            transition: all 0.3s;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            animation: cardAppear 0.6s forwards;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        .close-btn:hover {
-            color: var(--accent-color);
-            transform: rotate(90deg);
+        .program-card:nth-child(1) { animation-delay: 0.1s; }
+        .program-card:nth-child(2) { animation-delay: 0.2s; }
+        .program-card:nth-child(3) { animation-delay: 0.3s; }
+        .program-card:nth-child(4) { animation-delay: 0.4s; }
+        .program-card:nth-child(5) { animation-delay: 0.5s; }
+        
+        @keyframes cardAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) rotateY(30deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotateY(0);
+            }
         }
         
-        .program-details {
+        .program-card:hover {
+            transform: translateY(-15px) rotateY(5deg) scale(1.03);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .card-image {
+            height: 250px;
+            overflow: hidden;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        
+        .card-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+            z-index: 1;
+        }
+        
+        .program-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.5s ease;
+            transform: translateZ(20px);
+        }
+        
+        .program-card:hover .program-image {
+            transform: scale(1.1) translateZ(30px);
+        }
+        
+        .program-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 2;
+            transform: translateZ(30px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-content {
+            padding: 2rem;
+            transform-style: preserve-3d;
+        }
+        
+        .program-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            transform: translateZ(20px);
+        }
+        
+        .program-description {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            transform: translateZ(15px);
+        }
+        
+        .view-details-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            transform: translateZ(25px);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        }
+        
+        .view-details-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            transform: translateY(-3px) translateZ(30px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--hover-shadow);
+            transform: scale(0.9) rotateX(10deg);
+            opacity: 0;
+            transition: all 0.4s ease;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: scale(1) rotateX(0);
+            opacity: 1;
+        }
+        
+        .modal-header {
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: translateZ(20px);
+            font-size: 1.5rem;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg) translateZ(25px);
         }
         
         .program-header {
             display: flex;
-            gap: 20px;
-            align-items: flex-start;
-            margin-bottom: 20px;
+            align-items: center;
+            gap: 2rem;
+            transform: translateZ(15px);
         }
         
         .program-header-image {
-            width: 300px;
-            height: 200px;
+            width: 200px;
+            height: 150px;
             object-fit: cover;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transform: translateZ(30px);
         }
         
-        .program-header-text {
-            flex: 1;
+        .program-header-text h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
         }
         
-        .program-detail-title {
-            font-size: 2rem;
-            color: var(--dark-color);
-            margin-bottom: 10px;
+        .program-header-text p {
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
         
-        .program-section {
-            margin-bottom: 20px;
+        .modal-body {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            transform-style: preserve-3d;
         }
         
-        .section-title {
-            font-size: 1.3rem;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 5px;
+        .modal-section {
+            margin-bottom: 2rem;
+            transform: translateZ(10px);
         }
         
-        .section-content {
+        .modal-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.4rem;
+        }
+        
+        .modal-section h3 i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        .modal-section p {
             line-height: 1.6;
-            color: #34495e;
+            color: var(--dark);
         }
         
         .program-gallery {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
         }
         
         .gallery-item {
             position: relative;
             overflow: hidden;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            transition: all 0.3s;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
             height: 150px;
-            cursor: zoom-in;
+            cursor: pointer;
+            transform-style: preserve-3d;
         }
         
         .gallery-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            transform: translateY(-5px) translateZ(15px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
         
         .gallery-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: all 0.5s;
+            transition: all 0.5s ease;
         }
         
         .gallery-item:hover .gallery-image {
@@ -273,13 +468,13 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             color: white;
-            padding: 8px;
+            padding: 10px;
             font-size: 0.9rem;
             text-align: center;
             transform: translateY(100%);
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
         
         .gallery-item:hover .gallery-caption {
@@ -294,182 +489,58 @@
         }
         
         .location-icon {
-            color: var(--accent-color);
+            color: var(--accent);
             font-size: 1.2rem;
-        }
-        
-        /* Admin Modal Styles */
-        .admin-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            z-index: 1002;
-        }
-        
-        .admin-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 700px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
-            animation: slideDown 0.5s;
-        }
-        
-        .admin-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .form-label {
-            font-weight: bold;
-            color: var(--dark-color);
-        }
-        
-        .form-input, .form-textarea {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-        
-        .form-textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .form-submit {
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .form-submit:hover {
-            background-color: #27ae60;
-            transform: translateY(-2px);
-        }
-        
-        .password-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            max-width: 400px;
-            margin: 10% auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            animation: slideDown 0.5s;
-        }
-        
-        .save-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 20px;
-        }
-        
-        .save-btn:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
-        
-        .file-upload {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .file-upload-label {
-            display: inline-block;
-            padding: 8px 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        
-        .file-upload-label:hover {
-            background-color: #2980b9;
-        }
-        
-        .file-upload-input {
-            display: none;
-        }
-        
-        .file-preview {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 5px;
-            display: none;
-            margin-top: 10px;
         }
         
         /* Image Preview Modal */
         .image-preview-modal {
-            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.9);
-            z-index: 1003;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
             justify-content: center;
             align-items: center;
-            animation: fadeIn 0.3s;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+        
+        .image-preview-modal.active {
+            opacity: 1;
+            visibility: visible;
         }
         
         .image-preview-content {
             max-width: 90%;
             max-height: 90%;
             position: relative;
+            transform: scale(0.9);
+            transition: all 0.4s ease;
+        }
+        
+        .image-preview-modal.active .image-preview-content {
+            transform: scale(1);
         }
         
         .preview-image {
             max-width: 100%;
             max-height: 80vh;
             object-fit: contain;
-            border-radius: 5px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
-            animation: zoomIn 0.3s;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
         }
         
         .preview-caption {
             color: white;
             text-align: center;
-            margin-top: 15px;
-            font-size: 1.2rem;
+            margin-top: 20px;
+            font-size: 1.3rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
         
         .close-preview {
@@ -477,55 +548,71 @@
             top: -40px;
             right: -40px;
             color: white;
-            font-size: 2rem;
+            font-size: 2.5rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
         
         .close-preview:hover {
-            color: var(--accent-color);
+            color: var(--accent);
             transform: rotate(90deg);
         }
         
         /* Animations */
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        @keyframes slideDown {
-            from { 
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(-10px) translateX(-15px); }
+            75% { transform: translateY(10px) translateX(-5px); }
         }
         
-        @keyframes rotate3d {
-            0% { transform: perspective(1000px) rotateY(0deg); }
-            100% { transform: perspective(1000px) rotateY(360deg); }
-        }
-        
-        @keyframes zoomIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
         /* Responsive Design */
-        @media (max-width: 768px) {
-            .programs-container {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        @media (max-width: 1024px) {
+            .modal-body {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
             }
             
             .program-header {
                 flex-direction: column;
+                text-align: center;
             }
             
             .program-header-image {
                 width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .programs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .program-header-text h2 {
+                font-size: 1.8rem;
             }
             
             .modal-content, .admin-content {
@@ -536,185 +623,158 @@
             
             .close-preview {
                 top: -30px;
-                right: 0;
+                right: 10px;
+            }
+            
+            .program-gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Our Programs & Activities</h1>
-        <p>Explore our initiatives and their impacts</p>
-    </header>
+    <div class="bg-animation">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
     
-    <button class="admin-btn" id="adminBtn">Admin Login</button>
-    
-    <div class="programs-container" id="programsContainer">
-        <!-- Programs will be added here dynamically -->
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Pharmacy Health Club Programs</h1>
+            <p class="subtitle">Explore our impactful initiatives in AMR awareness, dengue prevention, and community health</p>
+        </header>
+        
+        <div class="programs-grid" id="programsContainer">
+            <!-- Programs will be added here dynamically -->
+        </div>
     </div>
     
     <!-- Program Detail Modal -->
-    <div class="modal" id="programModal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeModal">&times;</span>
-            <div class="program-details" id="programDetails">
+    <div class="modal-overlay" id="programModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="close-modal" id="closeModal"><i class="fas fa-times"></i></div>
+                <div class="program-header">
+                    <img id="modalProgramImage" class="program-header-image" src="" alt="">
+                    <div class="program-header-text">
+                        <h2 id="modalProgramTitle"></h2>
+                        <p id="modalProgramDescription"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body" id="programDetails">
                 <!-- Program details will be added here dynamically -->
             </div>
-        </div>
-    </div>
-    
-    <!-- Password Modal -->
-    <div class="modal" id="passwordModal">
-        <div class="password-form">
-            <h2>Admin Login</h2>
-            <div class="form-group">
-                <label for="password" class="form-label">Enter Password:</label>
-                <input type="password" id="password" class="form-input" placeholder="Enter admin password">
-            </div>
-            <button class="form-submit" id="submitPassword">Submit</button>
-            <p id="passwordError" style="color: red; display: none;">Incorrect password. Please try again.</p>
-        </div>
-    </div>
-    
-    <!-- Admin Modal -->
-    <div class="admin-modal" id="adminModal">
-        <div class="admin-content">
-            <span class="close-btn" id="closeAdminModal">&times;</span>
-            <h2 id="adminModalTitle">Add New Program</h2>
-            <form class="admin-form" id="programForm">
-                <input type="hidden" id="editProgramId" value="">
-                <div class="form-group">
-                    <label for="programTitle" class="form-label">Program Title:</label>
-                    <input type="text" id="programTitle" class="form-input" required>
-                </div>
-                
-                <div class="form-group file-upload">
-                    <label class="form-label">Main Display Image:</label>
-                    <label for="mainImageUpload" class="file-upload-label">Choose Image</label>
-                    <input type="file" id="mainImageUpload" class="file-upload-input" accept="image/*">
-                    <img id="mainImagePreview" class="file-preview" src="" alt="Preview">
-                </div>
-                
-                <div class="form-group">
-                    <label for="shortDescription" class="form-label">Short Description:</label>
-                    <textarea id="shortDescription" class="form-textarea" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="introduction" class="form-label">Introduction:</label>
-                    <textarea id="introduction" class="form-textarea" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="objectives" class="form-label">Objectives:</label>
-                    <textarea id="objectives" class="form-textarea" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="targetGroup" class="form-label">Expected Target Group:</label>
-                    <textarea id="targetGroup" class="form-textarea" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="location" class="form-label">Location:</label>
-                    <input type="text" id="location" class="form-input" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="outcomes" class="form-label">Outcomes:</label>
-                    <textarea id="outcomes" class="form-textarea" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Additional Photos:</label>
-                    <div id="additionalPhotos">
-                        <!-- Photo inputs will be added here dynamically -->
-                    </div>
-                    <button type="button" class="form-submit" id="addPhotoBtn" style="background-color: var(--primary-color); margin-top: 5px;">Add Another Photo</button>
-                </div>
-                
-                <button type="submit" class="form-submit" id="saveProgramBtn">Save Program</button>
-                <button type="button" class="edit-btn" id="cancelEditBtn" style="display: none; background-color: #7f8c8d;">Cancel Edit</button>
-            </form>
         </div>
     </div>
     
     <!-- Image Preview Modal -->
     <div class="image-preview-modal" id="imagePreviewModal">
         <div class="image-preview-content">
-            <span class="close-preview" id="closePreview">&times;</span>
+            <span class="close-preview" id="closePreview"><i class="fas fa-times"></i></span>
             <img id="previewImage" class="preview-image" src="" alt="">
             <p id="previewCaption" class="preview-caption"></p>
         </div>
     </div>
-    
+
     <script>
-        // Sample data
-        let programs = [
+        // Function to convert Google Drive shareable links to direct image links
+        function convertGoogleDriveLink(url) {
+            // Check if it's a Google Drive URL
+            if (url.includes('drive.google.com')) {
+                // Extract file ID from different Google Drive URL formats
+                let fileId;
+                
+                if (url.includes('/file/d/')) {
+                    // Format: https://drive.google.com/file/d/{fileId}/view
+                    fileId = url.split('/file/d/')[1].split('/')[0];
+                } else if (url.includes('id=')) {
+                    // Format: https://drive.google.com/open?id={fileId}
+                    fileId = url.split('id=')[1];
+                    // Remove any additional parameters
+                    fileId = fileId.split('&')[0];
+                }
+                
+                if (fileId) {
+                    return `https://lh3.googleusercontent.com/d/${fileId}=s400?authuser=0`;
+                }
+            }
+            
+            // Return original URL if not a Google Drive link or if extraction failed
+            return url;
+        }
+
+        // Sample program data
+        const programs = [
             {
                 id: 1,
-                title: "Community Health Workshop",
-                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f0f0f0'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='20' text-anchor='middle' fill='%23000'%3ESample Image 1%3C/text%3E%3C/svg%3E",
-                shortDescription: "A workshop to educate community members about basic health practices and prevention.",
-                introduction: "The Community Health Workshop was initiated to address the lack of basic health knowledge in rural areas. This program aims to empower individuals with knowledge about common diseases, prevention methods, and basic first aid.",
-                objectives: "1. Educate community members about common health issues\n2. Teach basic first aid techniques\n3. Promote preventive healthcare practices\n4. Provide basic health screenings",
-                targetGroup: "This program is designed for adults and teenagers in rural communities with limited access to healthcare information.",
-                location: "Rural Community Center, Springfield",
-                outcomes: "Over 200 community members trained in basic health practices. Increased awareness about preventive healthcare. Establishment of a community health volunteer group.",
+                title: "AMR Awareness Campaign",
+                image: "https://drive.google.com/file/d/1FDguBsxIKrHj4UthodCkqIrujFIJevt1/view?usp=sharing",
+                shortDescription: "Comprehensive program to combat antimicrobial resistance through education and community engagement",
+                introduction: "Our Antimicrobial Resistance (AMR) Awareness Campaign is a multi-faceted initiative designed to address the growing threat of drug-resistant infections. Through community workshops, healthcare professional training, and public awareness events, we're working to preserve the effectiveness of antibiotics for future generations.",
+                objectives: "1. Educate the public about proper antibiotic use\n2. Train healthcare professionals on antimicrobial stewardship\n3. Promote infection prevention practices\n4. Advocate for policy changes to combat AMR",
+                targetGroup: "General public, healthcare professionals, policymakers, and community leaders",
+                location: "Various locations across the community including health centers, schools, and public spaces",
+                outcomes: "Increased awareness about AMR, reduction in inappropriate antibiotic use, improved prescribing practices among healthcare providers, and establishment of a community AMR task force",
                 additionalPhotos: [
-                    {url: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f0f0f0'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='20' text-anchor='middle' fill='%23000'%3EParticipants learning%3C/text%3E%3C/svg%3E", caption: "Participants learning first aid"},
-                    {url: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f0f0f0'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='20' text-anchor='middle' fill='%23000'%3EHealth screening%3C/text%3E%3C/svg%3E", caption: "Health screening session"}
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Community workshop on antibiotic use"},
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Healthcare professional training session"},
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Public awareness event at local health fair"}
                 ]
             },
             {
                 id: 2,
-                title: "Youth Leadership Camp",
-                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f0f0f0'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='20' text-anchor='middle' fill='%23000'%3ESample Image 2%3C/text%3E%3C/svg%3E",
-                shortDescription: "A 5-day camp designed to develop leadership skills in young adults.",
-                introduction: "The Youth Leadership Camp was created to nurture the next generation of leaders by providing them with essential skills, confidence, and a network of like-minded peers.",
-                objectives: "1. Develop leadership qualities in participants\n2. Enhance communication and teamwork skills\n3. Provide mentorship opportunities\n4. Foster a sense of social responsibility",
-                targetGroup: "Young adults aged 16-22 from diverse backgrounds who show leadership potential.",
-                location: "Green Valley Retreat Center",
-                outcomes: "85% of participants reported increased confidence in leadership roles. Formation of a youth leadership network. Several participants initiated community projects after the camp.",
+                title: "Dengue Prevention Initiative",
+                image: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link",
+                shortDescription: "Community-based program to reduce dengue transmission through prevention and education",
+                introduction: "The Dengue Prevention Initiative focuses on reducing the incidence of dengue fever in our community through a comprehensive approach that includes vector control, public education, and community mobilization. Our program empowers residents to take proactive measures against mosquito breeding and dengue transmission.",
+                objectives: "1. Reduce mosquito breeding sites in the community\n2. Educate residents about dengue prevention\n3. Train community health workers on vector control\n4. Establish a dengue surveillance and response system",
+                targetGroup: "Community residents, schools, local businesses, and healthcare facilities",
+                location: "High-risk neighborhoods and community centers across the region",
+                outcomes: "Significant reduction in mosquito breeding sites, increased knowledge about dengue prevention, decreased dengue incidence rates, and establishment of a community-based surveillance system",
                 additionalPhotos: [
-                    {url: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f0f0f0'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='20' text-anchor='middle' fill='%23000'%3ETeam building%3C/text%3E%3C/svg%3E", caption: "Team building activity"},
-                    {url: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f0f0f0'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='20' text-anchor='middle' fill='%23000'%3EGroup discussion%3C/text%3E%3C/svg%3E", caption: "Group discussion session"}
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Community clean-up activity to eliminate breeding sites"},
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Educational session at local school"},
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Distribution of prevention materials door-to-door"}
+                ]
+            },
+            {
+                id: 3,
+                title: "Community Health Outreach",
+                image: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link",
+                shortDescription: "Mobile health services bringing essential care to underserved communities",
+                introduction: "Our Community Health Outreach program delivers essential healthcare services directly to underserved populations. Through mobile clinics, health screenings, and preventive care services, we're working to reduce health disparities and improve health outcomes in our community.",
+                objectives: "1. Provide basic health services to underserved populations\n2. Conduct health screenings and referrals\n3. Deliver health education on preventive care\n4. Build partnerships with local organizations",
+                targetGroup: "Underserved communities, low-income families, elderly residents, and homeless populations",
+                location: "Various community locations including shelters, community centers, and rural areas",
+                outcomes: "Thousands of patients served, early detection of health conditions, increased access to preventive services, and strengthened community health network",
+                additionalPhotos: [
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Mobile health clinic in action"},
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Health screening for community members"},
+                    {url: "https://drive.google.com/file/d/1Pb3KXXTwpE6PJK3FgneQ1wuADvKIRuz6/view?usp=drive_link", caption: "Distribution of health information materials"}
                 ]
             }
         ];
-        
-        // Password for admin access
-        const ADMIN_PASSWORD = "admin123";
-        
+
         // DOM Elements
         const programsContainer = document.getElementById('programsContainer');
         const programModal = document.getElementById('programModal');
         const programDetails = document.getElementById('programDetails');
         const closeModal = document.getElementById('closeModal');
-        const adminBtn = document.getElementById('adminBtn');
-        const passwordModal = document.getElementById('passwordModal');
-        const submitPassword = document.getElementById('submitPassword');
-        const passwordInput = document.getElementById('password');
-        const passwordError = document.getElementById('passwordError');
-        const adminModal = document.getElementById('adminModal');
-        const closeAdminModal = document.getElementById('closeAdminModal');
-        const programForm = document.getElementById('programForm');
-        const addPhotoBtn = document.getElementById('addPhotoBtn');
-        const additionalPhotos = document.getElementById('additionalPhotos');
-        const adminModalTitle = document.getElementById('adminModalTitle');
-        const editProgramId = document.getElementById('editProgramId');
-        const saveProgramBtn = document.getElementById('saveProgramBtn');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
         const imagePreviewModal = document.getElementById('imagePreviewModal');
         const previewImage = document.getElementById('previewImage');
         const previewCaption = document.getElementById('previewCaption');
         const closePreview = document.getElementById('closePreview');
-        const mainImageUpload = document.getElementById('mainImageUpload');
-        const mainImagePreview = document.getElementById('mainImagePreview');
-        
-        // Track admin login state
-        let isAdmin = false;
-        
+        const modalProgramImage = document.getElementById('modalProgramImage');
+        const modalProgramTitle = document.getElementById('modalProgramTitle');
+        const modalProgramDescription = document.getElementById('modalProgramDescription');
+
         // Display all programs
         function displayPrograms() {
             programsContainer.innerHTML = '';
@@ -722,13 +782,18 @@
             programs.forEach(program => {
                 const programCard = document.createElement('div');
                 programCard.className = 'program-card';
+                
+                const imageUrl = convertGoogleDriveLink(program.image);
+                
                 programCard.innerHTML = `
-                    <img src="${program.image}" alt="${program.title}" class="program-image">
-                    <div class="program-info">
+                    <div class="card-image">
+                        <img src="${imageUrl}" alt="${program.title}" class="program-image" onerror="this.onerror=null; this.src='https://placehold.co/600x400/6366f1/ffffff?text=${program.title.split(' ').map(word => word[0]).join('')}'">
+                        <div class="program-badge">Health Initiative</div>
+                    </div>
+                    <div class="card-content">
                         <h3 class="program-title">${program.title}</h3>
                         <p class="program-description">${program.shortDescription}</p>
-                        <a href="#" class="read-more" data-id="${program.id}">View Details</a>
-                        ${isAdmin ? `<button class="edit-btn" data-id="${program.id}">Edit Program</button>` : ''}
+                        <a href="#" class="view-details-btn" data-id="${program.id}">View Details</a>
                     </div>
                 `;
                 
@@ -736,96 +801,82 @@
             });
             
             // Add event listeners to "View Details" buttons
-            document.querySelectorAll('.read-more').forEach(button => {
+            document.querySelectorAll('.view-details-btn').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     const programId = parseInt(this.getAttribute('data-id'));
                     showProgramDetails(programId);
                 });
             });
-            
-            // Add event listeners to "Edit" buttons if admin
-            if (isAdmin) {
-                document.querySelectorAll('.edit-btn').forEach(button => {
-                    button.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const programId = parseInt(this.getAttribute('data-id'));
-                        editProgram(programId);
-                    });
-                });
-            }
         }
-        
+
         // Show program details in modal
         function showProgramDetails(programId) {
             const program = programs.find(p => p.id === programId);
             
             if (!program) return;
             
-            programDetails.innerHTML = `
-                <div class="program-header">
-                    <img src="${program.image}" alt="${program.title}" class="program-header-image">
-                    <div class="program-header-text">
-                        <h3 class="program-detail-title">${program.title}</h3>
-                        <p class="section-content">${program.shortDescription}</p>
-                        ${isAdmin ? `<button class="edit-btn" data-id="${program.id}">Edit Program</button>` : ''}
-                    </div>
-                </div>
-                
-                <div class="program-section">
-                    <h4 class="section-title">Introduction</h4>
-                    <p class="section-content">${program.introduction.replace(/\n/g, '<br>')}</p>
-                </div>
-                
-                <div class="program-section">
-                    <h4 class="section-title">Objectives</h4>
-                    <p class="section-content">${program.objectives.replace(/\n/g, '<br>')}</p>
-                </div>
-                
-                <div class="program-section">
-                    <h4 class="section-title">Expected Target Group</h4>
-                    <p class="section-content">${program.targetGroup.replace(/\n/g, '<br>')}</p>
-                </div>
-                
-                <div class="program-section">
-                    <h4 class="section-title">Location</h4>
-                    <div class="location-info">
-                        <span class="location-icon">📍</span>
-                        <p class="section-content">${program.location}</p>
-                    </div>
-                </div>
-                
-                <div class="program-section">
-                    <h4 class="section-title">Outcomes</h4>
-                    <p class="section-content">${program.outcomes.replace(/\n/g, '<br>')}</p>
-                </div>
-                
-                ${program.additionalPhotos && program.additionalPhotos.length > 0 ? `
-                <div class="program-section">
-                    <h4 class="section-title">Gallery</h4>
-                    <div class="program-gallery">
-                        ${program.additionalPhotos.map(photo => `
-                            <div class="gallery-item">
-                                <img src="${photo.url}" alt="${photo.caption}" class="gallery-image" data-url="${photo.url}" data-caption="${photo.caption}">
-                                <div class="gallery-caption">${photo.caption}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-                ` : ''}
-            `;
+            const imageUrl = convertGoogleDriveLink(program.image);
             
-            // Add event listener to edit button in details modal
-            if (isAdmin) {
-                const editBtn = programDetails.querySelector('.edit-btn');
-                if (editBtn) {
-                    editBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const programId = parseInt(this.getAttribute('data-id'));
-                        editProgram(programId);
-                    });
-                }
-            }
+            // Set modal header content
+            modalProgramImage.src = imageUrl;
+            modalProgramImage.onerror = function() {
+                this.src = `https://placehold.co/600x400/6366f1/ffffff?text=${program.title.split(' ').map(word => word[0]).join('')}`;
+            };
+            modalProgramTitle.textContent = program.title;
+            modalProgramDescription.textContent = program.shortDescription;
+            
+            // Set modal body content
+            programDetails.innerHTML = `
+                <div>
+                    <div class="modal-section">
+                        <h3><i class="fas fa-info-circle"></i> Introduction</h3>
+                        <p>${program.introduction.replace(/\n/g, '<br>')}</p>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3><i class="fas fa-bullseye"></i> Objectives</h3>
+                        <p>${program.objectives.replace(/\n/g, '<br>')}</p>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3><i class="fas fa-users"></i> Target Group</h3>
+                        <p>${program.targetGroup.replace(/\n/g, '<br>')}</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="modal-section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
+                        <div class="location-info">
+                            <span class="location-icon">📍</span>
+                            <p>${program.location}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3><i class="fas fa-chart-line"></i> Outcomes</h3>
+                        <p>${program.outcomes.replace(/\n/g, '<br>')}</p>
+                    </div>
+                    
+                    ${program.additionalPhotos && program.additionalPhotos.length > 0 ? `
+                    <div class="modal-section">
+                        <h3><i class="fas fa-images"></i> Program Gallery</h3>
+                        <div class="program-gallery">
+                            ${program.additionalPhotos.map(photo => {
+                                const photoUrl = convertGoogleDriveLink(photo.url);
+                                return `
+                                    <div class="gallery-item">
+                                        <img src="${photoUrl}" alt="${photo.caption}" class="gallery-image" data-url="${photoUrl}" data-caption="${photo.caption}" onerror="this.onerror=null; this.src='https://placehold.co/600x400/6366f1/ffffff?text=Photo'">
+                                        <div class="gallery-caption">${photo.caption}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
             
             // Add event listeners to gallery images
             document.querySelectorAll('.gallery-item img').forEach(img => {
@@ -834,287 +885,96 @@
                 });
             });
             
-            programModal.style.display = 'block';
+            programModal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-        
+
         // Show image preview modal
         function showImagePreview(url, caption) {
             previewImage.src = url;
+            previewImage.onerror = function() {
+                this.src = 'https://placehold.co/800x600/6366f1/ffffff?text=Image+Not+Found';
+            };
             previewCaption.textContent = caption;
-            imagePreviewModal.style.display = 'flex';
+            imagePreviewModal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-        
+
         // Close image preview modal
         function closeImagePreview() {
-            imagePreviewModal.style.display = 'none';
+            imagePreviewModal.classList.remove('active');
             document.body.style.overflow = 'auto';
         }
-        
-        // Edit program
-        function editProgram(programId) {
-            const program = programs.find(p => p.id === programId);
-            if (!program) return;
-            
-            // Set modal to edit mode
-            adminModalTitle.textContent = "Edit Program";
-            editProgramId.value = program.id;
-            cancelEditBtn.style.display = 'block';
-            
-            // Fill form with program data
-            document.getElementById('programTitle').value = program.title;
-            document.getElementById('shortDescription').value = program.shortDescription;
-            document.getElementById('introduction').value = program.introduction;
-            document.getElementById('objectives').value = program.objectives;
-            document.getElementById('targetGroup').value = program.targetGroup;
-            document.getElementById('location').value = program.location;
-            document.getElementById('outcomes').value = program.outcomes;
-            
-            // Set main image
-            mainImagePreview.src = program.image;
-            mainImagePreview.style.display = 'block';
-            
-            // Clear existing photo inputs
-            additionalPhotos.innerHTML = '';
-            
-            // Add photo inputs for each additional photo
-            if (program.additionalPhotos && program.additionalPhotos.length > 0) {
-                program.additionalPhotos.forEach(photo => {
-                    addPhotoInput(photo.url, photo.caption);
-                });
-            } else {
-                addPhotoInput();
-            }
-            
-            // Close any open modals
-            programModal.style.display = 'none';
-            passwordModal.style.display = 'none';
-            
-            // Open admin modal
-            adminModal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-        
-        // Cancel edit mode
-        function cancelEdit() {
-            adminModalTitle.textContent = "Add New Program";
-            editProgramId.value = '';
-            cancelEditBtn.style.display = 'none';
-            programForm.reset();
-            additionalPhotos.innerHTML = '';
-            addPhotoInput();
-            mainImagePreview.style.display = 'none';
-            adminModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-        
-        // Add new photo input fields
-        function addPhotoInput(url = '', caption = '') {
-            const photoGroup = document.createElement('div');
-            photoGroup.className = 'photo-input-group';
-            photoGroup.innerHTML = `
-                <div class="file-upload">
-                    <label class="file-upload-label">Choose Photo</label>
-                    <input type="file" class="file-upload-input additional-image" accept="image/*">
-                    <img class="file-preview additional-preview" src="${url}" ${url ? 'style="display: block;"' : ''}>
-                </div>
-                <input type="text" class="form-input photo-caption" placeholder="Photo Caption" style="margin-top: 5px;" value="${caption}">
-                <button type="button" class="form-submit remove-photo-btn" style="background-color: var(--accent-color); margin-top: 5px;">Remove</button>
-            `;
-            additionalPhotos.appendChild(photoGroup);
-            
-            // Add event listener to remove button
-            const removeBtn = photoGroup.querySelector('.remove-photo-btn');
-            removeBtn.addEventListener('click', function() {
-                photoGroup.remove();
-            });
-            
-            // Get elements
-            const fileLabel = photoGroup.querySelector('.file-upload-label');
-            const fileInput = photoGroup.querySelector('.file-upload-input');
-            const preview = photoGroup.querySelector('.file-preview');
-            
-            // Make label clickable
-            fileLabel.addEventListener('click', function(e) {
-                e.preventDefault();
-                fileInput.click();
-            });
-            
-            // Handle file selection
-            fileInput.addEventListener('change', function(e) {
-                if (fileInput.files && fileInput.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
-                    };
-                    reader.readAsDataURL(fileInput.files[0]);
-                }
-            });
-            
-            // If URL was provided, ensure preview is shown
-            if (url) {
-                preview.src = url;
-                preview.style.display = 'block';
-            }
-        }
-        
-        // Handle form submission
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            // Get all photo URLs and captions
-            const photoGroups = document.querySelectorAll('.photo-input-group');
-            const photos = [];
-            
-            photoGroups.forEach(group => {
-                const preview = group.querySelector('.additional-preview');
-                const caption = group.querySelector('.photo-caption').value;
-                
-                if (preview.src && caption) {
-                    photos.push({
-                        url: preview.src,
-                        caption: caption
-                    });
-                }
-            });
-            
-            const programId = editProgramId.value ? parseInt(editProgramId.value) : null;
-            
-            // Create new or update existing program object
-            const programData = {
-                id: programId || (programs.length > 0 ? Math.max(...programs.map(p => p.id)) + 1 : 1),
-                title: document.getElementById('programTitle').value,
-                image: mainImagePreview.src || '',
-                shortDescription: document.getElementById('shortDescription').value,
-                introduction: document.getElementById('introduction').value,
-                objectives: document.getElementById('objectives').value,
-                targetGroup: document.getElementById('targetGroup').value,
-                location: document.getElementById('location').value,
-                outcomes: document.getElementById('outcomes').value,
-                additionalPhotos: photos
-            };
-            
-            if (programId) {
-                // Update existing program
-                const index = programs.findIndex(p => p.id === programId);
-                if (index !== -1) {
-                    programs[index] = programData;
-                }
-            } else {
-                // Add new program
-                programs.push(programData);
-            }
-            
-            // Save to localStorage
-            localStorage.setItem('programs', JSON.stringify(programs));
-            
-            // Refresh display
-            displayPrograms();
-            
-            // Reset form
-            programForm.reset();
-            additionalPhotos.innerHTML = '';
-            addPhotoInput();
-            editProgramId.value = '';
-            adminModalTitle.textContent = "Add New Program";
-            cancelEditBtn.style.display = 'none';
-            mainImagePreview.style.display = 'none';
-            
-            // Close modal
-            closeModalFunc();
-            
-            // Scroll to new/updated program
-            setTimeout(() => {
-                const newCard = document.querySelector(`.read-more[data-id="${programData.id}"]`);
-                if (newCard) {
-                    newCard.scrollIntoView({behavior: 'smooth'});
-                }
-            }, 500);
-        }
-        
+
         // Close modal
         function closeModalFunc() {
-            programModal.style.display = 'none';
-            adminModal.style.display = 'none';
-            passwordModal.style.display = 'none';
+            programModal.classList.remove('active');
             document.body.style.overflow = 'auto';
         }
-        
-        // Show password modal
-        function showPasswordModal() {
-            passwordModal.style.display = 'block';
-            passwordInput.focus();
+
+        // Create connecting lines between dots
+        function createConnectingLines() {
+            const dots = document.querySelectorAll('.dot');
+            const container = document.querySelector('.bg-animation');
+            
+            dots.forEach(dot => {
+                dots.forEach(otherDot => {
+                    if (dot !== otherDot) {
+                        const line = document.createElement('div');
+                        line.className = 'connecting-line';
+                        
+                        const dotRect = dot.getBoundingClientRect();
+                        const otherDotRect = otherDot.getBoundingClientRect();
+                        
+                        const dotX = dotRect.left + dotRect.width / 2;
+                        const dotY = dotRect.top + dotRect.height / 2;
+                        const otherDotX = otherDotRect.left + otherDotRect.width / 2;
+                        const otherDotY = otherDotRect.top + otherDotRect.height / 2;
+                        
+                        const distance = Math.sqrt(Math.pow(otherDotX - dotX, 2) + Math.pow(otherDotY - dotY, 2));
+                        
+                        if (distance < 250) {
+                            line.style.width = distance + 'px';
+                            line.style.left = dotX + 'px';
+                            line.style.top = dotY + 'px';
+                            
+                            const angle = Math.atan2(otherDotY - dotY, otherDotX - dotX) * 180 / Math.PI;
+                            line.style.transform = `rotate(${angle}deg)`;
+                            
+                            container.appendChild(line);
+                        }
+                    }
+                });
+            });
         }
-        
-        // Verify password and set admin state
-        function verifyPassword() {
-            if (passwordInput.value === ADMIN_PASSWORD) {
-                isAdmin = true;
-                passwordModal.style.display = 'none';
-                adminModal.style.display = 'block';
-                passwordError.style.display = 'none';
-                passwordInput.value = '';
-                displayPrograms(); // Refresh to show edit buttons
-            } else {
-                passwordError.style.display = 'block';
-                passwordInput.value = '';
-                passwordInput.focus();
-            }
-        }
-        
-        // Load programs from localStorage
-        function loadPrograms() {
-            const savedPrograms = localStorage.getItem('programs');
-            if (savedPrograms) {
-                programs = JSON.parse(savedPrograms);
-            }
-            displayPrograms();
-        }
-        
+
         // Event Listeners
         closeModal.addEventListener('click', closeModalFunc);
-        adminBtn.addEventListener('click', showPasswordModal);
-        submitPassword.addEventListener('click', verifyPassword);
-        closeAdminModal.addEventListener('click', closeModalFunc);
-        addPhotoBtn.addEventListener('click', () => addPhotoInput());
-        programForm.addEventListener('submit', handleFormSubmit);
-        cancelEditBtn.addEventListener('click', cancelEdit);
         closePreview.addEventListener('click', closeImagePreview);
-        
-        // Main image upload handler
-        mainImageUpload.addEventListener('change', function(e) {
-            if (mainImageUpload.files && mainImageUpload.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    mainImagePreview.src = e.target.result;
-                    mainImagePreview.style.display = 'block';
-                };
-                reader.readAsDataURL(mainImageUpload.files[0]);
-            }
-        });
-        
-        // Also verify password on Enter key
-        passwordInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                verifyPassword();
-            }
-        });
-        
+
         // Close modals when clicking outside
         window.addEventListener('click', (e) => {
-            if (e.target === programModal || e.target === passwordModal || e.target === adminModal) {
+            if (e.target === programModal) {
                 closeModalFunc();
             }
             if (e.target === imagePreviewModal) {
                 closeImagePreview();
             }
         });
-        
+
         // Initialize
-        loadPrograms();
-        addPhotoInput(); // Add one empty photo input by default
+        displayPrograms();
+        
+        // Create connecting lines after a delay to allow dots to position
+        setTimeout(() => {
+            createConnectingLines();
+        }, 1000);
+        
+        // Update connecting lines on window resize
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('.connecting-line').forEach(line => line.remove());
+            setTimeout(createConnectingLines, 500);
+        });
     </script>
 </body>
 </html>
