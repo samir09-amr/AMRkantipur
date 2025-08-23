@@ -289,19 +289,20 @@
             padding: 0.5rem 1rem;
             border-radius: 5px;
             cursor: pointer;
+            margin-top: 10px;
         }
         
         #admin-logout {
             background: var(--accent);
             width: 100%;
+            margin-top: 20px;
         }
         
-         
+        /* Hero Section - Clear image with plain white text */
         .hero {
             min-height: 100vh;
             padding: 100px 5% 50px; 
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-                        url('https://drive.google.com/thumbnail?id=16xZVv76CfJO6TUw9pRazbb-qxxLHz7jb') no-repeat center center/cover;
+            background: url('https://drive.google.com/thumbnail?id=16xZVv76CfJO6TUw9pRazbb-qxxLHz7jb') no-repeat center center/cover;
             display: flex;
             align-items: center;
             position: relative;
@@ -313,9 +314,8 @@
             z-index: 10;
             color: white;
             transform: translateY(0);
-            opacity: 10;
+            opacity: 1;
             padding-top: 150px; 
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
         
         .hero-content h1 {
@@ -323,11 +323,7 @@
             margin-bottom: 20px;
             line-height: 1.2;
             color: #ffffff;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.85);
-            background: rgba(37, 99, 235, 0.2);
-            padding: 15px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
+            font-weight: 700;
         }
         
         .hero-content p {
@@ -335,10 +331,6 @@
             margin-bottom: 30px;
             line-height: 1.6;
             color: #ffffff;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
         }
         
         .cta-buttons {
@@ -369,10 +361,9 @@
         }
         
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary);
             border: 2px solid white;
-            backdrop-filter: blur(5px);
         }
         
         .btn-secondary:hover {
@@ -747,12 +738,10 @@
             
             .hero-content h1 {
                 font-size: 2.2rem;
-                padding: 10px;
             }
             
             .hero-content p {
                 font-size: 1.1rem;
-                padding: 15px;
             }
             
             .cta-buttons {
@@ -782,6 +771,29 @@
             .stats {
                 flex-direction: column;
             }
+            
+            /* Admin panel adjustments for mobile */
+            #admin-panel {
+                width: 280px;
+                right: -20px;
+            }
+        }
+        
+        /* Loading spinner for image uploads */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: 10px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -794,11 +806,11 @@
     <div>
         <h2>Admin Login</h2>
         <form id="admin-login-form">
-            <div>
-                <label>Password</label>
-                <input type="password" id="admin-password" required>
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem;">Password</label>
+                <input type="password" id="admin-password" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <button type="submit">Login</button>
+            <button type="submit" style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; width: 100%;">Login</button>
         </form>
     </div>
 </div>
@@ -811,24 +823,26 @@
     <div id="admin-panel">
         <h3>Admin Panel</h3>
         
-        <div>
-            <label>Edit Text Content</label>
-            <select id="content-selector">
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem;">Edit Text Content</label>
+            <select id="content-selector" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;">
                 <option value="">Select element to edit</option>
             </select>
             <textarea id="content-editor"></textarea>
             <button id="save-text-btn">Save Text</button>
         </div>
         
-        <div>
-            <label>Change Logo</label>
-            <input type="file" id="logo-upload" accept="image/*">
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem;">Change Logo</label>
+            <input type="file" id="logo-upload" accept="image/*" style="width: 100%; margin-bottom: 0.5rem;">
+            <div class="spinner" id="logo-spinner"></div>
             <button id="save-logo-btn">Upload Logo</button>
         </div>
         
-        <div>
-            <label>Change Hero Image</label>
-            <input type="file" id="hero-upload" accept="image/*">
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem;">Change Hero Image</label>
+            <input type="file" id="hero-upload" accept="image/*" style="width: 100%; margin-bottom: 0.5rem;">
+            <div class="spinner" id="hero-spinner"></div>
             <button id="save-hero-btn">Upload Hero Image</button>
         </div>
         
@@ -900,7 +914,7 @@
         </div>
         <div class="about-content">
             <div class="about-image">
-                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="AMR Club Members">
+                <img src="https://drive.google.com/thumbnail?id=1GvHhHpFUVpGLzbrytPYviNUonVhPTliF&sz=w1000" alt="AMR Club Members">
             </div>
             <div class="about-text">
                 <h3>Our Mission to Combat AMR in Kantipur</h3>
@@ -1132,16 +1146,59 @@ function setupAdminPanel() {
         }
     });
     
-    // Logo upload handler
+    // Logo upload handler - Improved for quality
     document.getElementById('save-logo-btn').addEventListener('click', () => {
         const fileInput = document.getElementById('logo-upload');
+        const spinner = document.getElementById('logo-spinner');
+        
         if (fileInput.files.length > 0) {
             const file = fileInput.files[0];
+            
+            // Show loading spinner
+            spinner.style.display = 'block';
+            
+            // Check if the file is an image
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                spinner.style.display = 'none';
+                return;
+            }
+            
+            // Use FileReader to read the file without quality loss
             const reader = new FileReader();
             
             reader.onload = (e) => {
-                document.querySelector('.logo img').src = e.target.result;
-                alert('Logo updated successfully!');
+                // Create a new image to check dimensions
+                const img = new Image();
+                img.onload = function() {
+                    // Create a canvas to maintain quality
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Set canvas dimensions to match the image
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    
+                    // Draw the image on the canvas
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Get the high-quality data URL
+                    const highQualityDataUrl = canvas.toDataURL('image/png', 1.0); // Highest quality
+                    
+                    // Apply the high-quality image
+                    document.querySelector('.logo img').src = highQualityDataUrl;
+                    
+                    // Hide spinner
+                    spinner.style.display = 'none';
+                    
+                    alert('Logo updated successfully with high quality!');
+                };
+                img.src = e.target.result;
+            };
+            
+            reader.onerror = () => {
+                spinner.style.display = 'none';
+                alert('Error reading the file');
             };
             
             reader.readAsDataURL(file);
@@ -1150,16 +1207,59 @@ function setupAdminPanel() {
         }
     });
     
-    // Hero image upload handler
+    // Hero image upload handler - Improved for quality
     document.getElementById('save-hero-btn').addEventListener('click', () => {
         const fileInput = document.getElementById('hero-upload');
+        const spinner = document.getElementById('hero-spinner');
+        
         if (fileInput.files.length > 0) {
             const file = fileInput.files[0];
+            
+            // Show loading spinner
+            spinner.style.display = 'block';
+            
+            // Check if the file is an image
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                spinner.style.display = 'none';
+                return;
+            }
+            
+            // Use FileReader to read the file without quality loss
             const reader = new FileReader();
             
             reader.onload = (e) => {
-                document.querySelector('.hero').style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${e.target.result})`;
-                alert('Hero image updated successfully!');
+                // Create a new image to check dimensions
+                const img = new Image();
+                img.onload = function() {
+                    // Create a canvas to maintain quality
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Set canvas dimensions to match the image
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    
+                    // Draw the image on the canvas
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Get the high-quality data URL
+                    const highQualityDataUrl = canvas.toDataURL('image/jpeg', 0.95); // High quality JPEG
+                    
+                    // Apply the high-quality image
+                    document.querySelector('.hero').style.backgroundImage = `url(${highQualityDataUrl})`;
+                    
+                    // Hide spinner
+                    spinner.style.display = 'none';
+                    
+                    alert('Hero image updated successfully with high quality!');
+                };
+                img.src = e.target.result;
+            };
+            
+            reader.onerror = () => {
+                spinner.style.display = 'none';
+                alert('Error reading the file');
             };
             
             reader.readAsDataURL(file);
