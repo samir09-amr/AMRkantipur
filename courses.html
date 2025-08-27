@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3041015200590330"
-     crossorigin="anonymous"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EduSphere - Enhanced Course Selection</title>
@@ -20,6 +18,8 @@
       --bg-light: #f0f2f5;
       --card-bg: #ffffff;
       --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
     }
     
     * {
@@ -292,7 +292,6 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
       overflow: hidden;
       text-align: center;
-      padding: 20px;
       transition: all 0.3s ease;
       position: relative;
     }
@@ -305,7 +304,7 @@
     .document-container {
       position: relative;
       width: 100%;
-      padding-top: 141.4%; /* A4 aspect ratio */
+      padding-top: 100%; /* Square aspect ratio */
       margin: 0 auto;
       background: white;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -325,24 +324,69 @@
       align-items: center;
       background: linear-gradient(135deg, #f0f2f5, #e1e5eb);
       cursor: pointer;
+      padding: 15px;
     }
     
     .document-thumbnail i {
       font-size: 3rem;
-      color: var(--primary);
       margin-bottom: 15px;
     }
     
-    .file-card h4 {
-      font-size: 1.1rem;
-      margin-top: 15px;
+    .file-name {
+      font-size: 1rem;
+      font-weight: 600;
       color: var(--text-dark);
-      white-space: nowrap;
+      width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      text-align: center;
+      margin-top: 10px;
+      line-height: 1.3;
     }
     
-    /* Full screen viewer */
+    .file-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+      padding: 0 10px 15px;
+    }
+    
+    .action-btn {
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .view-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+    }
+    
+    .view-btn:hover {
+      background: var(--secondary);
+    }
+    
+    .open-with-btn {
+      background: transparent;
+      color: var(--text-dark);
+      border: 1px solid var(--text-light);
+    }
+    
+    .open-with-btn:hover {
+      background: var(--bg-light);
+    }
+    
+    /* Full screen viewer - COMPLETELY REDESIGNED */
     .fullscreen-viewer {
       position: fixed;
       top: 0;
@@ -369,15 +413,49 @@
       width: 90%;
       height: 85%;
       background: white;
-      border-radius: 10px;
+      border-radius: 15px;
       overflow: hidden;
       position: relative;
       transform: scale(0.9);
       transition: transform 0.4s ease;
+      display: flex;
+      flex-direction: column;
     }
     
     .fullscreen-viewer.active .viewer-content {
       transform: scale(1);
+    }
+    
+    .viewer-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .viewer-header h3 {
+      font-size: 1.4rem;
+      font-weight: 500;
+      margin: 0;
+    }
+    
+    .viewer-body {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f0f2f5;
+      overflow: auto;
+      padding: 20px;
+    }
+    
+    .document-view {
+      max-width: 100%;
+      max-height: 100%;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease;
     }
     
     .pdf-viewer {
@@ -399,7 +477,10 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: rgba(0, 0, 0, 0.5);
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
       color: white;
       display: flex;
       justify-content: center;
@@ -409,20 +490,71 @@
     }
     
     .viewer-btn:hover {
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(255, 255, 255, 0.2);
       transform: scale(1.1);
     }
     
-    .viewer-header {
-      color: white;
-      text-align: center;
-      margin-bottom: 20px;
-      max-width: 80%;
+    .rotate-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 10;
     }
     
-    .viewer-header h3 {
-      font-size: 1.8rem;
-      margin-bottom: 5px;
+    .rotate-btn {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+    }
+    
+    .rotate-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+    
+    .zoom-controls {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10;
+    }
+    
+    .zoom-btn {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+    }
+    
+    .zoom-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
     }
     
     /* Back button */
@@ -531,6 +663,15 @@
       100% { transform: rotate(360deg); }
     }
     
+    /* File type colors */
+    .pdf-color { color: #e74c3c; }
+    .doc-color { color: #3498db; }
+    .ppt-color { color: #e67e22; }
+    .img-color { color: #2ecc71; }
+    .xls-color { color: #27ae60; }
+    .zip-color { color: #9b59b6; }
+    .default-color { color: var(--primary); }
+    
     /* Mobile responsiveness */
     @media (max-width: 768px) {
       header {
@@ -579,7 +720,27 @@
       }
       
       .viewer-header h3 {
-        font-size: 1.4rem;
+        font-size: 1.2rem;
+      }
+      
+      .file-actions {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .action-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .rotate-controls, .zoom-controls {
+        bottom: 10px;
+      }
+      
+      .rotate-btn, .zoom-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
       }
     }
     
@@ -601,6 +762,24 @@
     
     .fade-in {
       animation: fadeIn 0.6s ease-out;
+    }
+    
+    /* Enhanced design elements */
+    .glass-effect {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+    }
+    
+    .floating-btn {
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .floating-btn:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      transform: translateY(-2px);
     }
   </style>
 </head>
@@ -662,17 +841,40 @@
     </div>
   </div>
 
-  <!-- Full screen viewer -->
+  <!-- Full screen viewer - REDESIGNED -->
   <div class="fullscreen-viewer" id="fullscreenViewer">
-    <div class="viewer-header">
-      <h3 id="viewerTitle">Document Viewer</h3>
-      <p>Use the controls to navigate the document</p>
-    </div>
     <div class="viewer-content">
-      <iframe class="pdf-viewer" id="pdfViewer" src=""></iframe>
-      <div class="viewer-controls">
-        <div class="viewer-btn" onclick="closeFullscreen()">
-          <i class="fas fa-times"></i>
+      <div class="viewer-header">
+        <h3 id="viewerTitle">Document Viewer</h3>
+        <div class="viewer-controls">
+          <div class="viewer-btn" onclick="closeFullscreen()">
+            <i class="fas fa-times"></i>
+          </div>
+        </div>
+      </div>
+      <div class="viewer-body">
+        <iframe class="pdf-viewer" id="pdfViewer" src=""></iframe>
+      </div>
+      <div class="rotate-controls">
+        <div class="rotate-btn" onclick="rotateDocument(-90)">
+          <i class="fas fa-undo"></i>
+        </div>
+        <div class="rotate-btn" onclick="resetRotation()">
+          <i class="fas fa-sync"></i>
+        </div>
+        <div class="rotate-btn" onclick="rotateDocument(90)">
+          <i class="fas fa-redo"></i>
+        </div>
+      </div>
+      <div class="zoom-controls">
+        <div class="zoom-btn" onclick="zoomIn()">
+          <i class="fas fa-search-plus"></i>
+        </div>
+        <div class="zoom-btn" onclick="resetZoom()">
+          <i class="fas fa-search"></i>
+        </div>
+        <div class="zoom-btn" onclick="zoomOut()">
+          <i class="fas fa-search-minus"></i>
         </div>
       </div>
     </div>
@@ -688,6 +890,8 @@
       subject: null
     };
     let selectionHistory = [];
+    let currentRotation = 0;
+    let currentZoom = 1;
 
     // DOM elements
     const modalOverlay = document.getElementById('modalOverlay');
@@ -703,6 +907,45 @@
     const fullscreenViewer = document.getElementById('fullscreenViewer');
     const pdfViewer = document.getElementById('pdfViewer');
     const viewerTitle = document.getElementById('viewerTitle');
+
+    // Get file icon and color based on extension
+    function getFileIcon(filename) {
+      const extension = filename.split('.').pop().toLowerCase();
+      
+      switch(extension) {
+        case 'pdf':
+          return { icon: 'file-pdf', colorClass: 'pdf-color' };
+        case 'doc':
+        case 'docx':
+          return { icon: 'file-word', colorClass: 'doc-color' };
+        case 'ppt':
+        case 'pptx':
+          return { icon: 'file-powerpoint', colorClass: 'ppt-color' };
+        case 'xls':
+        case 'xlsx':
+          return { icon: 'file-excel', colorClass: 'xls-color' };
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+        case 'gif':
+        case 'bmp':
+        case 'svg':
+          return { icon: 'file-image', colorClass: 'img-color' };
+        case 'zip':
+        case 'rar':
+        case '7z':
+          return { icon: 'file-archive', colorClass: 'zip-color' };
+        default:
+          return { icon: 'file', colorClass: 'default-color' };
+      }
+    }
+
+    // Check if file is viewable in browser
+    function isViewableInBrowser(filename) {
+      const extension = filename.split('.').pop().toLowerCase();
+      const viewableExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp'];
+      return viewableExtensions.includes(extension);
+    }
 
     // Fetch data from Google Sheets
     async function loadData() {
@@ -776,10 +1019,10 @@
         // Handle Google Drive links
         if (url.includes('/file/d/')) {
           const fileId = url.match(/\/file\/d\/([^\/]+)/)[1];
-          return `https://drive.google.com/uc?export=download&id=${fileId}`;
+          return `https://drive.google.com/file/d/${fileId}/preview`;
         } else if (url.includes('id=')) {
           const fileId = url.match(/id=([^&]+)/)[1];
-          return `https://drive.google.com/uc?export=download&id=${fileId}`;
+          return `https://drive.google.com/file/d/${fileId}/preview`;
         }
       }
       return url;
@@ -990,15 +1233,27 @@
       let content = '<div class="file-list">';
       
       files.forEach(file => {
+        const fileInfo = getFileIcon(file.fileName);
+        const isViewable = isViewableInBrowser(file.fileName);
+        
         content += `
           <div class="file-card">
             <div class="document-container">
               <div class="document-thumbnail" onclick="openFullscreen('${file.fileLink}', '${file.fileName}')">
-                <i class="fas fa-file-pdf"></i>
-                <p>Click to view</p>
+                <i class="fas ${fileInfo.icon} ${fileInfo.colorClass}"></i>
+                <div class="file-name">${file.fileName}</div>
               </div>
             </div>
-            <h4>${file.fileName}</h4>
+            <div class="file-actions">
+              ${isViewable ? `
+                <button class="action-btn view-btn" onclick="openFullscreen('${file.fileLink}', '${file.fileName}')">
+                  <i class="fas fa-eye"></i> View
+                </button>
+              ` : ''}
+              <button class="action-btn open-with-btn" onclick="openWith('${file.fileLink}')">
+                <i class="fas fa-external-link-alt"></i> Open With
+              </button>
+            </div>
           </div>
         `;
       });
@@ -1017,34 +1272,87 @@
 
     // Function to open file in fullscreen
     function openFullscreen(fileLink, fileName) {
-      // Use Google Docs viewer for PDFs to ensure compatibility
-      const pdfUrl = `https://docs.google.com/gview?url=${encodeURIComponent(fileLink)}&embedded=true`;
-      pdfViewer.src = pdfUrl;
       viewerTitle.textContent = fileName;
+      pdfViewer.src = fileLink;
       fullscreenViewer.classList.add('active');
       document.body.style.overflow = 'hidden';
+      currentRotation = 0;
+      currentZoom = 1;
+      updateViewerTransform();
     }
 
-    // Function to close fullscreen viewer
+    // Function to close fullscreen
     function closeFullscreen() {
       fullscreenViewer.classList.remove('active');
       pdfViewer.src = '';
       document.body.style.overflow = 'auto';
     }
 
-    // Close fullscreen when clicking outside content
+    // Function to rotate document
+    function rotateDocument(degrees) {
+      currentRotation += degrees;
+      updateViewerTransform();
+    }
+
+    // Function to reset rotation
+    function resetRotation() {
+      currentRotation = 0;
+      updateViewerTransform();
+    }
+
+    // Function to zoom in
+    function zoomIn() {
+      currentZoom += 0.25;
+      updateViewerTransform();
+    }
+
+    // Function to zoom out
+    function zoomOut() {
+      if (currentZoom > 0.5) {
+        currentZoom -= 0.25;
+        updateViewerTransform();
+      }
+    }
+
+    // Function to reset zoom
+    function resetZoom() {
+      currentZoom = 1;
+      updateViewerTransform();
+    }
+
+    // Update viewer transform
+    function updateViewerTransform() {
+      pdfViewer.style.transform = `rotate(${currentRotation}deg) scale(${currentZoom})`;
+    }
+
+    // Function to open file with external application
+    function openWith(fileLink) {
+      window.open(fileLink, '_blank');
+    }
+
+    // Close modal when clicking outside
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) {
+        closeModal();
+      }
+    });
+
+    // Close fullscreen when clicking outside
     fullscreenViewer.addEventListener('click', (e) => {
       if (e.target === fullscreenViewer) {
         closeFullscreen();
       }
     });
 
-    // Initialize with a slight delay for animation
-    setTimeout(() => {
-      document.querySelector('header').classList.add('fade-in');
-      document.querySelector('.cards').classList.add('fade-in');
-    }, 100);
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', () => {
+      // Add animation to cards
+      const cards = document.querySelectorAll('.card');
+      cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.2}s`;
+        card.classList.add('fade-in');
+      });
+    });
   </script>
 </body>
 </html>
-
