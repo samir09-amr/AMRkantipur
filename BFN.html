@@ -356,26 +356,6 @@
             letter-spacing: 1px;
         }
         
-        /* Pagination */
-        .pagination .page-link {
-            border-radius: 8px;
-            margin: 0 4px;
-            border: none;
-            color: var(--text-color);
-            transition: var(--transition);
-        }
-        
-        .pagination .page-item.active .page-link {
-            background: var(--primary-gradient);
-            color: white;
-            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-        }
-        
-        .pagination .page-link:hover {
-            background-color: rgba(220, 53, 69, 0.1);
-            transform: translateY(-2px);
-        }
-        
         /* Loading Spinner */
         .loading-spinner {
             display: none;
@@ -470,7 +450,7 @@
         }
         
         .badge-pending {
-            background-color: rgba(255, 193, 7, 0.2);
+            background-color: rgba(255, 193, 07, 0.2);
             color: #ffc107;
         }
         
@@ -615,9 +595,16 @@
                     </div>
 
                     <!-- Error Alert -->
-                    <div class="alert alert-warning error-alert" id="errorAlert" role="alert">
+                    <div class="alert alert-warning error-alert" id="errorAlert" role="alert" style="display: none;">
                         <i class="fas fa-exclamation-triangle me-2"></i>
                         <span id="errorMessage"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    
+                    <!-- Success Alert -->
+                    <div class="alert alert-success error-alert" id="successAlert" role="alert" style="display: none;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span id="successMessage"></span>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                     
@@ -819,18 +806,8 @@
                                 </table>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mt-3">
-                                <div class="text-muted" id="showingText">Showing 0 of 0 donors</div>
-                                <nav aria-label="Donor list navigation">
-                                    <ul class="pagination justify-content-center mb-0">
-                                        <li class="page-item disabled" id="prevPage">
-                                            <a class="page-link" href="#">Previous</a>
-                                        </li>
-                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                        <li class="page-item disabled" id="nextPage">
-                                            <a class="page-link" href="#">Next</a>
-                                        </li>
-                                    </ul>
-                                </nav>
+                                <div class="text-muted" id="showingText">Showing all 0 donors</div>
+                                <div class="form-text text-center mt-2" id="syncStatus"></div>
                             </div>
                         </div>
                     </div>
@@ -1008,10 +985,9 @@
         // Global variables
         let donorData = [];
         let filteredData = [];
-        let currentPage = 1;
-        const itemsPerPage = 5;
         let currentSheetUrl = DEFAULT_SHEET_URL;
         let bloodChart = null;
+        let autoSyncInterval = null;
 
         // Login functionality - Only one ID has access
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -1047,34 +1023,95 @@
                 document.getElementById('mainApp').style.display = 'none';
                 document.getElementById('email').value = '';
                 document.getElementById('password').value = '';
+                
+                // Clear any auto sync interval
+                if (autoSyncInterval) {
+                    clearInterval(autoSyncInterval);
+                    autoSyncInterval = null;
+                }
             }, 500);
         });
 
-        // Fetch data from Google Sheets with better error handling
+        // Show success message
+        function showSuccess(message) {
+            document.getElementById('successMessage').textContent = message;
+            document.getElementById('successAlert').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('successAlert').style.display = 'none';
+            }, 3000);
+        }
+
+        // Show error message
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorAlert').style.display = 'block';
+        }
+
+        // Hide error message
+        function hideError() {
+            document.getElementById('errorAlert').style.display = 'none';
+        }
+
+        // Fetch data from Google Sheets with improved error handling
         async function fetchDonorData() {
             try {
                 document.getElementById('loadingSpinner').style.display = 'block';
+                document.getElementById('syncStatus').textContent = 'Syncing data...';
                 hideError();
                 
                 // Use the current sheet URL (either default or user-provided)
                 const sheetUrl = currentSheetUrl;
                 
-                // Try to fetch data directly first
-                let response = await fetch(sheetUrl);
+                // Try multiple methods to fetch the data
+                let response = null;
+                let csvData = null;
                 
-                // If direct fetch fails, try with CORS proxy
-                if (!response.ok) {
+                // Method 1: Direct fetch
+                try {
+                    response = await fetch(sheetUrl);
+                    if (response.ok) {
+                        csvData = await response.text();
+                        console.log('Data fetched directly');
+                    } else {
+                        throw new Error('Direct fetch failed');
+                    }
+                } catch (error) {
                     console.log('Direct fetch failed, trying CORS proxy...');
-                    // Use a different CORS proxy approach
-                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(sheetUrl)}`;
-                    response = await fetch(proxyUrl);
+                    
+                    // Method 2: CORS proxy
+                    try {
+                        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(sheetUrl)}`;
+                        response = await fetch(proxyUrl);
+                        
+                        if (response.ok) {
+                            csvData = await response.text();
+                            console.log('Data fetched via CORS proxy');
+                        } else {
+                            throw new Error('CORS proxy fetch failed');
+                        }
+                    } catch (proxyError) {
+                        console.log('CORS proxy failed, trying alternative proxy...');
+                        
+                        // Method 3: Alternative proxy
+                        try {
+                            const altProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(sheetUrl)}`;
+                            response = await fetch(altProxyUrl);
+                            
+                            if (response.ok) {
+                                csvData = await response.text();
+                                console.log('Data fetched via alternative proxy');
+                            } else {
+                                throw new Error('Alternative proxy fetch failed');
+                            }
+                        } catch (altError) {
+                            throw new Error('All fetch methods failed');
+                        }
+                    }
                 }
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (!csvData) {
+                    throw new Error('No data received from any source');
                 }
-                
-                const csvData = await response.text();
                 
                 // Parse CSV data
                 donorData = parseCSV(csvData);
@@ -1086,7 +1123,12 @@
                 updateBloodGroupChart();
                 
                 // Update last sync time
-                document.getElementById('lastSync').textContent = `Last sync: ${new Date().toLocaleTimeString()}`;
+                const syncTime = new Date().toLocaleTimeString();
+                document.getElementById('lastSync').textContent = `Last sync: ${syncTime}`;
+                document.getElementById('syncStatus').textContent = `Last synced: ${syncTime}`;
+                
+                showSuccess('Data synced successfully!');
+                
             } catch (error) {
                 console.error('Error fetching donor data:', error);
                 showError(`Failed to fetch data from Google Sheets. Please check: 
@@ -1102,20 +1144,10 @@
                 updateLocationFilter();
                 updateBloodGroupChart();
                 document.getElementById('lastSync').textContent = `Last sync: ${new Date().toLocaleTimeString()} (Sample Data)`;
+                document.getElementById('syncStatus').textContent = 'Using sample data due to sync issues';
             } finally {
                 document.getElementById('loadingSpinner').style.display = 'none';
             }
-        }
-
-        // Show error message
-        function showError(message) {
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorAlert').style.display = 'block';
-        }
-
-        // Hide error message
-        function hideError() {
-            document.getElementById('errorAlert').style.display = 'none';
         }
 
         // Parse CSV data
@@ -1290,17 +1322,12 @@
             // Apply filters if any
             applyFilters();
             
-            // Calculate pagination
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
-            const pageData = filteredData.slice(startIndex, endIndex);
+            // Use all filtered data (no pagination)
+            const pageData = filteredData;
             
             // Update showing text
             document.getElementById('showingText').textContent = 
-                `Showing ${startIndex + 1}-${endIndex} of ${filteredData.length} donors`;
-            
-            // Update pagination controls
-            updatePaginationControls();
+                `Showing all ${filteredData.length} donors`;
             
             // Add rows to table
             pageData.forEach((donor, index) => {
@@ -1340,62 +1367,6 @@
                 const bloodGroupMatch = !bloodGroupFilter || donor.bloodGroup === bloodGroupFilter;
                 
                 return locationMatch && bloodGroupMatch;
-            });
-            
-            // Reset to first page when filters change
-            currentPage = 1;
-        }
-
-        // Update pagination controls
-        function updatePaginationControls() {
-            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-            const prevPageBtn = document.getElementById('prevPage');
-            const nextPageBtn = document.getElementById('nextPage');
-            const paginationContainer = document.querySelector('.pagination');
-            
-            // Clear existing page numbers (except prev and next)
-            while (paginationContainer.children.length > 2) {
-                paginationContainer.removeChild(paginationContainer.children[1]);
-            }
-            
-            // Add page numbers
-            for (let i = 1; i <= totalPages; i++) {
-                const pageItem = document.createElement('li');
-                pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
-                
-                const pageLink = document.createElement('a');
-                pageLink.className = 'page-link';
-                pageLink.href = '#';
-                pageLink.textContent = i;
-                
-                pageLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    currentPage = i;
-                    updateDonorList();
-                });
-                
-                pageItem.appendChild(pageLink);
-                paginationContainer.insertBefore(pageItem, nextPageBtn);
-            }
-            
-            // Update prev/next buttons
-            prevPageBtn.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-            nextPageBtn.className = `page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`;
-            
-            prevPageBtn.querySelector('a').addEventListener('click', (e) => {
-                if (currentPage > 1) {
-                    e.preventDefault();
-                    currentPage--;
-                    updateDonorList();
-                }
-            });
-            
-            nextPageBtn.querySelector('a').addEventListener('click', (e) => {
-                if (currentPage < totalPages) {
-                    e.preventDefault();
-                    currentPage++;
-                    updateDonorList();
-                }
             });
         }
 
@@ -1488,7 +1459,7 @@
                         updateBloodGroupChart();
                         
                         // Show success message
-                        alert(`${donor.name} has been deleted successfully.`);
+                        showSuccess(`${donor.name} has been deleted successfully.`);
                     }
                 });
             });
@@ -1632,7 +1603,7 @@
                         status: calculateEligibility(document.getElementById('lastDonation').value)
                     };
                     
-                    alert('Donor updated successfully!');
+                    showSuccess('Donor updated successfully!');
                 }
                 
                 // Reset edit mode
@@ -1654,7 +1625,7 @@
                 };
                 
                 donorData.push(newDonor);
-                alert('New donor saved successfully!');
+                showSuccess('New donor saved successfully!');
             }
             
             document.getElementById('addDonorForm').reset();
@@ -1699,7 +1670,18 @@
             // Apply theme
             document.body.setAttribute('data-theme', theme);
             
-            alert('Settings saved successfully!');
+            // Setup auto sync if enabled
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+                autoSyncInterval = null;
+            }
+            
+            if (autoSync) {
+                const frequency = parseInt(syncFrequency) * 60 * 1000; // Convert minutes to milliseconds
+                autoSyncInterval = setInterval(fetchDonorData, frequency);
+            }
+            
+            showSuccess('Settings saved successfully!');
             
             // Close the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
@@ -1713,7 +1695,7 @@
         function loadSettings() {
             const theme = localStorage.getItem('theme') || 'light';
             const notifications = localStorage.getItem('notifications') !== 'false';
-            const autoSync = localStorage.getItem('autoSync') !== 'false';
+            const autoSync = localStorage.getItem('autoSync') === 'true';
             const syncFrequency = localStorage.getItem('syncFrequency') || '30';
             const sheetUrl = localStorage.getItem('sheetUrl') || DEFAULT_SHEET_URL;
             
@@ -1729,6 +1711,12 @@
             
             // Apply theme
             document.body.setAttribute('data-theme', theme);
+            
+            // Setup auto sync if enabled
+            if (autoSync) {
+                const frequency = parseInt(syncFrequency) * 60 * 1000; // Convert minutes to milliseconds
+                autoSyncInterval = setInterval(fetchDonorData, frequency);
+            }
         }
 
         // Initialize the application
@@ -1744,6 +1732,9 @@
             document.getElementById('bloodGroupFilter').addEventListener('change', function() {
                 updateDonorList();
             });
+            
+            // Initialize AdSense
+            (adsbygoogle = window.adsbygoogle || []).push({});
         }
 
         // Run initialization when page loads
@@ -1751,4 +1742,3 @@
     </script>
 </body>
 </html>
-
