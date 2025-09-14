@@ -322,10 +322,11 @@ const config = {
     leaderboardKey: "crosswordLeaderboard",
     loginDataKey: "crosswordLoginData",
     loginRecordsKey: "crosswordLoginRecords",
-    submissionRecordsKey: "crosswordSubmissionRecords", // NEW: Separate key for submission records
+    submissionRecordsKey: "crosswordSubmissionRecords",
     gridSize: 15,
     spreadsheetId: "1Zs1fOWhoiyhZmVZL5IRSzmhFB0t-NaCucYfriwtLqD8",
-    scriptURL: "https://script.google.com/macros/library/d/1ORXef_2X_LLMdML1-4qoMJhlDHFe8VRoIERlaSkLBik5E4CSbMDiJ7Hh/2"
+    scriptURL: "https://script.google.com/macros/library/d/1ORXef_2X_LLMdML1-4qoMJhlDHFe8VRoIERlaSkLBik5E4CSbMDiJ7Hh/2",
+    questionsSheetURL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR5Tas63fCeJ1ytgiL5-Hy8qLh4UMvtxuC-i1MJgQMQNcsr7pZnVe7ycY55MplwkWq7q9r2IGw5s6JW/pub?output=csv"
 };
 
 let gameState = {
@@ -628,14 +629,81 @@ function proceedToRegistration(name, email, school, club) {
     // Check if we have questions
     const questions = JSON.parse(localStorage.getItem(config.questionsKey) || '[]');
     if (questions.length === 0) {
-        el.quizStatus.textContent = 'Quiz not available. Please contact administrator.';
-        el.quizStatus.style.color = '#e74c3c';
-        el.startGameBtn.disabled = true;
+        // Load questions from Google Sheets if none are available
+        loadQuestionsFromGoogleSheets();
     } else {
         el.quizStatus.textContent = 'Quiz is ready!';
         el.quizStatus.style.color = '#2ecc71';
         el.startGameBtn.disabled = false;
     }
+}
+
+// Function to load questions from Google Sheets
+function loadQuestionsFromGoogleSheets() {
+    el.quizStatus.textContent = 'Loading questions from server...';
+    
+    fetch(config.questionsSheetURL)
+        .then(response => response.text())
+        .then(csvData => {
+            const questions = parseCSV(csvData);
+            if (questions.length > 0) {
+                localStorage.setItem(config.questionsKey, JSON.stringify(questions));
+                el.quizStatus.textContent = `Loaded ${questions.length} questions from server!`;
+                el.quizStatus.style.color = '#2ecc71';
+                el.startGameBtn.disabled = false;
+            } else {
+                el.quizStatus.textContent = 'Failed to load questions. Using default questions.';
+                el.quizStatus.style.color = '#e74c3c';
+                loadDefaultQuestions();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading questions from Google Sheets:', error);
+            el.quizStatus.textContent = 'Error loading questions. Using default questions.';
+            el.quizStatus.style.color = '#e74c3c';
+            loadDefaultQuestions();
+        });
+}
+
+// Function to parse CSV data
+function parseCSV(csvData) {
+    const questions = [];
+    const lines = csvData.split('\n');
+    
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        // Simple CSV parsing (assuming no commas in the values)
+        const cells = line.split(',').map(cell => cell.trim());
+        if (cells.length >= 2 && cells[0] && cells[1]) {
+            questions.push({
+                word: cells[0].toUpperCase(),
+                clue: cells[1],
+                difficulty: cells[2] || 'medium',
+                category: cells[3] || 'General'
+            });
+        }
+    }
+    
+    return questions;
+}
+
+// Function to load default questions if Google Sheets fails
+function loadDefaultQuestions() {
+    const defaultQuestions = [
+        { word: "ANTIBIOTIC", clue: "Medicine that kills bacteria", difficulty: "medium", category: "AMR" },
+        { word: "RESISTANCE", clue: "Ability of bacteria to withstand antibiotics", difficulty: "hard", category: "AMR" },
+        { word: "MOSQUITO", clue: "Insect that spreads dengue", difficulty: "easy", category: "Dengue" },
+        { word: "FEVER", clue: "Common symptom of dengue", difficulty: "easy", category: "Dengue" },
+        { word: "VACCINE", clue: "Preventive treatment for diseases", difficulty: "medium", category: "General" },
+        { word: "VIRUS", clue: "Type of pathogen that causes dengue", difficulty: "medium", category: "Dengue" },
+        { word: "VECTOR", clue: "Organism that transmits disease", difficulty: "hard", category: "General" },
+        { word: "PREVENTION", clue: "Stopping disease before it occurs", difficulty: "medium", category: "General" }
+    ];
+    
+    localStorage.setItem(config.questionsKey, JSON.stringify(defaultQuestions));
+    el.startGameBtn.disabled = false;
 }
 
 el.startGameBtn.addEventListener('click', () => {
