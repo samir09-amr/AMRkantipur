@@ -112,10 +112,35 @@
     .btn { background:#3498db; color:white; border:none; padding:10px 12px; border-radius:6px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
     .btn.secondary { background:#6c757d; }
 
+    /* login form styles */
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .form-group input, .form-group select {
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+    }
+
     /* small responsiveness */
     @media (max-width:700px) {
         .manual-row input[type=text]{ width: 100%; }
         .manual-row { flex-direction:column; align-items:stretch; }
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
 </style>
@@ -182,16 +207,63 @@
         </div>
     </div>
 
+    <!-- Login Section -->
+    <div class="section" id="loginSection">
+        <h1>AMR & Dengue Crossword Challenge</h1>
+        <p style="text-align: center; margin-bottom: 20px;">Please login to participate in the crossword puzzle challenge</p>
+        
+        <form id="loginForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="loginName">Full Name *</label>
+                    <input type="text" id="loginName" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginEmail">Email Address *</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="schoolName">School/College Name *</label>
+                    <input type="text" id="schoolName" required>
+                </div>
+                <div class="form-group">
+                    <label for="schoolAddress">School/College Address *</label>
+                    <input type="text" id="schoolAddress" required>
+                </div>
+                <div class="form-group">
+                    <label for="classStudying">Class/Year Studying *</label>
+                    <input type="text" id="classStudying" required>
+                </div>
+                <div class="form-group">
+                    <label for="parentName">Parent/Guardian Name *</label>
+                    <input type="text" id="parentName" required>
+                </div>
+                <div class="form-group">
+                    <label for="parentContact">Parent/Guardian Contact *</label>
+                    <input type="text" id="parentContact" required>
+                </div>
+                <div class="form-group">
+                    <label for="clubName">Club/Organization (if any)</label>
+                    <input type="text" id="clubName">
+                </div>
+            </div>
+            
+            <div style="text-align:center; margin-top:20px;">
+                <button type="button" id="loginBtn" class="btn">Login & Continue</button>
+            </div>
+        </form>
+    </div>
+
     <!-- Registration Section -->
-    <div class="section" id="registrationSection">
+    <div class="section hidden" id="registrationSection">
         <h1>AMR & Dengue Crossword Challenge</h1>
         <div id="quizStatus" style="text-align:center; margin-bottom:12px; color:#2ecc71;">Loading quiz...</div>
         <form id="registrationForm">
             <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
-                <div><label style="display:block;font-weight:600">Name</label><input id="playerName" type="text" /></div>
-                <div><label style="display:block;font-weight:600">Club/Organization</label><input id="clubName" type="text" /></div>
-                <div><label style="display:block;font-weight:600">Email</label><input id="email" type="email" /></div>
-                <div><label style="display:block;font-weight:600">Contact</label><input id="contact" type="text" /></div>
+                <div><label style="display:block;font-weight:600">Name</label><input id="playerName" type="text" readonly /></div>
+                <div><label style="display:block;font-weight:600">Club/Organization</label><input id="playerClub" type="text" readonly /></div>
+                <div><label style="display:block;font-weight:600">Email</label><input id="playerEmail" type="email" readonly /></div>
+                <div><label style="display:block;font-weight:600">School</label><input id="playerSchool" type="text" readonly /></div>
             </div>
             <div style="text-align:center; margin-top:12px;">
                 <button type="button" id="startGameBtn" class="btn">Start Game</button>
@@ -248,7 +320,12 @@ const config = {
     adminCredentials: { username: "admin", password: "amrdengue2023" },
     questionsKey: "crosswordQuestions",
     leaderboardKey: "crosswordLeaderboard",
-    gridSize: 15
+    loginDataKey: "crosswordLoginData",
+    loginRecordsKey: "crosswordLoginRecords",
+    submissionRecordsKey: "crosswordSubmissionRecords", // NEW: Separate key for submission records
+    gridSize: 15,
+    spreadsheetId: "1Zs1fOWhoiyhZmVZL5IRSzmhFB0t-NaCucYfriwtLqD8",
+    scriptURL: "https://script.google.com/macros/library/d/1ORXef_2X_LLMdML1-4qoMJhlDHFe8VRoIERlaSkLBik5E4CSbMDiJ7Hh/2"
 };
 
 let gameState = {
@@ -259,7 +336,8 @@ let gameState = {
     timeElapsed: 0,
     score: 0,
     checked: false,
-    words: []
+    words: [],
+    loginData: {}
 };
 
 /* ---------------------- element refs ---------------------- */
@@ -281,685 +359,659 @@ const el = {
     saveManualBtn: document.getElementById('saveManualBtn'),
     adminViewLeaderboard: document.getElementById('adminViewLeaderboard'),
     leaderboardArea: document.getElementById('leaderboardArea'),
-    adminLeaderboardBody: document.querySelector('#adminLeaderboard tbody'),
+    adminLeaderboard: document.getElementById('adminLeaderboard'),
     downloadAnimBtn: document.getElementById('downloadAnimBtn'),
-    quizStatus: document.getElementById('quizStatus'),
-
-    // game
-    startGameBtn: document.getElementById('startGameBtn'),
+    closeLogin: document.getElementById('closeLogin'),
+    loginSection: document.getElementById('loginSection'),
     registrationSection: document.getElementById('registrationSection'),
     gameSection: document.getElementById('gameSection'),
     resultsSection: document.getElementById('resultsSection'),
+    loginForm: document.getElementById('loginForm'),
+    loginBtn: document.getElementById('loginBtn'),
     playerName: document.getElementById('playerName'),
-    clubName: document.getElementById('clubName'),
-    email: document.getElementById('email'),
-    contact: document.getElementById('contact'),
+    playerClub: document.getElementById('playerClub'),
+    playerEmail: document.getElementById('playerEmail'),
+    playerSchool: document.getElementById('playerSchool'),
+    startGameBtn: document.getElementById('startGameBtn'),
     crosswordGrid: document.getElementById('crosswordGrid'),
     acrossClues: document.getElementById('acrossClues'),
     downClues: document.getElementById('downClues'),
+    timer: document.getElementById('timer'),
     checkAnswersBtn: document.getElementById('checkAnswersBtn'),
     submitGameBtn: document.getElementById('submitGameBtn'),
     playerResult: document.getElementById('playerResult'),
     solutionBox: document.getElementById('solutionBox'),
     solutionGrid: document.getElementById('solutionGrid'),
-    showSolutionBtn: document.getElementById('showSolutionBtn'),
-    leaderboardBody: document.getElementById('leaderboardBody'),
+    leaderboard: document.getElementById('leaderboardBody'),
     playAgainBtn: document.getElementById('playAgainBtn'),
-    timer: document.getElementById('timer'),
-    startGameBtn: document.getElementById('startGameBtn')
+    quizStatus: document.getElementById('quizStatus')
 };
 
-/* ---------------------- event wiring ---------------------- */
-el.adminAccessBtn.addEventListener('click', () => {
-    el.overlay.classList.add('show');
-    el.overlay.setAttribute('aria-hidden','false');
-});
-document.getElementById('closeModal').addEventListener('click', closeOverlay);
-document.getElementById('closeLogin').addEventListener('click', closeOverlay);
+/* ---------------------- admin functions ---------------------- */
+el.adminAccessBtn.addEventListener('click', () => el.overlay.classList.add('show'));
+el.closeModal.addEventListener('click', () => el.overlay.classList.remove('show'));
+el.closeLogin.addEventListener('click', () => el.overlay.classList.remove('show'));
 
-el.adminLoginBtn.addEventListener('click', adminLogin);
-el.adminLogoutBtn.addEventListener('click', adminLogout);
-el.uploadCsvBtn.addEventListener('click', uploadCsv);
-el.clearQuestionsBtn.addEventListener('click', clearQuestions);
-
-el.addRowBtn.addEventListener('click', addManualRow);
-el.saveManualBtn.addEventListener('click', saveManualRows);
-el.adminViewLeaderboard.addEventListener('click', toggleAdminLeaderboard);
-el.downloadAnimBtn.addEventListener('click', downloadAnimatedLeaderboard);
-
-/* game listeners */
-el.startGameBtn.addEventListener('click', startGame);
-el.checkAnswersBtn.addEventListener('click', checkAnswers);
-el.submitGameBtn.addEventListener('click', submitGame);
-el.playAgainBtn.addEventListener('click', playAgain);
-
-/* ---------------------- helper UI functions ---------------------- */
-function closeOverlay(){
-    el.overlay.classList.remove('show');
-    el.overlay.setAttribute('aria-hidden','true');
-    // reset login fields
-    el.adminUsername.value = "";
-    el.adminPassword.value = "";
-}
-
-/* ---------------------- CSV parsing & storage ---------------------- */
-function parseCSV(csv){
-    const lines = csv.split(/\r?\n/).filter(Boolean);
-    if(lines.length === 0) return [];
-    const headers = lines[0].split(',').map(h => h.trim());
-    const idx = h => headers.indexOf(h) >= 0 ? headers.indexOf(h) : -1;
-    const iWord = idx('Word') >=0 ? idx('Word') : idx('word');
-    const iClue = idx('Clue') >=0 ? idx('Clue') : idx('clue');
-    const iDiff = idx('Difficulty') >=0 ? idx('Difficulty') : -1;
-    const iCat = idx('Category') >=0 ? idx('Category') : -1;
-    const out = [];
-    for(let i=1;i<lines.length;i++){
-        const cols = lines[i].split(',').map(c=>c.trim());
-        if(!cols[iWord] || !cols[iClue]) continue;
-        out.push({
-            word: cols[iWord].toUpperCase(),
-            clue: cols[iClue],
-            difficulty: (iDiff>=0 ? cols[iDiff] : 'Medium') || 'Medium',
-            category: (iCat>=0 ? cols[iCat] : 'General') || 'General'
-        });
+el.adminLoginBtn.addEventListener('click', () => {
+    const username = el.adminUsername.value.trim();
+    const password = el.adminPassword.value.trim();
+    if (username === config.adminCredentials.username && password === config.adminCredentials.password) {
+        el.loginBlock.classList.add('hidden');
+        el.adminControls.classList.remove('hidden');
+        loadManualRows();
+    } else {
+        alert('Invalid admin credentials');
     }
-    return out;
-}
+});
 
-function uploadCsv(){
-    const file = el.csvUpload.files[0];
-    if(!file){ alert('Please select a CSV file.'); return; }
-    const reader = new FileReader();
-    reader.onload = e => {
-        try {
-            const questions = parseCSV(e.target.result);
-            if(questions.length){
-                // append to existing questions
-                const existing = JSON.parse(localStorage.getItem(config.questionsKey) || '[]');
-                const merged = existing.concat(questions);
-                localStorage.setItem(config.questionsKey, JSON.stringify(merged));
-                gameState.words = merged;
-                updateQuizStatus();
-                alert(`Uploaded ${questions.length} questions.`);
-            } else {
-                alert('No valid questions found in CSV.');
-            }
-        } catch(err){
-            alert('CSV parse error: ' + err.message);
-        }
-    };
-    reader.readAsText(file);
-}
+el.adminLogoutBtn.addEventListener('click', () => {
+    el.adminControls.classList.add('hidden');
+    el.loginBlock.classList.remove('hidden');
+    el.leaderboardArea.classList.add('hidden');
+    el.adminUsername.value = '';
+    el.adminPassword.value = '';
+});
 
-function clearQuestions(){
-    if(!confirm('Clear all saved questions? This cannot be undone.')) return;
-    localStorage.removeItem(config.questionsKey);
-    loadQuestions();
-    alert('Questions cleared — default set restored.');
-}
-
-/* ---------------------- manual add rows ---------------------- */
-function addManualRow(prefill){
+el.addRowBtn.addEventListener('click', () => {
     const row = document.createElement('div');
     row.className = 'manual-row';
     row.innerHTML = `
-        <input class="m-word" placeholder="Word" />
-        <input class="m-clue" placeholder="Clue" />
-        <input class="m-cat" placeholder="Category" />
-        <input class="m-diff" placeholder="Difficulty" />
-        <button class="remove small">X</button>
+        <input type="text" placeholder="Word" />
+        <input type="text" placeholder="Clue" />
+        <select>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <input type="text" placeholder="Category (optional)" />
+        <button class="remove-row-btn small" style="background:#e74c3c;">X</button>
     `;
-    const removeBtn = row.querySelector('.remove');
-    removeBtn.addEventListener('click', ()=> row.remove());
-    if(prefill){
-        row.querySelector('.m-word').value = prefill.word || '';
-        row.querySelector('.m-clue').value = prefill.clue || '';
-        row.querySelector('.m-cat').value = prefill.category || '';
-        row.querySelector('.m-diff').value = prefill.difficulty || '';
-    }
+    row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
     el.manualRows.appendChild(row);
-}
-function saveManualRows(){
-    const rows = [...el.manualRows.querySelectorAll('.manual-row')];
-    const newQs = [];
-    for(const r of rows){
-        const w = r.querySelector('.m-word').value.trim();
-        const c = r.querySelector('.m-clue').value.trim();
-        if(!w || !c) continue;
-        newQs.push({ word: w.toUpperCase(), clue: c, category: r.querySelector('.m-cat').value || 'General', difficulty: r.querySelector('.m-diff').value || 'Medium' });
-    }
-    if(newQs.length === 0){ alert('No valid manual questions to save.'); return; }
-    const existing = JSON.parse(localStorage.getItem(config.questionsKey) || '[]');
-    const merged = existing.concat(newQs);
-    localStorage.setItem(config.questionsKey, JSON.stringify(merged));
-    gameState.words = merged;
-    el.manualRows.innerHTML = '';
-    updateQuizStatus();
-    alert(`Saved ${newQs.length} questions.`);
-}
+});
 
-/* ---------------------- admin login/logout ---------------------- */
-function adminLogin(){
-    const u = el.adminUsername.value.trim();
-    const p = el.adminPassword.value;
-    if(u === config.adminCredentials.username && p === config.adminCredentials.password){
-        localStorage.setItem('adminLoggedIn','true');
-        el.loginBlock.classList.add('hidden');
-        el.adminControls.classList.remove('hidden');
-        loadAdminState();
-    } else {
-        alert('Invalid credentials');
-    }
-}
-
-function adminLogout(){
-    localStorage.removeItem('adminLoggedIn');
-    el.adminControls.classList.add('hidden');
-    el.loginBlock.classList.remove('hidden');
-    closeOverlay();
-}
-
-/* ---------------------- load / init questions ---------------------- */
-function getDefaultQuestions(){
-    return [
-        { word: "ANTIBIOTIC", clue: "Medicines used to prevent and treat bacterial infections", category: "AMR" },
-        { word: "RESISTANCE", clue: "The ability of bacteria to withstand the effects of an antibiotic", category: "AMR" },
-        { word: "MOSQUITO", clue: "Insect that transmits dengue virus", category: "Dengue" },
-        { word: "AEDES", clue: "Genus of mosquito that spreads dengue", category: "Dengue" }
-    ];
-}
-
-function loadQuestions(){
-    try {
-        const saved = localStorage.getItem(config.questionsKey);
-        if(saved){
-            gameState.words = JSON.parse(saved);
-        } else {
-            gameState.words = getDefaultQuestions();
-        }
-    } catch(e) {
-        console.error('loadQuestions', e);
-        gameState.words = getDefaultQuestions();
-    }
-    updateQuizStatus();
-}
-
-function updateQuizStatus(){
-    if(gameState.words && gameState.words.length){
-        el.quizStatus.textContent = `Quiz loaded with ${gameState.words.length} questions.`;
-        el.quizStatus.style.color = "#2ecc71";
-    } else {
-        el.quizStatus.textContent = `Quiz is not quizing 😂😂`;
-        el.quizStatus.style.color = "#e74c3c";
-    }
-}
-
-/* ---------------------- Admin leaderboard view & animated export ---------------------- */
-function loadAdminState(){
-    // show up to 5 manual rows prefilled with nothing for fast add
-    el.manualRows.innerHTML = '';
-    for(let i=0;i<4;i++) addManualRow();
-
-    // populate admin leaderboard area if exists
-    displayAdminLeaderboard();
-}
-
-function displayAdminLeaderboard(){
-    try{
-        const data = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
-        data.sort((a,b) => (b.score - a.score) || (a.time - b.time));
-        el.adminLeaderboardBody.innerHTML = '';
-        data.forEach((row,i) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${i+1}</td><td>${row.name}</td><td>${row.club}</td><td>${row.score}%</td><td>${formatTime(row.time)}</td><td>${new Date(row.date).toLocaleString()}</td>`;
-            el.adminLeaderboardBody.appendChild(tr);
-        });
-    }catch(e){ console.error(e); }
-}
-
-function toggleAdminLeaderboard(){
-    const area = document.getElementById('leaderboardArea');
-    area.classList.toggle('hidden');
-    displayAdminLeaderboard();
-}
-
-/* Animated leaderboard export:
-   - Creates a canvas, draws static leaderboard then animates falling flowers and top 3 highlight.
-   - Uses gif.js if available. If gif.js fails, falls back to static PNG. */
-async function downloadAnimatedLeaderboard(){
-    const data = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
-    data.sort((a,b) => (b.score - a.score) || (a.time - b.time));
-    // prepare a list for top entries (cap at 6)
-    const top = data.slice(0,6);
-
-    // canvas drawing size
-    const W = 800, H = 400;
-    const canvas = document.createElement('canvas');
-    canvas.width = W; canvas.height = H;
-    const ctx = canvas.getContext('2d');
-
-    // generate frames for simple animation
-    const frames = [];
-    const totalFrames = 40;
-    // pre-generate flower positions
-    const petals = [];
-    for(let i=0;i<24;i++){
-        petals.push({ x: Math.random()*W, y: -Math.random()*H, vx: (Math.random()-0.5)*1.2, vy: 1+Math.random()*2, r:6+Math.random()*8, rot: Math.random()*360 });
-    }
-
-    function drawFrame(t){
-        // background
-        ctx.clearRect(0,0,W,H);
-        ctx.fillStyle = '#fff8f2';
-        ctx.fillRect(0,0,W,H);
-
-        // big title
-        ctx.fillStyle = '#2b6cb0';
-        ctx.font = '26px Segoe UI Semibold';
-        ctx.fillText('Leaderboard', 20, 40);
-
-        // draw a stylish box for top 3
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(18,54, W-36, 220);
-        ctx.strokeStyle = '#dfe7f2';
-        ctx.strokeRect(18,54, W-36, 220);
-
-        // draw top entries
-        ctx.font = '16px Segoe UI';
-        for(let i=0;i<6;i++){
-            const ent = top[i];
-            const y = 90 + i*30;
-            if(!ent) break;
-            // highlight top 3 with subtle glow that pulses
-            if(i<3){
-                const pulse = 1 + 0.06*Math.sin((t+i)*0.35);
-                ctx.save();
-                ctx.fillStyle = (i===0? '#fde68a' : i===1? '#e6eefc' : '#fde6d6');
-                ctx.globalAlpha = 0.9;
-                ctx.fillRect(36, y-18, W-72, 28*pulse);
-                ctx.restore();
-            }
-            ctx.fillStyle = '#333';
-            ctx.fillText(`${i+1}. ${ent.name} (${ent.club})`, 40, y);
-            ctx.fillText(`${ent.score}%`, W-140, y);
-            ctx.fillText(formatTime(ent.time), W-90, y);
-        }
-
-        // falling flowers
-        for(let p of petals){
-            p.x += p.vx;
-            p.y += p.vy;
-            p.rot += 4;
-            // wrap
-            if(p.y > H+30) { p.y = -40; p.x = Math.random()*W; }
-            drawPetal(ctx, p.x, p.y, p.r, p.rot);
-        }
-
-        // footer celebration text
-        ctx.fillStyle = '#2c7a7b';
-        ctx.font = '14px Segoe UI';
-        ctx.fillText('Congrats to the top players!', 20, H-16);
-    }
-
-    function drawPetal(ctx,x,y,r,rot){
-        ctx.save();
-        ctx.translate(x,y);
-        ctx.rotate(rot*Math.PI/180);
-        ctx.globalAlpha = 0.95;
-        ctx.fillStyle = '#ff6b6b';
-        ctx.beginPath();
-        ctx.ellipse(0,0,r*0.6,r,0,0,Math.PI*2);
-        ctx.fill();
-        ctx.restore();
-    }
-
-    // use gif.js if present
-    if(window.GIF){
-        try {
-            const gif = new GIF({ workers: 2, quality: 10, width:W, height:H });
-            for(let f=0; f<totalFrames; f++){
-                drawFrame(f);
-                gif.addFrame(canvas, {copy:true, delay:50});
-            }
-            gif.on('finished', function(blob){
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'leaderboard-celebration.gif';
-                a.click();
+el.saveManualBtn.addEventListener('click', () => {
+    const rows = el.manualRows.querySelectorAll('.manual-row');
+    const questions = [];
+    rows.forEach(row => {
+        const inputs = row.querySelectorAll('input, select');
+        if (inputs[0].value && inputs[1].value) {
+            questions.push({
+                word: inputs[0].value.trim().toUpperCase(),
+                clue: inputs[1].value.trim(),
+                difficulty: inputs[2].value,
+                category: inputs[3].value.trim() || 'General'
             });
-            gif.render();
-            return;
-        } catch(e){
-            console.warn('gif export failed, falling back to PNG', e);
         }
+    });
+    if (questions.length) {
+        localStorage.setItem(config.questionsKey, JSON.stringify(questions));
+        alert(`Saved ${questions.length} questions!`);
+    } else {
+        alert('No valid questions to save');
     }
+});
 
-    // fallback: create single PNG snapshot
-    drawFrame(0);
-    canvas.toBlob(function(b){
-        const url = URL.createObjectURL(b);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'leaderboard.png';
-        a.click();
-    }, 'image/png');
+el.clearQuestionsBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear all questions?')) {
+        localStorage.removeItem(config.questionsKey);
+        el.manualRows.innerHTML = '';
+        alert('Questions cleared');
+    }
+});
+
+el.uploadCsvBtn.addEventListener('click', () => {
+    const file = el.csvUpload.files[0];
+    if (!file) return alert('Please select a CSV file first');
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const csv = e.target.result;
+        const lines = csv.split('\n');
+        const questions = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            const cells = lines[i].split(',').map(c => c.trim());
+            if (cells.length >= 2 && cells[0] && cells[1]) {
+                questions.push({
+                    word: cells[0].toUpperCase(),
+                    clue: cells[1],
+                    difficulty: cells[2] || 'easy',
+                    category: cells[3] || 'General'
+                });
+            }
+        }
+        
+        if (questions.length) {
+            localStorage.setItem(config.questionsKey, JSON.stringify(questions));
+            loadManualRows();
+            alert(`Uploaded ${questions.length} questions from CSV!`);
+        } else {
+            alert('No valid questions found in CSV');
+        }
+    };
+    reader.readAsText(file);
+});
+
+el.adminViewLeaderboard.addEventListener('click', () => {
+    el.leaderboardArea.classList.toggle('hidden');
+    if (!el.leaderboardArea.classList.contains('hidden')) {
+        loadAdminLeaderboard();
+    }
+});
+
+function loadManualRows() {
+    const questions = JSON.parse(localStorage.getItem(config.questionsKey) || '[]');
+    el.manualRows.innerHTML = '';
+    questions.forEach(q => {
+        const row = document.createElement('div');
+        row.className = 'manual-row';
+        row.innerHTML = `
+            <input type="text" placeholder="Word" value="${q.word}" />
+            <input type="text" placeholder="Clue" value="${q.clue}" />
+            <select>
+                <option value="easy" ${q.difficulty === 'easy' ? 'selected' : ''}>Easy</option>
+                <option value="medium" ${q.difficulty === 'medium' ? 'selected' : ''}>Medium</option>
+                <option value="hard" ${q.difficulty === 'hard' ? 'selected' : ''}>Hard</option>
+            </select>
+            <input type="text" placeholder="Category (optional)" value="${q.category || ''}" />
+            <button class="remove-row-btn small" style="background:#e74c3c;">X</button>
+        `;
+        row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
+        el.manualRows.appendChild(row);
+    });
 }
 
-/* ---------------------- crossword generation (kept from original, simplified) ---------------------- */
-/* For brevity, I preserved your original crossword placement/render logic with light adjustments. */
+function loadAdminLeaderboard() {
+    const leaderboard = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
+    const tbody = el.adminLeaderboard.querySelector('tbody');
+    tbody.innerHTML = '';
+    
+    leaderboard.sort((a, b) => b.score - a.score || a.time - b.time)
+        .forEach((entry, i) => {
+            const tr = document.createElement('tr');
+            const minutes = Math.floor(entry.time / 60);
+            const seconds = entry.time % 60;
+            tr.innerHTML = `
+                <td>${i + 1}</td>
+                <td>${entry.name}</td>
+                <td>${entry.club || '-'}</td>
+                <td>${entry.score}</td>
+                <td>${minutes}:${seconds.toString().padStart(2, '0')}</td>
+                <td>${new Date(entry.date).toLocaleDateString()}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+}
 
-function generateCrossword(){
-    const gridSize = config.gridSize;
-    const grid = Array(gridSize).fill().map(()=>Array(gridSize).fill(''));
-    const usedWords = [];
+/* ---------------------- login functions ---------------------- */
+el.loginBtn.addEventListener('click', () => {
+    const name = document.getElementById('loginName').value.trim();
+    const email = document.getElementById('loginEmail').value.trim();
+    const school = document.getElementById('schoolName').value.trim();
+    const address = document.getElementById('schoolAddress').value.trim();
+    const classStudying = document.getElementById('classStudying').value.trim();
+    const parentName = document.getElementById('parentName').value.trim();
+    const parentContact = document.getElementById('parentContact').value.trim();
+    const club = document.getElementById('clubName').value.trim();
+
+    if (!name || !email || !school || !address || !classStudying || !parentName || !parentContact) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    // Check if user has already submitted within 24 hours
+    const submissionRecords = JSON.parse(localStorage.getItem(config.submissionRecordsKey) || '{}');
+    const userKey = email.toLowerCase();
+    
+    if (submissionRecords[userKey]) {
+        const lastSubmission = new Date(submissionRecords[userKey]);
+        const now = new Date();
+        const hoursDiff = (now - lastSubmission) / (1000 * 60 * 60);
+        
+        if (hoursDiff < 24) {
+            const hoursLeft = Math.ceil(24 - hoursDiff);
+            alert(`You can only submit once every 24 hours. Please try again after ${hoursLeft} hours.`);
+            return;
+        }
+    }
+
+    // Check if user is already logged in (but hasn't submitted)
+    const loginRecords = JSON.parse(localStorage.getItem(config.loginRecordsKey) || '{}');
+    if (loginRecords[userKey]) {
+        const lastLogin = new Date(loginRecords[userKey]);
+        const now = new Date();
+        const hoursDiff = (now - lastLogin) / (1000 * 60 * 60);
+        
+        if (hoursDiff < 24) {
+            // Allow login if they haven't submitted yet
+            proceedToRegistration(name, email, school, club);
+            return;
+        }
+    }
+
+    // First time login or 24 hours have passed
+    proceedToRegistration(name, email, school, club);
+    
+    // Store login record (not submission record yet)
+    loginRecords[userKey] = new Date().toISOString();
+    localStorage.setItem(config.loginRecordsKey, JSON.stringify(loginRecords));
+});
+
+function proceedToRegistration(name, email, school, club) {
+    gameState.player = { name, email, school, club };
+    
+    // Store login data for later submission
+    const loginData = {
+        name,
+        email,
+        school,
+        address: document.getElementById('schoolAddress').value.trim(),
+        classStudying: document.getElementById('classStudying').value.trim(),
+        parentName: document.getElementById('parentName').value.trim(),
+        parentContact: document.getElementById('parentContact').value.trim(),
+        club,
+        loginTime: new Date().toISOString()
+    };
+    
+    gameState.loginData = loginData;
+    
+    // Update UI
+    el.playerName.value = name;
+    el.playerEmail.value = email;
+    el.playerSchool.value = school;
+    el.playerClub.value = club || 'Not specified';
+    
+    el.loginSection.classList.add('hidden');
+    el.registrationSection.classList.remove('hidden');
+    
+    // Check if we have questions
+    const questions = JSON.parse(localStorage.getItem(config.questionsKey) || '[]');
+    if (questions.length === 0) {
+        el.quizStatus.textContent = 'Quiz not available. Please contact administrator.';
+        el.quizStatus.style.color = '#e74c3c';
+        el.startGameBtn.disabled = true;
+    } else {
+        el.quizStatus.textContent = 'Quiz is ready!';
+        el.quizStatus.style.color = '#2ecc71';
+        el.startGameBtn.disabled = false;
+    }
+}
+
+el.startGameBtn.addEventListener('click', () => {
+    el.registrationSection.classList.add('hidden');
+    el.gameSection.classList.remove('hidden');
+    startGame();
+});
+
+/* ---------------------- game functions ---------------------- */
+function startGame() {
+    const questions = JSON.parse(localStorage.getItem(config.questionsKey) || '[]');
+    if (questions.length === 0) {
+        alert('No questions available. Please contact administrator.');
+        return;
+    }
+    
+    gameState.crossword = generateCrossword(questions, config.gridSize);
+    renderCrossword(gameState.crossword);
+    
+    gameState.startTime = Date.now();
+    gameState.timeElapsed = 0;
+    updateTimer();
+    gameState.timerInterval = setInterval(updateTimer, 1000);
+}
+
+function updateTimer() {
+    gameState.timeElapsed = Math.floor((Date.now() - gameState.startTime) / 1000);
+    const minutes = Math.floor(gameState.timeElapsed / 60);
+    const seconds = gameState.timeElapsed % 60;
+    el.timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function generateCrossword(words, gridSize) {
+    // Sort by length (longest first for better placement)
+    words = words.map(w => ({...w}));
+    words.sort((a, b) => b.word.length - a.word.length);
+    
+    const grid = Array(gridSize).fill().map(() => Array(gridSize).fill(''));
     const placedWords = [];
-
-    const sorted = [...gameState.words].sort((a,b)=> b.word.length - a.word.length);
-    if(sorted.length === 0) return;
-
-    const first = sorted[0];
-    const fr = Math.floor(gridSize/2);
-    const fc = Math.floor((gridSize - first.word.length)/2);
-    for(let i=0;i<first.word.length;i++){
-        grid[fr][fc+i] = { letter:'', correct:first.word[i], across: i===0? {number:1, clue:first.clue} : null, down:null };
+    const across = [];
+    const down = [];
+    
+    // Place first word in the center
+    const firstWord = words.shift();
+    const startRow = Math.floor((gridSize - firstWord.word.length) / 2);
+    const startCol = Math.floor(gridSize / 2);
+    
+    for (let i = 0; i < firstWord.word.length; i++) {
+        grid[startRow][startCol + i] = firstWord.word[i];
     }
-    placedWords.push({ word:first.word, clue:first.clue, row:fr, col:fc, direction:'across', number:1 });
-    usedWords.push(first.word);
-    let wordNumber = 2;
-
-    function canPlaceWord(grid,word,row,col,direction){
-        const N = gridSize;
-        if(direction === 'across'){
-            if(col<0 || col+word.length> N) return false;
-        } else {
-            if(row<0 || row+word.length> N) return false;
-        }
-        for(let i=0;i<word.length;i++){
-            const r = direction==='across'? row : row+i;
-            const c = direction==='across'? col+i : col;
-            if(grid[r][c] !== ''){
-                if(grid[r][c].correct !== word[i]) return false;
-            } else {
-                // basic adjacency checks minimal
-            }
-        }
-        return true;
-    }
-    function placeWord(grid,wordObj,wordNumber,row,col,direction){
-        const word = wordObj.word;
-        let hasNumber = false;
-        for(let i=0;i<word.length;i++){
-            const r = direction==='across'? row : row+i;
-            const c = direction==='across'? col+i : col;
-            if(grid[r][c] === ''){
-                grid[r][c] = { letter:'', correct:word[i], across: direction==='across' && i===0? {number:wordNumber, clue:wordObj.clue} : null, down:direction==='down' && i===0? {number:wordNumber, clue:wordObj.clue} : null };
-            } else {
-                if(i===0){
-                    if(direction==='across' && grid[r][c].across === null) grid[r][c].across = {number:wordNumber, clue:wordObj.clue};
-                    if(direction==='down' && grid[r][c].down === null) grid[r][c].down = {number:wordNumber, clue:wordObj.clue};
-                }
-            }
-        }
-        placedWords.push({word:word, clue:wordObj.clue, row, col, direction, number:wordNumber});
-    }
-
-    for(const wordObj of sorted.slice(1)){
-        const word = wordObj.word;
-        if(usedWords.includes(word)) continue;
+    
+    placedWords.push({
+        word: firstWord.word,
+        clue: firstWord.clue,
+        row: startRow,
+        col: startCol,
+        direction: 'across',
+        number: 1
+    });
+    across.push(placedWords[0]);
+    
+    let number = 2;
+    
+    // Try to place remaining words
+    for (const wordData of words) {
+        const word = wordData.word;
         let placed = false;
-        for(let i=0;i<word.length && !placed;i++){
-            const letter = word[i];
-            for(let r=0;r<gridSize && !placed;r++){
-                for(let c=0;c<gridSize && !placed;c++){
-                    if(grid[r][c] !== '' && grid[r][c].correct === letter){
-                        if(canPlaceWord(grid,word, r - i, c, 'down')){
-                            placeWord(grid,wordObj,wordNumber, r - i, c, 'down');
-                            wordNumber++; placed = true;
-                        } else if(canPlaceWord(grid,word, r, c - i, 'across')){
-                            placeWord(grid,wordObj,wordNumber, r, c - i, 'across');
-                            wordNumber++; placed = true;
+        
+        // Try to place across
+        for (let i = 0; i < word.length && !placed; i++) {
+            for (const placedWord of placedWords) {
+                for (let j = 0; j < placedWord.word.length && !placed; j++) {
+                    if (word[i] === placedWord.word[j]) {
+                        let row, col;
+                        
+                        if (placedWord.direction === 'across') {
+                            row = placedWord.row - i;
+                            col = placedWord.col + j;
+                            
+                            if (canPlaceDown(word, row, col, grid, placedWord)) {
+                                placeWord(word, wordData.clue, row, col, 'down', grid, placedWords, down, number++);
+                                placed = true;
+                            }
+                        } else {
+                            row = placedWord.row + j;
+                            col = placedWord.col - i;
+                            
+                            if (canPlaceAcross(word, row, col, grid, placedWord)) {
+                                placeWord(word, wordData.clue, row, col, 'across', grid, placedWords, across, number++);
+                                placed = true;
+                            }
                         }
                     }
                 }
             }
         }
-        if(placed) usedWords.push(word);
     }
-
-    for(let r=0;r<gridSize;r++){
-        for(let c=0;c<gridSize;c++){
-            if(grid[r][c] === '') grid[r][c] = { black:true };
-        }
-    }
-    gameState.crossword = { grid, placedWords, size:gridSize };
+    
+    return { grid, across, down };
 }
 
-/* render crossword */
-function renderCrossword(){
-    const cw = gameState.crossword;
-    if(!cw || !cw.grid) return;
-    el.crosswordGrid.innerHTML = '';
+function canPlaceDown(word, row, col, grid, ignoreWord) {
+    if (row < 0 || row + word.length > grid.length) return false;
+    
+    for (let i = 0; i < word.length; i++) {
+        const cell = grid[row + i]?.[col];
+        
+        // Check if cell is empty or matches the letter we want to place
+        if (cell && cell !== word[i]) return false;
+        
+        // Check left neighbor (must be empty)
+        if (col > 0 && !grid[row + i][col - 1] && (i === 0 || grid[row + i - 1][col])) {
+            if (grid[row + i][col - 1] && !isPartOfWord(row + i, col - 1, ignoreWord)) return false;
+        }
+        
+        // Check right neighbor (must be empty)
+        if (col < grid.length - 1 && !grid[row + i][col + 1] && (i === 0 || grid[row + i - 1][col])) {
+            if (grid[row + i][col + 1] && !isPartOfWord(row + i, col + 1, ignoreWord)) return false;
+        }
+    }
+    
+    // Check top and bottom
+    if (row > 0 && grid[row - 1][col]) return false;
+    if (row + word.length < grid.length && grid[row + word.length][col]) return false;
+    
+    return true;
+}
+
+function canPlaceAcross(word, row, col, grid, ignoreWord) {
+    if (col < 0 || col + word.length > grid.length) return false;
+    
+    for (let i = 0; i < word.length; i++) {
+        const cell = grid[row]?.[col + i];
+        
+        // Check if cell is empty or matches the letter we want to place
+        if (cell && cell !== word[i]) return false;
+        
+        // Check top neighbor (must be empty)
+        if (row > 0 && !grid[row - 1][col + i] && (i === 0 || grid[row][col + i - 1])) {
+            if (grid[row - 1][col + i] && !isPartOfWord(row - 1, col + i, ignoreWord)) return false;
+        }
+        
+        // Check bottom neighbor (must be empty)
+        if (row < grid.length - 1 && !grid[row + 1][col + i] && (i === 0 || grid[row][col + i - 1])) {
+            if (grid[row + 1][col + i] && !isPartOfWord(row + 1, col + i, ignoreWord)) return false;
+        }
+    }
+    
+    // Check left and right
+    if (col > 0 && grid[row][col - 1]) return false;
+    if (col + word.length < grid.length && grid[row][col + word.length]) return false;
+    
+    return true;
+}
+
+function isPartOfWord(row, col, word) {
+    if (word.direction === 'across') {
+        return row === word.row && col >= word.col && col < word.col + word.word.length;
+    } else {
+        return col === word.col && row >= word.row && row < word.row + word.word.length;
+    }
+}
+
+function placeWord(word, clue, row, col, direction, grid, placedWords, directionList, number) {
+    const wordObj = { word, clue, row, col, direction, number };
+    placedWords.push(wordObj);
+    directionList.push(wordObj);
+    
+    if (direction === 'across') {
+        for (let i = 0; i < word.length; i++) {
+            grid[row][col + i] = word[i];
+        }
+    } else {
+        for (let i = 0; i < word.length; i++) {
+            grid[row + i][col] = word[i];
+        }
+    }
+}
+
+function renderCrossword(crossword) {
+    // Create grid HTML
+    let gridHTML = '<table class="crossword">';
+    for (let i = 0; i < config.gridSize; i++) {
+        gridHTML += '<tr>';
+        for (let j = 0; j < config.gridSize; j++) {
+            const cell = crossword.grid[i][j];
+            if (cell) {
+                // Find if this cell has a number
+                let number = '';
+                for (const word of [...crossword.across, ...crossword.down]) {
+                    if (word.row === i && word.col === j) {
+                        number = `<span class="number">${word.number}</span>`;
+                        break;
+                    }
+                }
+                
+                gridHTML += `<td>${number}<input type="text" class="cell" maxlength="1" data-row="${i}" data-col="${j}"></td>`;
+            } else {
+                gridHTML += '<td class="black"></td>';
+            }
+        }
+        gridHTML += '</tr>';
+    }
+    gridHTML += '</table>';
+    el.crosswordGrid.innerHTML = gridHTML;
+    
+    // Render clues
     el.acrossClues.innerHTML = '';
+    crossword.across.forEach(word => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${word.number}.</strong> ${word.clue}`;
+        el.acrossClues.appendChild(li);
+    });
+    
     el.downClues.innerHTML = '';
-
-    const table = document.createElement('table');
-    table.className = 'crossword';
-    for(let r=0;r<cw.size;r++){
-        const tr = document.createElement('tr');
-        for(let c=0;c<cw.size;c++){
-            const td = document.createElement('td');
-            const cell = cw.grid[r][c];
-            if(cell.black){ td.classList.add('black'); tr.appendChild(td); continue; }
-            if(cell.across && cell.across.number){ const s = document.createElement('span'); s.className='number'; s.textContent = cell.across.number; td.appendChild(s); }
-            else if(cell.down && cell.down.number){ const s = document.createElement('span'); s.className='number'; s.textContent = cell.down.number; td.appendChild(s); }
-
-            const input = document.createElement('input');
-            input.className = 'cell';
-            input.maxLength = 1;
-            input.dataset.row = r; input.dataset.col = c;
-            input.addEventListener('input', function(){
-                const row = +this.dataset.row; const col = +this.dataset.col;
-                gameState.crossword.grid[row][col].letter = this.value.toUpperCase();
-                saveGameState();
-            });
-            td.appendChild(input);
-            tr.appendChild(td);
-        }
-        table.appendChild(tr);
-    }
-    el.crosswordGrid.appendChild(table);
-
-    // clues
-    const across = cw.placedWords.filter(w => w.direction === 'across').sort((a,b)=>a.number-b.number);
-    const down = cw.placedWords.filter(w => w.direction === 'down').sort((a,b)=>a.number-b.number);
-    across.forEach(w => { const li = document.createElement('li'); li.innerHTML = `<strong>${w.number}.</strong> ${w.clue}`; el.acrossClues.appendChild(li); });
-    down.forEach(w => { const li = document.createElement('li'); li.innerHTML = `<strong>${w.number}.</strong> ${w.clue}`; el.downClues.appendChild(li); });
+    crossword.down.forEach(word => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${word.number}.</strong> ${word.clue}`;
+        el.downClues.appendChild(li);
+    });
 }
 
-/* check & scoring */
-function checkAnswers(){
-    if(!gameState.crossword || !gameState.crossword.grid) return;
-    let correctCount = 0; let total = 0;
-    for(let r=0;r<gameState.crossword.size;r++){
-        for(let c=0;c<gameState.crossword.size;c++){
-            const cell = gameState.crossword.grid[r][c];
-            if(cell.black) continue;
-            total++;
-            const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
-            if(!input) continue;
-            const val = (input.value||'').toUpperCase();
-            if(val === cell.correct){ input.parentElement.classList.add('correct'); input.parentElement.classList.remove('incorrect'); correctCount++; }
-            else if(val) { input.parentElement.classList.add('incorrect'); input.parentElement.classList.remove('correct'); }
-            else { input.parentElement.classList.remove('correct','incorrect'); }
-        }
-    }
-    gameState.score = Math.floor((correctCount/total)*100);
-    gameState.checked = true;
-    saveGameState();
-    alert(`Checked: ${correctCount} / ${total} letters — Score ${gameState.score}%`);
-}
+el.checkAnswersBtn.addEventListener('click', () => {
+    checkAnswers(false);
+});
 
-function submitGame(){
-    if(!gameState.checked){
-        if(!confirm("You haven't checked your answers. Check now?")) return;
-        checkAnswers();
+el.submitGameBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to submit your answers? This will end the game.')) {
+        checkAnswers(true);
     }
+});
+
+function checkAnswers(isFinalSubmit) {
     clearInterval(gameState.timerInterval);
-    gameState.timeElapsed = Math.floor((new Date() - gameState.startTime)/1000);
-    submitToLeaderboard();
-    showSection('results');
+    
+    const cells = el.crosswordGrid.querySelectorAll('.cell');
+    let correctCount = 0;
+    let totalCount = 0;
+    
+    cells.forEach(cell => {
+        const row = parseInt(cell.dataset.row);
+        const col = parseInt(cell.dataset.col);
+        const userInput = cell.value.toUpperCase();
+        const correctAnswer = gameState.crossword.grid[row][col];
+        
+        if (correctAnswer) {
+            totalCount++;
+            if (userInput === correctAnswer) {
+                correctCount++;
+                cell.style.backgroundColor = '#d4edda';
+            } else {
+                cell.style.backgroundColor = '#f8d7da';
+                if (isFinalSubmit) {
+                    cell.value = correctAnswer;
+                    cell.style.color = '#721c24';
+                }
+            }
+        }
+    });
+    
+    gameState.score = Math.round((correctCount / totalCount) * 100);
+    gameState.checked = true;
+    
+    if (isFinalSubmit) {
+        submitGame();
+    }
+}
+
+function submitGame() {
+    // Store submission record for 24-hour restriction
+    const submissionRecords = JSON.parse(localStorage.getItem(config.submissionRecordsKey) || '{}');
+    const userKey = gameState.player.email.toLowerCase();
+    submissionRecords[userKey] = new Date().toISOString();
+    localStorage.setItem(config.submissionRecordsKey, JSON.stringify(submissionRecords));
+    
+    // Remove login record since submission is complete
+    const loginRecords = JSON.parse(localStorage.getItem(config.loginRecordsKey) || '{}');
+    delete loginRecords[userKey];
+    localStorage.setItem(config.loginRecordsKey, JSON.stringify(loginRecords));
+    
+    // Save to leaderboard
+    const leaderboard = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
+    leaderboard.push({
+        name: gameState.player.name,
+        email: gameState.player.email,
+        club: gameState.player.club || '',
+        school: gameState.player.school,
+        score: gameState.score,
+        time: gameState.timeElapsed,
+        date: new Date().toISOString()
+    });
+    localStorage.setItem(config.leaderboardKey, JSON.stringify(leaderboard));
+    
+    // Save login data to spreadsheet
+    saveLoginDataToSheet();
+    
+    // Show results
     showResults();
 }
 
-function submitToLeaderboard(){
-    const data = {
-        name: gameState.player.name,
-        club: gameState.player.club,
-        email: gameState.player.email,
-        contact: gameState.player.contact,
-        score: gameState.score,
-        time: gameState.timeElapsed,
-        date: gameState.player.date
-    };
-    const lb = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
-    lb.push(data);
-    localStorage.setItem(config.leaderboardKey, JSON.stringify(lb));
+function saveLoginDataToSheet() {
+    // This would normally use Google Apps Script to save to spreadsheet
+    // For demo purposes, we'll just log it
+    console.log('Saving login data:', gameState.loginData);
+    
+    // In a real implementation, you would use:
+    // fetch(config.scriptURL, {
+    //     method: 'POST',
+    //     body: JSON.stringify(gameState.loginData)
+    // });
 }
 
-/* results & leaderboard display */
-function showResults(){
-    let medal = '', cls = '';
-    if(gameState.score >= 90){ medal='🥇'; cls='gold'; }
-    else if(gameState.score >=75){ medal='🥈'; cls='silver'; }
-    else if(gameState.score >=50){ medal='🥉'; cls='bronze'; }
-    el.playerResult.innerHTML = `<h3>Your Result ${medal ? `<span>${medal}</span>` : ''}</h3>
+function showResults() {
+    el.gameSection.classList.add('hidden');
+    el.resultsSection.classList.remove('hidden');
+    
+    // Show player result
+    const minutes = Math.floor(gameState.timeElapsed / 60);
+    const seconds = gameState.timeElapsed % 60;
+    el.playerResult.innerHTML = `
         <p><strong>Name:</strong> ${gameState.player.name}</p>
-        <p><strong>Club:</strong> ${gameState.player.club}</p>
         <p><strong>Score:</strong> ${gameState.score}%</p>
-        <p><strong>Time:</strong> ${formatTime(gameState.timeElapsed)}</p>`;
-
-    el.solutionBox.style.display = 'block';
-    displayLeaderboard();
-}
-
-function displayLeaderboard(){
-    try{
-        const lb = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
-        lb.sort((a,b)=> (b.score - a.score) || (a.time - b.time));
-        el.leaderboardBody.innerHTML = '';
-        lb.forEach((entry,i) => {
+        <p><strong>Time:</strong> ${minutes}:${seconds.toString().padStart(2, '0')}</p>
+    `;
+    
+    // Show solution
+    renderSolution();
+    
+    // Show leaderboard
+    const leaderboard = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
+    el.leaderboardBody.innerHTML = '';
+    
+    leaderboard.sort((a, b) => b.score - a.score || a.time - b.time)
+        .slice(0, 10)
+        .forEach((entry, i) => {
             const tr = document.createElement('tr');
-            if(entry.name === gameState.player.name && entry.date === gameState.player.date) tr.style.backgroundColor = '#e3f2fd';
-            tr.innerHTML = `<td>${i+1}</td><td>${entry.name}</td><td>${entry.club}</td><td>${entry.score}%</td><td>${formatTime(entry.time)}</td><td>${new Date(entry.date).toLocaleString()}</td>`;
+            const minutes = Math.floor(entry.time / 60);
+            const seconds = entry.time % 60;
+            tr.innerHTML = `
+                <td>${i + 1}</td>
+                <td>${entry.name}</td>
+                <td>${entry.club || '-'}</td>
+                <td>${entry.score}%</td>
+                <td>${minutes}:${seconds.toString().padStart(2, '0')}</td>
+                <td>${new Date(entry.date).toLocaleDateString()}</td>
+            `;
             el.leaderboardBody.appendChild(tr);
         });
-    }catch(e){ console.error(e); }
 }
 
-/* start / timer / play again */
-function startGame(){
-    if(!el.playerName.value || !el.clubName.value){ alert('Enter name and club'); return; }
-    if(!gameState.words || gameState.words.length === 0){ alert('No questions available. Contact admin.'); return; }
-    gameState.player = {
-        name: el.playerName.value,
-        club: el.clubName.value,
-        email: el.email.value,
-        contact: el.contact.value,
-        date: new Date().toISOString()
-    };
-    generateCrossword();
-    gameState.startTime = new Date();
-    gameState.timerInterval = setInterval(updateTimer, 1000);
-    gameState.checked = false;
-    showSection('game');
-    renderCrossword();
-    saveGameState();
-}
-
-function playAgain(){
-    const player = gameState.player;
-    gameState = { player, crossword: {}, startTime: null, timerInterval: null, timeElapsed: 0, score:0, checked:false, words: gameState.words };
-    el.playerName.value = player.name; el.clubName.value = player.club; el.email.value = player.email; el.contact.value = player.contact;
-    showSection('registration');
-}
-
-/* timer and helpers */
-function updateTimer(){
-    const now = new Date();
-    gameState.timeElapsed = Math.floor((now - gameState.startTime)/1000);
-    el.timer.textContent = formatTime(gameState.timeElapsed);
-}
-function formatTime(sec){
-    const mm = Math.floor(sec/60).toString().padStart(2,'0');
-    const ss = (sec%60).toString().padStart(2,'0');
-    return `${mm}:${ss}`;
-}
-
-/* save/load game */
-function saveGameState(){
-    try { localStorage.setItem('crosswordGame', JSON.stringify(gameState)); } catch(e){}
-}
-function loadGame(){
-    const saved = localStorage.getItem('crosswordGame');
-    if(!saved) { showSection('registration'); return; }
-    try {
-        const s = JSON.parse(saved);
-        gameState = { ...gameState, ...s };
-        if(gameState.crossword && gameState.crossword.grid){
-            // resume
-            gameState.startTime = new Date(new Date() - (gameState.timeElapsed || 0) * 1000);
-            gameState.timerInterval = setInterval(updateTimer, 1000);
-            renderCrossword();
-            showSection('game');
-        } else if(gameState.score > 0){
-            showSection('results');
-            showResults();
-        } else {
-            showSection('registration');
-        }
-    } catch(e){ console.error(e); showSection('registration'); }
-}
-
-function showSection(which){
-    el.registrationSection.classList.add('hidden');
-    el.gameSection.classList.add('hidden');
-    el.resultsSection.classList.add('hidden');
-    if(which === 'registration') el.registrationSection.classList.remove('hidden');
-    else if(which === 'game') el.gameSection.classList.remove('hidden');
-    else if(which === 'results') el.resultsSection.classList.remove('hidden');
-}
-
-/* ---------------------- initialization ---------------------- */
-function init(){
-    loadQuestions();
-    // if admin already logged in (localStorage) show admin controls
-    if(localStorage.getItem('adminLoggedIn') === 'true'){
-        el.loginBlock.classList.add('hidden');
-        el.adminControls.classList.remove('hidden');
-        loadAdminState();
-    }
-    // restore saved game if exists
-    const saved = localStorage.getItem('crosswordGame');
-    if(saved) {
-        try {
-            const s = JSON.parse(saved);
-            // keep loaded words from storage
-            if(s.crossword && s.crossword.grid) {
-                gameState = { ...gameState, ...s };
-                loadGame();
-                return;
+function renderSolution() {
+    let solutionHTML = '<table class="crossword">';
+    for (let i = 0; i < config.gridSize; i++) {
+        solutionHTML += '<tr>';
+        for (let j = 0; j < config.gridSize; j++) {
+            const cell = gameState.crossword.grid[i][j];
+            if (cell) {
+                solutionHTML += `<td>${cell}</td>`;
+            } else {
+                solutionHTML += '<td class="black"></td>';
             }
-        } catch(e){}
+        }
+        solutionHTML += '</tr>';
     }
-    showSection('registration');
+    solutionHTML += '</table>';
+    el.solutionGrid.innerHTML = solutionHTML;
+    el.solutionBox.style.display = 'block';
 }
 
-init();
-// Force show registration form on load
-showSection('registration');
+el.playAgainBtn.addEventListener('click', () => {
+    el.resultsSection.classList.add('hidden');
+    el.loginSection.classList.remove('hidden');
+});
 
+// Initialize
+loadManualRows();
 </script>
 </body>
-
 </html>
