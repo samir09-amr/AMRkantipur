@@ -134,6 +134,37 @@
         font-size: 14px;
     }
 
+    /* sample spreadsheet preview */
+    .sample-spreadsheet {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+    .sample-spreadsheet h4 {
+        margin-top: 0;
+        color: #2c3e50;
+    }
+    .sample-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 12px;
+    }
+    .sample-table th, .sample-table td {
+        border: 1px solid #ddd;
+        padding: 6px;
+        text-align: left;
+    }
+    .sample-table th {
+        background-color: #3498db;
+        color: white;
+    }
+    .sample-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
     /* small responsiveness */
     @media (max-width:700px) {
         .manual-row input[type=text]{ width: 100%; }
@@ -252,6 +283,54 @@
                 <button type="button" id="loginBtn" class="btn">Login & Continue</button>
             </div>
         </form>
+
+        <!-- Sample Spreadsheet Preview -->
+        <div class="sample-spreadsheet">
+            <h4>Sample Spreadsheet Structure:</h4>
+            <p>All responses will be saved to the spreadsheet with the following format:</p>
+            <table class="sample-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>School</th>
+                        <th>Class</th>
+                        <th>Parent Name</th>
+                        <th>Parent Contact</th>
+                        <th>Club</th>
+                        <th>Score</th>
+                        <th>Time (seconds)</th>
+                        <th>Submission Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>John Doe</td>
+                        <td>john@example.com</td>
+                        <td>City High School</td>
+                        <td>10th Grade</td>
+                        <td>Jane Doe</td>
+                        <td>123-456-7890</td>
+                        <td>Science Club</td>
+                        <td>85%</td>
+                        <td>325</td>
+                        <td>2023-10-15</td>
+                    </tr>
+                    <tr>
+                        <td>Sarah Smith</td>
+                        <td>sarah@example.com</td>
+                        <td>Town College</td>
+                        <td>2nd Year</td>
+                        <td>Robert Smith</td>
+                        <td>987-654-3210</td>
+                        <td>-</td>
+                        <td>100%</td>
+                        <td>280</td>
+                        <td>2023-10-15</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Registration Section -->
@@ -997,7 +1076,7 @@ function submitGame() {
     });
     localStorage.setItem(config.leaderboardKey, JSON.stringify(leaderboard));
     
-    // Save login data to spreadsheet
+    // Save ALL responses to spreadsheet (regardless of score)
     saveLoginDataToSheet();
     
     // Show results
@@ -1005,14 +1084,28 @@ function submitGame() {
 }
 
 function saveLoginDataToSheet() {
+    // Prepare data for submission
+    const submissionData = {
+        ...gameState.loginData,
+        score: gameState.score,
+        time: gameState.timeElapsed,
+        submissionTime: new Date().toISOString()
+    };
+    
     // This would normally use Google Apps Script to save to spreadsheet
     // For demo purposes, we'll just log it
-    console.log('Saving login data:', gameState.loginData);
+    console.log('Saving submission data:', submissionData);
     
     // In a real implementation, you would use:
     // fetch(config.scriptURL, {
     //     method: 'POST',
-    //     body: JSON.stringify(gameState.loginData)
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({
+    //         action: 'submit',
+    //         data: submissionData
+    //     })
     // });
 }
 
@@ -1027,6 +1120,7 @@ function showResults() {
         <p><strong>Name:</strong> ${gameState.player.name}</p>
         <p><strong>Score:</strong> ${gameState.score}%</p>
         <p><strong>Time:</strong> ${minutes}:${seconds.toString().padStart(2, '0')}</p>
+        <p>Your response has been recorded. Thank you for participating!</p>
     `;
     
     // Show solution
