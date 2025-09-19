@@ -97,13 +97,44 @@
     #adminLeaderboard th, #adminLeaderboard td { border:1px solid #ddd; padding:8px; text-align:left; background:#fff; }
     #adminLeaderboard th { background:#3498db; color:#fff; position:sticky; top:0; }
 
-    /* kept your crossword cell styles (copied) */
+    /* Improved crossword cell styles */
     table.crossword { border-collapse:collapse; margin:18px auto; }
-    table.crossword td { width:35px; height:35px; border:1px solid #ddd; text-align:center; vertical-align:middle; position:relative; }
+    table.crossword td { 
+        width:42px; 
+        height:42px; 
+        border:2px solid #333; 
+        text-align:center; 
+        vertical-align:middle; 
+        position:relative; 
+        font-size: 18px;
+        font-weight: bold;
+    }
     .black { background:#34495e; }
-    .number { position:absolute; top:1px; left:2px; font-size:9px; color:#2c3e50; font-weight:bold; }
+    .number { 
+        position:absolute; 
+        top:2px; 
+        left:2px; 
+        font-size:10px; 
+        color:#2c3e50; 
+        font-weight:bold; 
+    }
 
-    input.cell { width:100%; height:100%; border:none; text-align:center; font-size:18px; font-weight:bold; text-transform:uppercase; background:transparent; }
+    input.cell { 
+        width:100%; 
+        height:100%; 
+        border:none; 
+        text-align:center; 
+        font-size:20px; 
+        font-weight:bold; 
+        text-transform:uppercase; 
+        background:transparent;
+        padding: 0;
+        margin: 0;
+    }
+    input.cell:focus {
+        outline: none;
+        background-color: #e6f7ff;
+    }
 
     .hidden { display:none; }
     .timer { font-weight:bold; color:#e74c3c; background:#fdedec; padding:8px 12px; border-radius:20px; }
@@ -134,43 +165,19 @@
         font-size: 14px;
     }
 
-    /* sample spreadsheet preview */
-    .sample-spreadsheet {
-        margin-top: 20px;
-        padding: 15px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-    }
-    .sample-spreadsheet h4 {
-        margin-top: 0;
-        color: #2c3e50;
-    }
-    .sample-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-        font-size: 12px;
-    }
-    .sample-table th, .sample-table td {
-        border: 1px solid #ddd;
-        padding: 6px;
-        text-align: left;
-    }
-    .sample-table th {
-        background-color: #3498db;
-        color: white;
-    }
-    .sample-table tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
-
     /* small responsiveness */
     @media (max-width:700px) {
         .manual-row input[type=text]{ width: 100%; }
         .manual-row { flex-direction:column; align-items:stretch; }
         .form-grid {
             grid-template-columns: 1fr;
+        }
+        table.crossword td {
+            width: 32px;
+            height: 32px;
+        }
+        input.cell {
+            font-size: 16px;
         }
     }
 
@@ -283,54 +290,6 @@
                 <button type="button" id="loginBtn" class="btn">Login & Continue</button>
             </div>
         </form>
-
-        <!-- Sample Spreadsheet Preview -->
-        <div class="sample-spreadsheet">
-            <h4>Sample Spreadsheet Structure:</h4>
-            <p>All responses will be saved to the spreadsheet with the following format:</p>
-            <table class="sample-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>School</th>
-                        <th>Class</th>
-                        <th>Parent Name</th>
-                        <th>Parent Contact</th>
-                        <th>Club</th>
-                        <th>Score</th>
-                        <th>Time (seconds)</th>
-                        <th>Submission Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>John Doe</td>
-                        <td>john@example.com</td>
-                        <td>City High School</td>
-                        <td>10th Grade</td>
-                        <td>Jane Doe</td>
-                        <td>123-456-7890</td>
-                        <td>Science Club</td>
-                        <td>85%</td>
-                        <td>325</td>
-                        <td>2023-10-15</td>
-                    </tr>
-                    <tr>
-                        <td>Sarah Smith</td>
-                        <td>sarah@example.com</td>
-                        <td>Town College</td>
-                        <td>2nd Year</td>
-                        <td>Robert Smith</td>
-                        <td>987-654-3210</td>
-                        <td>-</td>
-                        <td>100%</td>
-                        <td>280</td>
-                        <td>2023-10-15</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
     </div>
 
     <!-- Registration Section -->
@@ -404,8 +363,8 @@ const config = {
     submissionRecordsKey: "crosswordSubmissionRecords",
     gridSize: 15,
     spreadsheetId: "1Zs1fOWhoiyhZmVZL5IRSzmhFB0t-NaCucYfriwtLqD8",
-    scriptURL: "https://script.google.com/macros/library/d/1ORXef_2X_LLMdML1-4qoMJhlDHFe8VRoIERlaSkLBik5E4CSbMDiJ7Hh/2",
-    questionsSheetURL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR5Tas63fCeJ1ytgiL5-Hy8qLh4UMvtxuC-i1MJgQMQNcsr7pZnVe7ycY55MplwkWq7q9r2IGw5s6JW/pub?output=csv"
+    scriptURL: "https://script.google.com/macros/s/AKfycby-WITGwSel8lih3IytnJ8q53age5N58C_JcbYey6a7hIjqGWEHmznpNkert1zG77AgQw/exec",
+    questionsSheetURL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ21NZYx30nSpde1woJ-Q-4PGtmzmyk51u0ZsH0sBdyjWKiqBdm-umaWMPE_rq7DxPj9EqG_lNbxzSK/pub?output=csv"
 };
 
 let gameState = {
@@ -417,7 +376,8 @@ let gameState = {
     score: 0,
     checked: false,
     words: [],
-    loginData: {}
+    loginData: {},
+    currentCell: null
 };
 
 /* ---------------------- element refs ---------------------- */
@@ -989,6 +949,15 @@ function renderCrossword(crossword) {
     gridHTML += '</table>';
     el.crosswordGrid.innerHTML = gridHTML;
     
+    // Add keyboard navigation
+    const cells = el.crosswordGrid.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        cell.addEventListener('keydown', handleKeyNavigation);
+        cell.addEventListener('focus', () => {
+            gameState.currentCell = cell;
+        });
+    });
+    
     // Render clues
     el.acrossClues.innerHTML = '';
     crossword.across.forEach(word => {
@@ -1003,6 +972,41 @@ function renderCrossword(crossword) {
         li.innerHTML = `<strong>${word.number}.</strong> ${word.clue}`;
         el.downClues.appendChild(li);
     });
+}
+
+function handleKeyNavigation(e) {
+    const key = e.key;
+    const row = parseInt(e.target.dataset.row);
+    const col = parseInt(e.target.dataset.col);
+    
+    if (key === 'ArrowUp') {
+        e.preventDefault();
+        moveFocus(row - 1, col);
+    } else if (key === 'ArrowDown') {
+        e.preventDefault();
+        moveFocus(row + 1, col);
+    } else if (key === 'ArrowLeft') {
+        e.preventDefault();
+        moveFocus(row, col - 1);
+    } else if (key === 'ArrowRight') {
+        e.preventDefault();
+        moveFocus(row, col + 1);
+    } else if (key.match(/^[a-z]$/i)) {
+        // Auto-advance to next cell after typing a letter
+        setTimeout(() => {
+            moveFocus(row, col + 1);
+        }, 10);
+    }
+}
+
+function moveFocus(row, col) {
+    if (row < 0 || row >= config.gridSize || col < 0 || col >= config.gridSize) return;
+    
+    const nextCell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+    if (nextCell) {
+        nextCell.focus();
+        nextCell.select();
+    }
 }
 
 el.checkAnswersBtn.addEventListener('click', () => {
@@ -1092,21 +1096,24 @@ function saveLoginDataToSheet() {
         submissionTime: new Date().toISOString()
     };
     
-    // This would normally use Google Apps Script to save to spreadsheet
-    // For demo purposes, we'll just log it
-    console.log('Saving submission data:', submissionData);
-    
-    // In a real implementation, you would use:
-    // fetch(config.scriptURL, {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //         action: 'submit',
-    //         data: submissionData
-    //     })
-    // });
+    // Send data to Google Apps Script web app
+    fetch(config.scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            action: 'submit',
+            data: submissionData
+        })
+    })
+    .then(() => {
+        console.log('Data submitted successfully');
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
 
 function showResults() {
