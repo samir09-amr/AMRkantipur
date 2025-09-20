@@ -1,1186 +1,656 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3041015200590330"
-     crossorigin="anonymous"></script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>AMR & Dengue Crossword Puzzle</title>
+<title>AMR & Dengue Crossword — Login + Live CSV</title>
 <style>
-    
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        max-width: 980px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #f0f8ff;
-        color: #333;
-    }
-    .section {
-        background-color: white;
-        padding: 25px;
-        margin-bottom: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-    }
-    h1,h2 { text-align:center; }
-    h1 { color:#2980b9; font-size:2.2em; }
-
-    /* admin floating button */
-    .admin-btn {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #34495e;
-        color: #fff;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 6px;
-        cursor: pointer;
-        z-index: 1200;
-    }
-
-    /* overlay + modal */
-    .overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.35);
-        backdrop-filter: blur(6px);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 1100;
-    }
-    .overlay.show { display:flex; }
-
-    .modal {
-        width: 760px;
-        max-width: calc(100% - 40px);
-        background: linear-gradient(180deg,#fff,#fbfdff);
-        border-radius: 12px;
-        padding: 18px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-        position: relative;
-    }
-
-    .modal h3 { margin-top:0; }
-    .close-x {
-        position: absolute;
-        right: 12px;
-        top: 8px;
-        background: transparent;
-        border: none;
-        font-size: 20px;
-        cursor: pointer;
-    }
-
-    .admin-form, .admin-controls {
-        display:flex; flex-direction:column; gap:10px;
-    }
-
-    .file-upload input[type=file] {
-        padding:8px; border-radius:6px; border:1px dashed #3498db; width:100%;
-    }
-
-    .manual-rows { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow:auto; padding-right:6px; }
-
-    .manual-row { display:flex; gap:8px; align-items:center; }
-    .manual-row input { padding:8px; border-radius:6px; border:1px solid #ddd; font-size:14px; }
-    .manual-row input[type=text]{ width: 32%; }
-    .manual-row input[type=select]{ width: 22%; }
-
-    .small { font-size:13px; padding:8px 10px; border-radius:6px; }
-
-    /* leaderboard table */
-    #adminLeaderboard { width:100%; border-collapse:collapse; max-height:220px; overflow:auto; display:block; }
-    #adminLeaderboard th, #adminLeaderboard td { border:1px solid #ddd; padding:8px; text-align:left; background:#fff; }
-    #adminLeaderboard th { background:#3498db; color:#fff; position:sticky; top:0; }
-
-    /* Improved crossword cell styles */
-    table.crossword { border-collapse:collapse; margin:18px auto; }
-    table.crossword td { 
-        width:42px; 
-        height:42px; 
-        border:2px solid #333; 
-        text-align:center; 
-        vertical-align:middle; 
-        position:relative; 
-        font-size: 18px;
-        font-weight: bold;
-    }
-    .black { background:#34495e; }
-    .number { 
-        position:absolute; 
-        top:2px; 
-        left:2px; 
-        font-size:10px; 
-        color:#2c3e50; 
-        font-weight:bold; 
-    }
-
-    input.cell { 
-        width:100%; 
-        height:100%; 
-        border:none; 
-        text-align:center; 
-        font-size:20px; 
-        font-weight:bold; 
-        text-transform:uppercase; 
-        background:transparent;
-        padding: 0;
-        margin: 0;
-    }
-    input.cell:focus {
-        outline: none;
-        background-color: #e6f7ff;
-    }
-
-    .hidden { display:none; }
-    .timer { font-weight:bold; color:#e74c3c; background:#fdedec; padding:8px 12px; border-radius:20px; }
-
-    /* download button group */
-    .btn { background:#3498db; color:white; border:none; padding:10px 12px; border-radius:6px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-    .btn.secondary { background:#6c757d; }
-
-    /* login form styles */
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 15px;
-        margin: 20px 0;
-    }
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-    .form-group label {
-        font-weight: 600;
-        margin-bottom: 5px;
-    }
-    .form-group input, .form-group select {
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #ddd;
-        font-size: 14px;
-    }
-
-    /* small responsiveness */
-    @media (max-width:700px) {
-        .manual-row input[type=text]{ width: 100%; }
-        .manual-row { flex-direction:column; align-items:stretch; }
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
-        table.crossword td {
-            width: 32px;
-            height: 32px;
-        }
-        input.cell {
-            font-size: 16px;
-        }
-    }
-
+  :root{--blue:#2b6cb0;--muted:#6c757d;--card:#fff;--bg:#f6fbff}
+  body{font-family:Inter,Segoe UI,Roboto,Arial; background:var(--bg); margin:0; padding:18px; color:#1f2937}
+  .wrap{max-width:980px;margin:0 auto}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  h1{margin:0;font-size:20px;color:var(--blue)}
+  .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(10,20,40,0.06);margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:1fr;gap:12px}
+  label{display:block;font-weight:600;margin-bottom:6px;font-size:13px}
+  input[type=text],input[type=email],select{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eef6;font-size:14px}
+  .row{display:flex;gap:8px}
+  .row > div{flex:1}
+  .btn{background:var(--blue);color:#fff;padding:10px 12px;border-radius:8px;border:0;cursor:pointer}
+  .btn.gray{background:#f3f4f6;color:#111;border:1px solid #e6eef6}
+  .timer{font-weight:700;background:#fff7ed;color:#d97706;padding:6px 10px;border-radius:999px}
+  table.cross{border-collapse:collapse;margin:12px auto}
+  table.cross td{width:34px;height:34px;border:1px solid #dbeafe;vertical-align:middle;padding:0;position:relative}
+  .black{background:#0f172a;border-color:#0f172a}
+  input.cell{width:100%;height:100%;border:0;font-weight:700;font-size:18px;text-transform:uppercase;text-align:center;background:#ffffff;border:1px solid #cbd5e1;box-shadow:inset 0 2px 4px rgba(0,0,0,0.05)}
+  .clues{max-height:420px;overflow:auto;padding-right:6px}
+  ol{margin:6px 0 0 18px;padding:0}
+  .small{font-size:13px;color:#475569}
+  .resultBox{display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .ok{background:#dcfce7}
+  .bad{background:#fee2e2}
+  .notice{background:#fff3cd;border-radius:8px;padding:10px;color:#7c4a02}
+  footer{margin-top:18px;font-size:13px;color:#475569}
+  .hidden{display:none}
+  .admin-btn{position:fixed;right:16px;top:14px;padding:8px 10px;border-radius:10px;border:0;background:#111827;color:#fff;z-index:1200}
+  .center{text-align:center}
+  .clue-number{position:absolute;top:1px;left:1px;font-size:8px;color:#64748b;font-weight:bold;z-index:1}
+  .clues-container{display:flex;gap:20px;margin-top:20px}
+  .clues-section{flex:1}
+  .clues-section h3{margin-top:0;color:var(--blue)}
+  .score-display{font-size:18px;font-weight:bold;color:var(--blue);margin-top:15px;padding:10px;background:#f1f7ff;border-radius:8px;text-align:center}
 </style>
 </head>
 <body>
-    <button id="adminAccessBtn" class="admin-btn">Admin Login</button>
+  <button id="adminAccessBtn" class="admin-btn" title="Admin - CSV upload & leaderboard">Admin</button>
 
-    <!-- overlay + floating admin modal -->
-    <div id="overlay" class="overlay" aria-hidden="true">
-        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
-            <button class="close-x" id="closeModal">&times;</button>
-            <h3 id="adminTitle">Admin Portal</h3>
+  <div class="wrap">
+    <header><h1>AMR & Dengue Crossword</h1><div class="small">Login → Puzzle (questions load from your sheet)</div></header>
 
-            <!-- Login block -->
-            <div id="loginBlock" class="admin-form">
-                <input id="adminUsername" placeholder="Username" class="small" />
-                <input id="adminPassword" placeholder="Password" type="password" class="small" />
-                <div style="display:flex; gap:8px;">
-                    <button id="adminLoginBtn" class="btn">Login</button>
-                    <button id="closeLogin" class="btn secondary">Cancel</button>
-                </div>
-            </div>
+    <!-- LOGIN / REGISTRATION CARD (first view) -->
+    <section class="card" id="loginCard">
+      <h3 style="margin-top:0">Player Registration</h3>
+      <div class="row" style="margin-bottom:8px">
+        <div><label>Name *</label><input id="playerName" type="text" placeholder="Full name" required></div>
+        <div><label>Email</label><input id="email" type="email" placeholder="you@example.com"></div>
+        <div><label>Contact</label><input id="contact" type="text" placeholder="9801xxxxx"></div>
+      </div>
+      <div class="row" style="margin-bottom:8px">
+        <div><label>School</label><input id="schoolName" type="text" placeholder="School name"></div>
+        <div><label>Class</label><input id="className" type="text" placeholder="Class / Grade"></div>
+        <div><label>Parent Name</label><input id="parentName" type="text" placeholder="Parent / Guardian"></div>
+      </div>
+      <div class="row" style="margin-bottom:12px">
+        <div><label>Parent Contact</label><input id="parentContact" type="text" placeholder="984xxxxxxxx"></div>
+        <div><label>Club / Organization (if any)</label><input id="clubName" type="text" placeholder="AMR Club"></div>
+        <div style="align-self:end"><button id="loginSubmitBtn" class="btn">Continue to Puzzle</button></div>
+      </div>
+      <div class="small">Required: Name. The rest are optional but will be saved to the sheet on submit.</div>
+    </section>
 
-            <!-- Controls shown after login -->
-            <div id="adminControls" class="admin-controls hidden" style="margin-top:12px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <strong>Admin Panel</strong>
-                    <div style="display:flex; gap:8px;">
-                        <button id="adminViewLeaderboard" class="btn small">View Leaderboard</button>
-                        <button id="downloadAnimBtn" class="btn small">Download Animated Leaderboard</button>
-                        <button id="adminLogoutBtn" class="btn small secondary">Logout</button>
-                    </div>
-                </div>
-
-                <!-- CSV upload -->
-                <div class="file-upload" style="margin-top:8px;">
-                    <label style="font-weight:600;">Upload Questions CSV</label>
-                    <input id="csvUpload" type="file" accept=".csv" />
-                    <div style="display:flex; gap:8px; margin-top:6px;">
-                        <button id="uploadCsvBtn" class="btn">Upload CSV</button>
-                        <button id="clearQuestionsBtn" class="btn secondary">Clear Questions</button>
-                    </div>
-                    <small style="color:#666;">CSV headers: Word,Clue,Difficulty (optional),Category (optional)</small>
-                </div>
-
-                <!-- Manual add rows -->
-                <div style="margin-top:6px;">
-                    <label style="font-weight:600;">Add Questions Manually</label>
-                    <div class="manual-rows" id="manualRows"></div>
-                    <div style="display:flex; gap:8px; margin-top:8px;">
-                        <button id="addRowBtn" class="btn small">Add another</button>
-                        <button id="saveManualBtn" class="btn small">Save Questions</button>
-                    </div>
-                </div>
-
-                <!-- Leaderboard view -->
-                <div id="leaderboardArea" class="hidden" style="margin-top:10px;">
-                    <label style="font-weight:600;">Leaderboard</label>
-                    <div style="max-height:220px; overflow:auto; border:1px solid #eee; border-radius:6px; padding:6px; background:#fafafa;">
-                        <table id="adminLeaderboard"><thead><tr><th>#</th><th>Name</th><th>Club</th><th>Score</th><th>Time</th><th>Date</th></tr></thead><tbody></tbody></table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Login Section -->
-    <div class="section" id="loginSection">
-        <h1>AMR & Dengue Crossword Challenge</h1>
-        <p style="text-align: center; margin-bottom: 20px;">Please login to participate in the crossword puzzle challenge</p>
-        
-        <form id="loginForm">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="loginName">Full Name *</label>
-                    <input type="text" id="loginName" required>
-                </div>
-                <div class="form-group">
-                    <label for="loginEmail">Email Address *</label>
-                    <input type="email" id="loginEmail" required>
-                </div>
-                <div class="form-group">
-                    <label for="schoolName">School/College Name *</label>
-                    <input type="text" id="schoolName" required>
-                </div>
-                <div class="form-group">
-                    <label for="schoolAddress">School/College Address *</label>
-                    <input type="text" id="schoolAddress" required>
-                </div>
-                <div class="form-group">
-                    <label for="classStudying">Class/Year Studying *</label>
-                    <input type="text" id="classStudying" required>
-                </div>
-                <div class="form-group">
-                    <label for="parentName">Parent/Guardian Name *</label>
-                    <input type="text" id="parentName" required>
-                </div>
-                <div class="form-group">
-                    <label for="parentContact">Parent/Guardian Contact *</label>
-                    <input type="text" id="parentContact" required>
-                </div>
-                <div class="form-group">
-                    <label for="clubName">Club/Organization (if any)</label>
-                    <input type="text" id="clubName">
-                </div>
-            </div>
-            
-            <div style="text-align:center; margin-top:20px;">
-                <button type="button" id="loginBtn" class="btn">Login & Continue</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Registration Section -->
-    <div class="section hidden" id="registrationSection">
-        <h1>AMR & Dengue Crossword Challenge</h1>
-        <div id="quizStatus" style="text-align:center; margin-bottom:12px; color:#2ecc71;">Loading quiz...</div>
-        <form id="registrationForm">
-            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
-                <div><label style="display:block;font-weight:600">Name</label><input id="playerName" type="text" readonly /></div>
-                <div><label style="display:block;font-weight:600">Club/Organization</label><input id="playerClub" type="text" readonly /></div>
-                <div><label style="display:block;font-weight:600">Email</label><input id="playerEmail" type="email" readonly /></div>
-                <div><label style="display:block;font-weight:600">School</label><input id="playerSchool" type="text" readonly /></div>
-            </div>
-            <div style="text-align:center; margin-top:12px;">
-                <button type="button" id="startGameBtn" class="btn">Start Game</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Game Section -->
-    <div class="section hidden" id="gameSection">
-        <h2>AMR & Dengue Crossword Puzzle</h2>
-        <div style="text-align:center; margin-bottom:10px;">Time: <span id="timer" class="timer">00:00</span></div>
-        <div id="crosswordGrid"></div>
-        <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;">
-            <div style="flex:1; min-width:260px;">
-                <h3>Across</h3>
-                <ol id="acrossClues"></ol>
-            </div>
-            <div style="flex:1; min-width:260px;">
-                <h3>Down</h3>
-                <ol id="downClues"></ol>
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:12px;">
-            <button id="checkAnswersBtn" class="btn">Check Answers</button>
-            <button id="submitGameBtn" class="btn secondary">Submit Answers</button>
-        </div>
-    </div>
-
-    <!-- Results Section -->
-    <div class="section hidden" id="resultsSection">
-        <h2>Game Results</h2>
-        <div id="playerResult" style="margin-bottom:12px;"></div>
-        <div id="solutionBox" style="display:none; margin-bottom:12px;">
-            <h3>Puzzle Solution</h3>
-            <div id="solutionGrid"></div>
+    <!-- PUZZLE + CLUES (hidden until login) -->
+    <div id="puzzleArea" class="hidden">
+      <section class="card" id="gameCard">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong>Crossword</strong></div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="timer" id="timerDisplay">00:00</div>
+            <button id="checkAnswersBtn" class="btn gray">Check</button>
+            <button id="submitGameBtn" class="btn">Submit</button>
+          </div>
         </div>
 
-        <h3>Leaderboard</h3>
-        <table id="leaderboard" style="width:100%; border-collapse:collapse; margin-bottom:12px;">
-            <thead><tr style="background:#3498db; color:#fff;"><th>Rank</th><th>Name</th><th>Club</th><th>Score</th><th>Time</th><th>Date</th></tr></thead>
-            <tbody id="leaderboardBody"></tbody>
-        </table>
-        <div style="text-align:center;">
-            <button id="playAgainBtn" class="btn">Play Again</button>
+        <div id="crosswordGrid" style="text-align:center;margin-top:10px"></div>
+
+        <div id="solutionBox" style="display:none;margin-top:12px">
+          <strong>Solution</strong>
+          <div id="solutionGrid"></div>
         </div>
+      </section>
+
+      <!-- Clues section moved below the puzzle -->
+      <section class="card">
+        <h3 style="margin-top:0">Clues</h3>
+        <div class="clues-container">
+          <div class="clues-section">
+            <h3>Across</h3>
+            <div class="clues"><ol id="acrossList"></ol></div>
+          </div>
+          <div class="clues-section">
+            <h3>Down</h3>
+            <div class="clues"><ol id="downList"></ol></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Score display after completion -->
+      <div class="score-display hidden" id="scoreDisplay">
+        Your Score: <span id="scoreValue">0</span>%
+      </div>
     </div>
 
-    <!-- Include GIF.js from CDN for animation export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    <footer>
+      <div class="small">Questions load from this CSV: <code>https://docs.google.com/spreadsheets/d/e/2PACX-1vR5Tas63fCeJ1ytgiL5-Hy8qLh4UMvtxuC-i1MJgQMQNcsr7pZnVe7ycY55MplwkWq7q9r2IGw5s6JW/pub?output=csv</code>. If fetch fails, defaults are used.</div>
+      <div class="small" style="margin-top:6px">To enable Sheets saving: paste your Apps Script web app /exec URL into the <code>SHEETS_WEBAPP_URL</code> variable in the script below.</div>
+    </footer>
+  </div>
 
 <script>
-/* ---------------------- config & state ---------------------- */
-const config = {
-    adminCredentials: { username: "admin", password: "amrdengue2023" },
-    questionsKey: "crosswordQuestions",
-    leaderboardKey: "crosswordLeaderboard",
-    loginDataKey: "crosswordLoginData",
-    loginRecordsKey: "crosswordLoginRecords",
-    submissionRecordsKey: "crosswordSubmissionRecords",
-    gridSize: 15,
-    spreadsheetId: "1Zs1fOWhoiyhZmVZL5IRSzmhFB0t-NaCucYfriwtLqD8",
-    scriptURL: "https://script.google.com/macros/s/AKfycby-WITGwSel8lih3IytnJ8q53age5N58C_JcbYey6a7hIjqGWEHmznpNkert1zG77AgQw/exec",
-    questionsSheetURL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ21NZYx30nSpde1woJ-Q-4PGtmzmyk51u0ZsH0sBdyjWKiqBdm-umaWMPE_rq7DxPj9EqG_lNbxzSK/pub?output=csv"
+/* ================== CONFIG ================== */
+/* Paste your Apps Script web app URL here if you want spreadsheet saving.
+   Example: "https://script.google.com/macros/s/AKfycbx.../exec" */
+const SHEETS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzkXZ3EeMva4FXVtT-2umBPNSCwfsNP6cO351QXey03b8dHAzTwZXpVhTpr3PNkzH-Sgg/exec";
+
+/* CSV URL provided by you (the published CSV) */
+const QUESTIONS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR5Tas63fCeJ1ytgiL5-Hy8qLh4UMvtxuC-i1MJgQMQNcsr7pZnVe7ycY55MplwkWq7q9r2IGw5s6JW/pub?output=csv";
+
+/* persistent keys */
+const QKEY = 'amr_crossword_questions_v2';
+const LBKEY = 'amr_crossword_leaderboard_v2';
+
+/* UI refs */
+const $ = id => document.getElementById(id);
+const loginCard = $('loginCard');
+const loginSubmitBtn = $('loginSubmitBtn');
+const puzzleArea = $('puzzleArea');
+const crosswordGrid = $('crosswordGrid');
+const acrossList = $('acrossList');
+const downList = $('downList');
+const timerDisplay = $('timerDisplay');
+const checkAnswersBtn = $('checkAnswersBtn');
+const submitGameBtn = $('submitGameBtn');
+const solutionBox = $('solutionBox');
+const solutionGrid = $('solutionGrid');
+const adminBtn = $('adminAccessBtn');
+const scoreDisplay = $('scoreDisplay');
+const scoreValue = $('scoreValue');
+
+/* state */
+let state = {
+  N: 15,
+  grid: [],
+  placements: [],
+  startTime: null,
+  timerInterval: null,
+  timeElapsed: 0,
+  score: 0,
+  words: [],
+  clueNumbers: {} // To store clue numbers for each word
 };
 
-let gameState = {
-    player: {},
-    crossword: {},
-    startTime: null,
-    timerInterval: null,
-    timeElapsed: 0,
-    score: 0,
-    checked: false,
-    words: [],
-    loginData: {},
-    currentCell: null
-};
+/* small helpers */
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function pad(n){ return String(n).padStart(2,'0'); }
+function formatTime(sec){ return `${pad(Math.floor(sec/60))}:${pad(sec%60)}`; }
 
-/* ---------------------- element refs ---------------------- */
-const el = {
-    adminAccessBtn: document.getElementById('adminAccessBtn'),
-    overlay: document.getElementById('overlay'),
-    closeModal: document.getElementById('closeModal'),
-    loginBlock: document.getElementById('loginBlock'),
-    adminControls: document.getElementById('adminControls'),
-    adminUsername: document.getElementById('adminUsername'),
-    adminPassword: document.getElementById('adminPassword'),
-    adminLoginBtn: document.getElementById('adminLoginBtn'),
-    adminLogoutBtn: document.getElementById('adminLogoutBtn'),
-    csvUpload: document.getElementById('csvUpload'),
-    uploadCsvBtn: document.getElementById('uploadCsvBtn'),
-    clearQuestionsBtn: document.getElementById('clearQuestionsBtn'),
-    addRowBtn: document.getElementById('addRowBtn'),
-    manualRows: document.getElementById('manualRows'),
-    saveManualBtn: document.getElementById('saveManualBtn'),
-    adminViewLeaderboard: document.getElementById('adminViewLeaderboard'),
-    leaderboardArea: document.getElementById('leaderboardArea'),
-    adminLeaderboard: document.getElementById('adminLeaderboard'),
-    downloadAnimBtn: document.getElementById('downloadAnimBtn'),
-    closeLogin: document.getElementById('closeLogin'),
-    loginSection: document.getElementById('loginSection'),
-    registrationSection: document.getElementById('registrationSection'),
-    gameSection: document.getElementById('gameSection'),
-    resultsSection: document.getElementById('resultsSection'),
-    loginForm: document.getElementById('loginForm'),
-    loginBtn: document.getElementById('loginBtn'),
-    playerName: document.getElementById('playerName'),
-    playerClub: document.getElementById('playerClub'),
-    playerEmail: document.getElementById('playerEmail'),
-    playerSchool: document.getElementById('playerSchool'),
-    startGameBtn: document.getElementById('startGameBtn'),
-    crosswordGrid: document.getElementById('crosswordGrid'),
-    acrossClues: document.getElementById('acrossClues'),
-    downClues: document.getElementById('downClues'),
-    timer: document.getElementById('timer'),
-    checkAnswersBtn: document.getElementById('checkAnswersBtn'),
-    submitGameBtn: document.getElementById('submitGameBtn'),
-    playerResult: document.getElementById('playerResult'),
-    solutionBox: document.getElementById('solutionBox'),
-    solutionGrid: document.getElementById('solutionGrid'),
-    leaderboard: document.getElementById('leaderboardBody'),
-    playAgainBtn: document.getElementById('playAgainBtn'),
-    quizStatus: document.getElementById('quizStatus')
-};
+/* default questions fallback */
+const DEFAULT_QUESTIONS = [
+  {word:"ANTIBIOTIC", clue:"Medicines used to prevent and treat bacterial infections"},
+  {word:"RESISTANCE", clue:"The ability of bacteria to withstand antibiotics"},
+  {word:"MOSQUITO", clue:"Insect that transmits dengue virus"},
+  {word:"AEDES", clue:"Genus of mosquito that spreads dengue"},
+  {word:"FEVER", clue:"A common symptom of dengue"},
+  {word:"VECTOR", clue:"An organism that transmits disease"},
+  {word:"VACCINE", clue:"A biological preparation that provides immunity"},
+  {word:"SANITATION", clue:"Essential to prevent mosquito breeding"},
+  {word:"HYDRATION", clue:"Important treatment during dengue"}
+];
 
-/* ---------------------- admin functions ---------------------- */
-el.adminAccessBtn.addEventListener('click', () => el.overlay.classList.add('show'));
-el.closeModal.addEventListener('click', () => el.overlay.classList.remove('show'));
-el.closeLogin.addEventListener('click', () => el.overlay.classList.remove('show'));
-
-el.adminLoginBtn.addEventListener('click', () => {
-    const username = el.adminUsername.value.trim();
-    const password = el.adminPassword.value.trim();
-    if (username === config.adminCredentials.username && password === config.adminCredentials.password) {
-        el.loginBlock.classList.add('hidden');
-        el.adminControls.classList.remove('hidden');
-        loadManualRows();
-    } else {
-        alert('Invalid admin credentials');
+/* ================== CSV load & parse ================== */
+/* Try fetch the published CSV. If fails, use local storage or defaults.
+   CSV expected columns: Word,Clue (headers included) */
+async function fetchQuestionsFromCSV(){
+  try{
+    const res = await fetch(QUESTIONS_CSV_URL, {cache:'no-store'});
+    if(!res.ok) throw new Error('CSV fetch failed');
+    const text = await res.text();
+    const lines = text.split(/\r?\n/).filter(Boolean);
+    if(lines.length < 2) throw new Error('CSV appears empty or has no data');
+    const headers = lines[0].split(',').map(h=>h.trim().toLowerCase());
+    const wIdx = headers.findIndex(h => h.includes('word'));
+    const cIdx = headers.findIndex(h => h.includes('clue'));
+    if(wIdx === -1 || cIdx === -1) throw new Error('CSV missing Word/Clue headers');
+    const arr = [];
+    for(let i=1;i<lines.length;i++){
+      const cols = splitCsvRow(lines[i]);
+      const w = (cols[wIdx] || '').trim();
+      const c = (cols[cIdx] || '').trim();
+      if(!w || !c) continue;
+      // normalize
+      arr.push({ word: w.toUpperCase().replace(/[^A-Z]/g,''), clue: c });
     }
-});
-
-el.adminLogoutBtn.addEventListener('click', () => {
-    el.adminControls.classList.add('hidden');
-    el.loginBlock.classList.remove('hidden');
-    el.leaderboardArea.classList.add('hidden');
-    el.adminUsername.value = '';
-    el.adminPassword.value = '';
-});
-
-el.addRowBtn.addEventListener('click', () => {
-    const row = document.createElement('div');
-    row.className = 'manual-row';
-    row.innerHTML = `
-        <input type="text" placeholder="Word" />
-        <input type="text" placeholder="Clue" />
-        <select>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-        </select>
-        <input type="text" placeholder="Category (optional)" />
-        <button class="remove-row-btn small" style="background:#e74c3c;">X</button>
-    `;
-    row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
-    el.manualRows.appendChild(row);
-});
-
-el.saveManualBtn.addEventListener('click', () => {
-    const rows = el.manualRows.querySelectorAll('.manual-row');
-    const questions = [];
-    rows.forEach(row => {
-        const inputs = row.querySelectorAll('input, select');
-        if (inputs[0].value && inputs[1].value) {
-            questions.push({
-                word: inputs[0].value.trim().toUpperCase(),
-                clue: inputs[1].value.trim(),
-                difficulty: inputs[2].value,
-                category: inputs[3].value.trim() || 'General'
-            });
-        }
-    });
-    if (questions.length) {
-        localStorage.setItem(config.questionsKey, JSON.stringify(questions));
-        alert(`Saved ${questions.length} questions!`);
-    } else {
-        alert('No valid questions to save');
+    if(arr.length === 0) throw new Error('No valid rows in CSV');
+    // save to localStorage for offline reuse
+    localStorage.setItem(QKEY, JSON.stringify(arr));
+    console.log('Questions loaded from CSV:', arr.length);
+    return arr;
+  }catch(err){
+    console.warn('CSV fetch error:', err);
+    // fallback to any stored questions or defaults
+    const stored = localStorage.getItem(QKEY);
+    if(stored){
+      try{ return JSON.parse(stored); } catch(e){}
     }
-});
-
-el.clearQuestionsBtn.addEventListener('click', () => {
-    if (confirm('Are you sure you want to clear all questions?')) {
-        localStorage.removeItem(config.questionsKey);
-        el.manualRows.innerHTML = '';
-        alert('Questions cleared');
-    }
-});
-
-el.uploadCsvBtn.addEventListener('click', () => {
-    const file = el.csvUpload.files[0];
-    if (!file) return alert('Please select a CSV file first');
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const csv = e.target.result;
-        const lines = csv.split('\n');
-        const questions = [];
-        
-        for (let i = 1; i < lines.length; i++) {
-            const cells = lines[i].split(',').map(c => c.trim());
-            if (cells.length >= 2 && cells[0] && cells[1]) {
-                questions.push({
-                    word: cells[0].toUpperCase(),
-                    clue: cells[1],
-                    difficulty: cells[2] || 'easy',
-                    category: cells[3] || 'General'
-                });
-            }
-        }
-        
-        if (questions.length) {
-            localStorage.setItem(config.questionsKey, JSON.stringify(questions));
-            loadManualRows();
-            alert(`Uploaded ${questions.length} questions from CSV!`);
-        } else {
-            alert('No valid questions found in CSV');
-        }
-    };
-    reader.readAsText(file);
-});
-
-el.adminViewLeaderboard.addEventListener('click', () => {
-    el.leaderboardArea.classList.toggle('hidden');
-    if (!el.leaderboardArea.classList.contains('hidden')) {
-        loadAdminLeaderboard();
-    }
-});
-
-function loadManualRows() {
-    const questions = JSON.parse(localStorage.getItem(config.questionsKey) || '[]');
-    el.manualRows.innerHTML = '';
-    questions.forEach(q => {
-        const row = document.createElement('div');
-        row.className = 'manual-row';
-        row.innerHTML = `
-            <input type="text" placeholder="Word" value="${q.word}" />
-            <input type="text" placeholder="Clue" value="${q.clue}" />
-            <select>
-                <option value="easy" ${q.difficulty === 'easy' ? 'selected' : ''}>Easy</option>
-                <option value="medium" ${q.difficulty === 'medium' ? 'selected' : ''}>Medium</option>
-                <option value="hard" ${q.difficulty === 'hard' ? 'selected' : ''}>Hard</option>
-            </select>
-            <input type="text" placeholder="Category (optional)" value="${q.category || ''}" />
-            <button class="remove-row-btn small" style="background:#e74c3c;">X</button>
-        `;
-        row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
-        el.manualRows.appendChild(row);
-    });
+    console.log('Using default questions');
+    localStorage.setItem(QKEY, JSON.stringify(DEFAULT_QUESTIONS));
+    return DEFAULT_QUESTIONS.slice();
+  }
 }
 
-function loadAdminLeaderboard() {
-    const leaderboard = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
-    const tbody = el.adminLeaderboard.querySelector('tbody');
-    tbody.innerHTML = '';
-    
-    leaderboard.sort((a, b) => b.score - a.score || a.time - b.time)
-        .forEach((entry, i) => {
-            const tr = document.createElement('tr');
-            const minutes = Math.floor(entry.time / 60);
-            const seconds = entry.time % 60;
-            tr.innerHTML = `
-                <td>${i + 1}</td>
-                <td>${entry.name}</td>
-                <td>${entry.club || '-'}</td>
-                <td>${entry.score}</td>
-                <td>${minutes}:${seconds.toString().padStart(2, '0')}</td>
-                <td>${new Date(entry.date).toLocaleDateString()}</td>
-            `;
-            tbody.appendChild(tr);
-        });
+/* split CSV row with basic support for quoted commas */
+function splitCsvRow(row){
+  const out = [];
+  let cur = '', inQuotes = false;
+  for(let i=0;i<row.length;i++){
+    const ch = row[i];
+    if(ch === '"' ) { inQuotes = !inQuotes; continue; }
+    if(ch === ',' && !inQuotes){ out.push(cur); cur = ''; continue; }
+    cur += ch;
+  }
+  out.push(cur);
+  return out;
 }
 
-/* ---------------------- login functions ---------------------- */
-el.loginBtn.addEventListener('click', () => {
-    const name = document.getElementById('loginName').value.trim();
-    const email = document.getElementById('loginEmail').value.trim();
-    const school = document.getElementById('schoolName').value.trim();
-    const address = document.getElementById('schoolAddress').value.trim();
-    const classStudying = document.getElementById('classStudying').value.trim();
-    const parentName = document.getElementById('parentName').value.trim();
-    const parentContact = document.getElementById('parentContact').value.trim();
-    const club = document.getElementById('clubName').value.trim();
+/* ================== Crossword placement algorithm (favor DOWN & balance) ================== */
+/* Algorithm strategy:
+   - Sort words by length desc
+   - Decide a target for DOWN words: prefer more DOWN than ACROSS (ceil(60% of words) but ensure balance)
+   - Try placements giving priority to DOWN until target reached, then across
+   - Try multiple attempts (randomized) to fit maximum words
+*/
 
-    if (!name || !email || !school || !address || !classStudying || !parentName || !parentContact) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    // Check if user has already submitted within 24 hours
-    const submissionRecords = JSON.parse(localStorage.getItem(config.submissionRecordsKey) || '{}');
-    const userKey = email.toLowerCase();
-    
-    if (submissionRecords[userKey]) {
-        const lastSubmission = new Date(submissionRecords[userKey]);
-        const now = new Date();
-        const hoursDiff = (now - lastSubmission) / (1000 * 60 * 60);
-        
-        if (hoursDiff < 24) {
-            const hoursLeft = Math.ceil(24 - hoursDiff);
-            alert(`You can only submit once every 24 hours. Please try again after ${hoursLeft} hours.`);
-            return;
-        }
-    }
-
-    // Check if user is already logged in (but hasn't submitted)
-    const loginRecords = JSON.parse(localStorage.getItem(config.loginRecordsKey) || '{}');
-    if (loginRecords[userKey]) {
-        const lastLogin = new Date(loginRecords[userKey]);
-        const now = new Date();
-        const hoursDiff = (now - lastLogin) / (1000 * 60 * 60);
-        
-        if (hoursDiff < 24) {
-            // Allow login if they haven't submitted yet
-            proceedToRegistration(name, email, school, club);
-            return;
-        }
-    }
-
-    // First time login or 24 hours have passed
-    proceedToRegistration(name, email, school, club);
-    
-    // Store login record (not submission record yet)
-    loginRecords[userKey] = new Date().toISOString();
-    localStorage.setItem(config.loginRecordsKey, JSON.stringify(loginRecords));
-});
-
-function proceedToRegistration(name, email, school, club) {
-    gameState.player = { name, email, school, club };
-    
-    // Store login data for later submission
-    const loginData = {
-        name,
-        email,
-        school,
-        address: document.getElementById('schoolAddress').value.trim(),
-        classStudying: document.getElementById('classStudying').value.trim(),
-        parentName: document.getElementById('parentName').value.trim(),
-        parentContact: document.getElementById('parentContact').value.trim(),
-        club,
-        loginTime: new Date().toISOString()
-    };
-    
-    gameState.loginData = loginData;
-    
-    // Update UI
-    el.playerName.value = name;
-    el.playerEmail.value = email;
-    el.playerSchool.value = school;
-    el.playerClub.value = club || 'Not specified';
-    
-    el.loginSection.classList.add('hidden');
-    el.registrationSection.classList.remove('hidden');
-    
-    // Check if we have questions
-    const questions = JSON.parse(localStorage.getItem(config.questionsKey) || '[]');
-    if (questions.length === 0) {
-        // Load questions from Google Sheets if none are available
-        loadQuestionsFromGoogleSheets();
-    } else {
-        el.quizStatus.textContent = 'Quiz is ready!';
-        el.quizStatus.style.color = '#2ecc71';
-        el.startGameBtn.disabled = false;
-    }
+function createEmptyGrid(N){
+  const g=[];
+  for(let r=0;r<N;r++){ g[r]=[]; for(let c=0;c<N;c++) g[r][c]=null; }
+  return g;
 }
 
-// Function to load questions from Google Sheets
-function loadQuestionsFromGoogleSheets() {
-    el.quizStatus.textContent = 'Loading questions from server...';
-    
-    fetch(config.questionsSheetURL)
-        .then(response => response.text())
-        .then(csvData => {
-            const questions = parseCSV(csvData);
-            if (questions.length > 0) {
-                localStorage.setItem(config.questionsKey, JSON.stringify(questions));
-                el.quizStatus.textContent = `Loaded ${questions.length} questions from server!`;
-                el.quizStatus.style.color = '#2ecc71';
-                el.startGameBtn.disabled = false;
-            } else {
-                el.quizStatus.textContent = 'Failed to load questions. Using default questions.';
-                el.quizStatus.style.color = '#e74c3c';
-                loadDefaultQuestions();
-            }
-        })
-        .catch(error => {
-            console.error('Error loading questions from Google Sheets:', error);
-            el.quizStatus.textContent = 'Error loading questions. Using default questions.';
-            el.quizStatus.style.color = '#e74c3c';
-            loadDefaultQuestions();
-        });
-}
-
-// Function to parse CSV data
-function parseCSV(csvData) {
-    const questions = [];
-    const lines = csvData.split('\n');
-    
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
-        
-        // Simple CSV parsing (assuming no commas in the values)
-        const cells = line.split(',').map(cell => cell.trim());
-        if (cells.length >= 2 && cells[0] && cells[1]) {
-            questions.push({
-                word: cells[0].toUpperCase(),
-                clue: cells[1],
-                difficulty: cells[2] || 'medium',
-                category: cells[3] || 'General'
-            });
-        }
+function canPlace(word, r, c, dir, grid){
+  const L = word.length;
+  const N = grid.length;
+  if(dir === 'across'){
+    if(c + L > N) return false;
+    // adjacent checks: ensure not connecting wrongly
+    if(c>0 && grid[r][c-1]) return false;
+    if(c+L < N && grid[r][c+L]) return false;
+    for(let i=0;i<L;i++){
+      const ch = grid[r][c+i];
+      if(ch && ch !== word[i]) return false;
+      // ensure above/below not conflict with adjacent non-overlap letters
+      if(!ch){
+        if(r>0 && grid[r-1][c+i] && grid[r-1][c+i] !== word[i]) {/* ok */}
+        if(r+1 < N && grid[r+1][c+i] && grid[r+1][c+i] !== word[i]) {/* ok */}
+      }
     }
-    
-    return questions;
-}
-
-// Function to load default questions if Google Sheets fails
-function loadDefaultQuestions() {
-    const defaultQuestions = [
-        { word: "ANTIBIOTIC", clue: "Medicine that kills bacteria", difficulty: "medium", category: "AMR" },
-        { word: "RESISTANCE", clue: "Ability of bacteria to withstand antibiotics", difficulty: "hard", category: "AMR" },
-        { word: "MOSQUITO", clue: "Insect that spreads dengue", difficulty: "easy", category: "Dengue" },
-        { word: "FEVER", clue: "Common symptom of dengue", difficulty: "easy", category: "Dengue" },
-        { word: "VACCINE", clue: "Preventive treatment for diseases", difficulty: "medium", category: "General" },
-        { word: "VIRUS", clue: "Type of pathogen that causes dengue", difficulty: "medium", category: "Dengue" },
-        { word: "VECTOR", clue: "Organism that transmits disease", difficulty: "hard", category: "General" },
-        { word: "PREVENTION", clue: "Stopping disease before it occurs", difficulty: "medium", category: "General" }
-    ];
-    
-    localStorage.setItem(config.questionsKey, JSON.stringify(defaultQuestions));
-    el.startGameBtn.disabled = false;
-}
-
-el.startGameBtn.addEventListener('click', () => {
-    el.registrationSection.classList.add('hidden');
-    el.gameSection.classList.remove('hidden');
-    startGame();
-});
-
-/* ---------------------- game functions ---------------------- */
-function startGame() {
-    const questions = JSON.parse(localStorage.getItem(config.questionsKey) || '[]');
-    if (questions.length === 0) {
-        alert('No questions available. Please contact administrator.');
-        return;
-    }
-    
-    gameState.crossword = generateCrossword(questions, config.gridSize);
-    renderCrossword(gameState.crossword);
-    
-    gameState.startTime = Date.now();
-    gameState.timeElapsed = 0;
-    updateTimer();
-    gameState.timerInterval = setInterval(updateTimer, 1000);
-}
-
-function updateTimer() {
-    gameState.timeElapsed = Math.floor((Date.now() - gameState.startTime) / 1000);
-    const minutes = Math.floor(gameState.timeElapsed / 60);
-    const seconds = gameState.timeElapsed % 60;
-    el.timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
-
-function generateCrossword(words, gridSize) {
-    // Sort by length (longest first for better placement)
-    words = words.map(w => ({...w}));
-    words.sort((a, b) => b.word.length - a.word.length);
-    
-    const grid = Array(gridSize).fill().map(() => Array(gridSize).fill(''));
-    const placedWords = [];
-    const across = [];
-    const down = [];
-    
-    // Place first word in the center
-    const firstWord = words.shift();
-    const startRow = Math.floor((gridSize - firstWord.word.length) / 2);
-    const startCol = Math.floor(gridSize / 2);
-    
-    for (let i = 0; i < firstWord.word.length; i++) {
-        grid[startRow][startCol + i] = firstWord.word[i];
-    }
-    
-    placedWords.push({
-        word: firstWord.word,
-        clue: firstWord.clue,
-        row: startRow,
-        col: startCol,
-        direction: 'across',
-        number: 1
-    });
-    across.push(placedWords[0]);
-    
-    let number = 2;
-    
-    // Try to place remaining words
-    for (const wordData of words) {
-        const word = wordData.word;
-        let placed = false;
-        
-        // Try to place across
-        for (let i = 0; i < word.length && !placed; i++) {
-            for (const placedWord of placedWords) {
-                for (let j = 0; j < placedWord.word.length && !placed; j++) {
-                    if (word[i] === placedWord.word[j]) {
-                        let row, col;
-                        
-                        if (placedWord.direction === 'across') {
-                            row = placedWord.row - i;
-                            col = placedWord.col + j;
-                            
-                            if (canPlaceDown(word, row, col, grid, placedWord)) {
-                                placeWord(word, wordData.clue, row, col, 'down', grid, placedWords, down, number++);
-                                placed = true;
-                            }
-                        } else {
-                            row = placedWord.row + j;
-                            col = placedWord.col - i;
-                            
-                            if (canPlaceAcross(word, row, col, grid, placedWord)) {
-                                placeWord(word, wordData.clue, row, col, 'across', grid, placedWords, across, number++);
-                                placed = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    return { grid, across, down };
-}
-
-function canPlaceDown(word, row, col, grid, ignoreWord) {
-    if (row < 0 || row + word.length > grid.length) return false;
-    
-    for (let i = 0; i < word.length; i++) {
-        const cell = grid[row + i]?.[col];
-        
-        // Check if cell is empty or matches the letter we want to place
-        if (cell && cell !== word[i]) return false;
-        
-        // Check left neighbor (must be empty)
-        if (col > 0 && !grid[row + i][col - 1] && (i === 0 || grid[row + i - 1][col])) {
-            if (grid[row + i][col - 1] && !isPartOfWord(row + i, col - 1, ignoreWord)) return false;
-        }
-        
-        // Check right neighbor (must be empty)
-        if (col < grid.length - 1 && !grid[row + i][col + 1] && (i === 0 || grid[row + i - 1][col])) {
-            if (grid[row + i][col + 1] && !isPartOfWord(row + i, col + 1, ignoreWord)) return false;
-        }
-    }
-    
-    // Check top and bottom
-    if (row > 0 && grid[row - 1][col]) return false;
-    if (row + word.length < grid.length && grid[row + word.length][col]) return false;
-    
     return true;
-}
-
-function canPlaceAcross(word, row, col, grid, ignoreWord) {
-    if (col < 0 || col + word.length > grid.length) return false;
-    
-    for (let i = 0; i < word.length; i++) {
-        const cell = grid[row]?.[col + i];
-        
-        // Check if cell is empty or matches the letter we want to place
-        if (cell && cell !== word[i]) return false;
-        
-        // Check top neighbor (must be empty)
-        if (row > 0 && !grid[row - 1][col + i] && (i === 0 || grid[row][col + i - 1])) {
-            if (grid[row - 1][col + i] && !isPartOfWord(row - 1, col + i, ignoreWord)) return false;
-        }
-        
-        // Check bottom neighbor (must be empty)
-        if (row < grid.length - 1 && !grid[row + 1][col + i] && (i === 0 || grid[row][col + i - 1])) {
-            if (grid[row + 1][col + i] && !isPartOfWord(row + 1, col + i, ignoreWord)) return false;
-        }
+  } else {
+    if(r + L > N) return false;
+    if(r>0 && grid[r-1][c]) return false;
+    if(r+L < N && grid[r+L][c]) return false;
+    for(let i=0;i<L;i++){
+      const ch = grid[r+i][c];
+      if(ch && ch !== word[i]) return false;
+      if(!ch){
+        if(c>0 && grid[r+i][c-1] && grid[r+i][c-1] !== word[i]) {/* ok */}
+        if(c+1 < N && grid[r+i][c+1] && grid[r+i][c+1] !== word[i]) {/* ok */}
+      }
     }
-    
-    // Check left and right
-    if (col > 0 && grid[row][col - 1]) return false;
-    if (col + word.length < grid.length && grid[row][col + word.length]) return false;
-    
     return true;
+  }
 }
 
-function isPartOfWord(row, col, word) {
-    if (word.direction === 'across') {
-        return row === word.row && col >= word.col && col < word.col + word.word.length;
-    } else {
-        return col === word.col && row >= word.row && row < word.row + word.word.length;
+/* attempt to place word at random positions, return placement or null */
+function tryPlaceWordRandom(word, grid, preferDir){
+  const N = grid.length;
+  const dirs = preferDir === 'down' ? ['down','across'] : ['across','down'];
+  for(let attempt=0; attempt<300; attempt++){
+    const dir = dirs[Math.floor(Math.random()*dirs.length)];
+    const r = Math.floor(Math.random()*N);
+    const c = Math.floor(Math.random()*N);
+    if(canPlace(word, r, c, dir, grid)){
+      // place it
+      if(dir === 'across'){
+        for(let i=0;i<word.length;i++) grid[r][c+i] = word[i];
+      } else {
+        for(let i=0;i<word.length;i++) grid[r+i][c] = word[i];
+      }
+      return {row:r, col:c, dir, word};
     }
+  }
+  return null;
 }
 
-function placeWord(word, clue, row, col, direction, grid, placedWords, directionList, number) {
-    const wordObj = { word, clue, row, col, direction, number };
-    placedWords.push(wordObj);
-    directionList.push(wordObj);
-    
-    if (direction === 'across') {
-        for (let i = 0; i < word.length; i++) {
-            grid[row][col + i] = word[i];
+/* main builder: tries multiple layouts and returns best fit */
+function buildCrossword(words, N=15){
+  // words: array of {word, clue}
+  const cleaned = words.map(w=>({word: (w.word||'').toUpperCase().replace(/[^A-Z]/g,''), clue: w.clue||''}))
+                        .filter(w=>w.word && w.word.length <= N);
+  // sort by length desc
+  cleaned.sort((a,b)=>b.word.length - a.word.length);
+
+  // decide target down count: prefer down heavier (60% or ceil)
+  const total = cleaned.length || 1;
+  const targetDown = Math.ceil(total * 0.60);
+
+  let best = {placed:[], grid:createEmptyGrid(N), score: -1};
+
+  // try multiple randomized builds and keep the one with most words placed and better down/across balance
+  for(let attempt=0; attempt<18; attempt++){
+    const grid = createEmptyGrid(N);
+    const placed = [];
+    let downCount = 0, acrossCount = 0;
+    for(let i=0;i<cleaned.length;i++){
+      const entry = cleaned[i];
+      // choose preferDir: if downCount < targetDown prefer down, else across
+      const preferDir = downCount < targetDown ? 'down' : 'across';
+      const p = tryPlaceWordRandom(entry.word, grid, preferDir);
+      if(p){
+        p.clue = entry.clue;
+        placed.push(p);
+        if(p.dir === 'down') downCount++; else acrossCount++;
+      }
+    }
+    // score primary: number of placed words, secondary: how close downCount to targetDown, tertiary: fewer empty cells
+    const placedCount = placed.length;
+    const downDelta = Math.abs(targetDown - downCount);
+    // count letters placed
+    let letters=0; for(let r=0;r<N;r++) for(let c=0;c<N;c++) if(grid[r][c]) letters++;
+    const score = placedCount*100 - downDelta*2 + Math.floor(letters/10);
+    if(score > best.score){
+      best = {placed, grid, score, downCount, acrossCount, letters};
+    }
+  }
+
+  // finalize: number assignment not needed (we won't print numbers). Return placements with length.
+  best.placed.forEach(p => p.length = p.word.length);
+  return {grid: best.grid, placements: best.placed};
+}
+
+/* ================== Rendering (with numbers for clues) ================== */
+function renderGrid(grid, placements){
+  crosswordGrid.innerHTML = '';
+  const tbl = document.createElement('table');
+  tbl.className = 'cross';
+  const tbody = document.createElement('tbody');
+  tbl.appendChild(tbody);
+  
+  // Generate clue numbers
+  state.clueNumbers = {};
+  let clueCounter = 1;
+  
+  for(let r=0;r<grid.length;r++){
+    const tr = document.createElement('tr');
+    for(let c=0;c<grid[0].length;c++){
+      const td = document.createElement('td');
+      if(!grid[r][c]){
+        td.className = 'black';
+      } else {
+        // Check if this cell should have a clue number (start of a word)
+        let hasClueNumber = false;
+        for(const p of placements){
+          if(p.row === r && p.col === c){
+            state.clueNumbers[`${r}-${c}`] = clueCounter;
+            hasClueNumber = true;
+            break;
+          }
         }
-    } else {
-        for (let i = 0; i < word.length; i++) {
-            grid[row + i][col] = word[i];
-        }
-    }
-}
-
-function renderCrossword(crossword) {
-    // Create grid HTML
-    let gridHTML = '<table class="crossword">';
-    for (let i = 0; i < config.gridSize; i++) {
-        gridHTML += '<tr>';
-        for (let j = 0; j < config.gridSize; j++) {
-            const cell = crossword.grid[i][j];
-            if (cell) {
-                // Find if this cell has a number
-                let number = '';
-                for (const word of [...crossword.across, ...crossword.down]) {
-                    if (word.row === i && word.col === j) {
-                        number = `<span class="number">${word.number}</span>`;
-                        break;
-                    }
-                }
-                
-                gridHTML += `<td>${number}<input type="text" class="cell" maxlength="1" data-row="${i}" data-col="${j}"></td>`;
-            } else {
-                gridHTML += '<td class="black"></td>';
-            }
-        }
-        gridHTML += '</tr>';
-    }
-    gridHTML += '</table>';
-    el.crosswordGrid.innerHTML = gridHTML;
-    
-    // Add keyboard navigation
-    const cells = el.crosswordGrid.querySelectorAll('.cell');
-    cells.forEach(cell => {
-        cell.addEventListener('keydown', handleKeyNavigation);
-        cell.addEventListener('focus', () => {
-            gameState.currentCell = cell;
-        });
-    });
-    
-    // Render clues
-    el.acrossClues.innerHTML = '';
-    crossword.across.forEach(word => {
-        const li = document.createElement('li');
-        li.innerHTML = `<strong>${word.number}.</strong> ${word.clue}`;
-        el.acrossClues.appendChild(li);
-    });
-    
-    el.downClues.innerHTML = '';
-    crossword.down.forEach(word => {
-        const li = document.createElement('li');
-        li.innerHTML = `<strong>${word.number}.</strong> ${word.clue}`;
-        el.downClues.appendChild(li);
-    });
-}
-
-function handleKeyNavigation(e) {
-    const key = e.key;
-    const row = parseInt(e.target.dataset.row);
-    const col = parseInt(e.target.dataset.col);
-    
-    if (key === 'ArrowUp') {
-        e.preventDefault();
-        moveFocus(row - 1, col);
-    } else if (key === 'ArrowDown') {
-        e.preventDefault();
-        moveFocus(row + 1, col);
-    } else if (key === 'ArrowLeft') {
-        e.preventDefault();
-        moveFocus(row, col - 1);
-    } else if (key === 'ArrowRight') {
-        e.preventDefault();
-        moveFocus(row, col + 1);
-    } else if (key.match(/^[a-z]$/i)) {
-        // Auto-advance to next cell after typing a letter
-        setTimeout(() => {
-            moveFocus(row, col + 1);
-        }, 10);
-    }
-}
-
-function moveFocus(row, col) {
-    if (row < 0 || row >= config.gridSize || col < 0 || col >= config.gridSize) return;
-    
-    const nextCell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
-    if (nextCell) {
-        nextCell.focus();
-        nextCell.select();
-    }
-}
-
-el.checkAnswersBtn.addEventListener('click', () => {
-    checkAnswers(false);
-});
-
-el.submitGameBtn.addEventListener('click', () => {
-    if (confirm('Are you sure you want to submit your answers? This will end the game.')) {
-        checkAnswers(true);
-    }
-});
-
-function checkAnswers(isFinalSubmit) {
-    clearInterval(gameState.timerInterval);
-    
-    const cells = el.crosswordGrid.querySelectorAll('.cell');
-    let correctCount = 0;
-    let totalCount = 0;
-    
-    cells.forEach(cell => {
-        const row = parseInt(cell.dataset.row);
-        const col = parseInt(cell.dataset.col);
-        const userInput = cell.value.toUpperCase();
-        const correctAnswer = gameState.crossword.grid[row][col];
         
-        if (correctAnswer) {
-            totalCount++;
-            if (userInput === correctAnswer) {
-                correctCount++;
-                cell.style.backgroundColor = '#d4edda';
-            } else {
-                cell.style.backgroundColor = '#f8d7da';
-                if (isFinalSubmit) {
-                    cell.value = correctAnswer;
-                    cell.style.color = '#721c24';
-                }
-            }
+        if(hasClueNumber){
+          const clueNumSpan = document.createElement('span');
+          clueNumSpan.className = 'clue-number';
+          clueNumSpan.textContent = clueCounter++;
+          td.appendChild(clueNumSpan);
         }
-    });
-    
-    gameState.score = Math.round((correctCount / totalCount) * 100);
-    gameState.checked = true;
-    
-    if (isFinalSubmit) {
-        submitGame();
-    }
-}
-
-function submitGame() {
-    // Store submission record for 24-hour restriction
-    const submissionRecords = JSON.parse(localStorage.getItem(config.submissionRecordsKey) || '{}');
-    const userKey = gameState.player.email.toLowerCase();
-    submissionRecords[userKey] = new Date().toISOString();
-    localStorage.setItem(config.submissionRecordsKey, JSON.stringify(submissionRecords));
-    
-    // Remove login record since submission is complete
-    const loginRecords = JSON.parse(localStorage.getItem(config.loginRecordsKey) || '{}');
-    delete loginRecords[userKey];
-    localStorage.setItem(config.loginRecordsKey, JSON.stringify(loginRecords));
-    
-    // Save to leaderboard
-    const leaderboard = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
-    leaderboard.push({
-        name: gameState.player.name,
-        email: gameState.player.email,
-        club: gameState.player.club || '',
-        school: gameState.player.school,
-        score: gameState.score,
-        time: gameState.timeElapsed,
-        date: new Date().toISOString()
-    });
-    localStorage.setItem(config.leaderboardKey, JSON.stringify(leaderboard));
-    
-    // Save ALL responses to spreadsheet (regardless of score)
-    saveLoginDataToSheet();
-    
-    // Show results
-    showResults();
-}
-
-function saveLoginDataToSheet() {
-    // Prepare data for submission
-    const submissionData = {
-        ...gameState.loginData,
-        score: gameState.score,
-        time: gameState.timeElapsed,
-        submissionTime: new Date().toISOString()
-    };
-    
-    // Send data to Google Apps Script web app
-    fetch(config.scriptURL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            action: 'submit',
-            data: submissionData
-        })
-    })
-    .then(() => {
-        console.log('Data submitted successfully');
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
-}
-
-function showResults() {
-    el.gameSection.classList.add('hidden');
-    el.resultsSection.classList.remove('hidden');
-    
-    // Show player result
-    const minutes = Math.floor(gameState.timeElapsed / 60);
-    const seconds = gameState.timeElapsed % 60;
-    el.playerResult.innerHTML = `
-        <p><strong>Name:</strong> ${gameState.player.name}</p>
-        <p><strong>Score:</strong> ${gameState.score}%</p>
-        <p><strong>Time:</strong> ${minutes}:${seconds.toString().padStart(2, '0')}</p>
-        <p>Your response has been recorded. Thank you for participating!</p>
-    `;
-    
-    // Show solution
-    renderSolution();
-    
-    // Show leaderboard
-    const leaderboard = JSON.parse(localStorage.getItem(config.leaderboardKey) || '[]');
-    el.leaderboardBody.innerHTML = '';
-    
-    leaderboard.sort((a, b) => b.score - a.score || a.time - b.time)
-        .slice(0, 10)
-        .forEach((entry, i) => {
-            const tr = document.createElement('tr');
-            const minutes = Math.floor(entry.time / 60);
-            const seconds = entry.time % 60;
-            tr.innerHTML = `
-                <td>${i + 1}</td>
-                <td>${entry.name}</td>
-                <td>${entry.club || '-'}</td>
-                <td>${entry.score}%</td>
-                <td>${minutes}:${seconds.toString().padStart(2, '0')}</td>
-                <td>${new Date(entry.date).toLocaleDateString()}</td>
-            `;
-            el.leaderboardBody.appendChild(tr);
+        
+        const input = document.createElement('input');
+        input.setAttribute('maxlength','1');
+        input.className = 'cell';
+        input.dataset.r = r; input.dataset.c = c;
+        input.dataset.solution = grid[r][c];
+        input.addEventListener('input', function(e){
+          this.value = (this.value||'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,1);
         });
-}
-
-function renderSolution() {
-    let solutionHTML = '<table class="crossword">';
-    for (let i = 0; i < config.gridSize; i++) {
-        solutionHTML += '<tr>';
-        for (let j = 0; j < config.gridSize; j++) {
-            const cell = gameState.crossword.grid[i][j];
-            if (cell) {
-                solutionHTML += `<td>${cell}</td>`;
-            } else {
-                solutionHTML += '<td class="black"></td>';
-            }
-        }
-        solutionHTML += '</tr>';
+        // keyboard navigation
+        input.addEventListener('keydown', handleArrowNav);
+        td.appendChild(input);
+      }
+      tr.appendChild(td);
     }
-    solutionHTML += '</table>';
-    el.solutionGrid.innerHTML = solutionHTML;
-    el.solutionBox.style.display = 'block';
+    tbody.appendChild(tr);
+  }
+  crosswordGrid.appendChild(tbl);
+
+  // render clues lists with numbers
+  const across = [], down = [];
+  placements.forEach(p => {
+    if(p.dir === 'across') across.push(p);
+    else down.push(p);
+  });
+  across.sort((a,b)=>a.row - b.row || a.col - b.col);
+  down.sort((a,b)=>a.col - b.col || a.row - b.row);
+
+  acrossList.innerHTML = '';
+  downList.innerHTML = '';
+  
+  // Render across clues with numbers
+  across.forEach((p, i) => {
+    const clueNum = state.clueNumbers[`${p.row}-${p.col}`] || (i + 1);
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${clueNum}.</strong> ${escapeHtml(p.clue)} (${p.length})`;
+    acrossList.appendChild(li);
+  });
+  
+  // Render down clues with numbers
+  down.forEach((p, i) => {
+    const clueNum = state.clueNumbers[`${p.row}-${p.col}`] || (i + 1);
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${clueNum}.</strong> ${escapeHtml(p.clue)} (${p.length})`;
+    downList.appendChild(li);
+  });
 }
 
-el.playAgainBtn.addEventListener('click', () => {
-    el.resultsSection.classList.add('hidden');
-    el.loginSection.classList.remove('hidden');
+/* keyboard arrow navigation (left/right/up/down) */
+function handleArrowNav(e){
+  const key = e.key;
+  if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Tab','Backspace','Enter'].includes(key)) return;
+  const r = parseInt(this.dataset.r), c = parseInt(this.dataset.c);
+  function focusCell(rr, cc){
+    const selector = `input.cell[data-r="${rr}"][data-c="${cc}"]`;
+    const el = document.querySelector(selector);
+    if(el) el.focus();
+  }
+  if(key === 'ArrowLeft'){ focusCell(r, c-1); e.preventDefault(); }
+  else if(key === 'ArrowRight'){ focusCell(r, c+1); e.preventDefault(); }
+  else if(key === 'ArrowUp'){ focusCell(r-1, c); e.preventDefault(); }
+  else if(key === 'ArrowDown'){ focusCell(r+1, c); e.preventDefault(); }
+  else if(key === 'Enter'){ focusCell(r+1, c); e.preventDefault(); }
+}
+
+/* show solution as filled readonly grid */
+function renderSolution(grid){
+  solutionGrid.innerHTML = '';
+  const tbl = document.createElement('table'); tbl.className='cross';
+  const tbody = document.createElement('tbody'); tbl.appendChild(tbody);
+  for(let r=0;r<grid.length;r++){
+    const tr = document.createElement('tr');
+    for(let c=0;c<grid[0].length;c++){
+      const td = document.createElement('td');
+      if(!grid[r][c]) td.className='black';
+      else td.textContent = grid[r][c];
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  solutionGrid.appendChild(tbl);
+}
+
+/* ================== Timer & scoring ================== */
+function startTimer(){
+  state.startTime = Date.now();
+  state.timeElapsed = 0;
+  timerDisplay.textContent = '00:00';
+  state.timerInterval = setInterval(()=> {
+    state.timeElapsed = Math.floor((Date.now() - state.startTime)/1000);
+    timerDisplay.textContent = formatTime(state.timeElapsed);
+  }, 1000);
+}
+function stopTimer(){
+  if(state.timerInterval) clearInterval(state.timerInterval);
+  state.timerInterval = null;
+}
+
+/* count correct letters and score */
+function checkAnswers(mark){
+  const inputs = Array.from(document.querySelectorAll('input.cell'));
+  let total=0, correct=0;
+  inputs.forEach(inp => {
+    const sol = inp.dataset.solution || '';
+    if(!sol) return;
+    total++;
+    const val = (inp.value || '').toUpperCase();
+    if(val === sol){ correct++; if(mark) inp.style.background = '#dcfce7'; }
+    else { if(mark) inp.style.background = '#fee2e2'; }
+  });
+  const percent = total ? Math.round((correct/total)*100) : 0;
+  state.score = percent;
+  return {percent, correct, total};
+}
+
+/* ================== Save to Google Sheet (Apps Script endpoint) ================== */
+function sendToSheet(payload){
+  if(!SHEETS_WEBAPP_URL || SHEETS_WEBAPP_URL.includes('REPLACE_WITH')) {
+    console.warn('SHEETS_WEBAPP_URL not set — skipping push to Google Sheets.');
+    return Promise.resolve({status:'skipped'});
+  }
+  return fetch(SHEETS_WEBAPP_URL, {
+    method:'POST',
+    mode:'cors',
+    headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify(payload)
+  }).then(res => {
+    if(res.ok) return res.json().catch(()=> ({status:'success'}));
+    return res.text().then(t => ({status:'error', message:t}));
+  }).catch(err=>{
+    console.warn('CORS failed, trying no-cors fallback', err);
+    return fetch(SHEETS_WEBAPP_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) })
+      .then(()=> ({status:'success (no-cors)'})).catch(e => ({status:'error', message: e.toString()}));
+  });
+}
+
+/* ================== Submit flow ================== */
+async function submitGame(){
+  const name = $('playerName').value.trim();
+  if(!name){ alert('Name is required.'); return; }
+  stopTimer();
+  const res = checkAnswers(true);
+  state.timeElapsed = state.timeElapsed || Math.floor((Date.now() - state.startTime)/1000);
+
+  const payload = {
+    name: name,
+    email: $('email').value.trim(),
+    school: $('schoolName').value.trim(),
+    class: $('className').value.trim(),
+    parentName: $('parentName').value.trim(),
+    parentContact: $('parentContact').value.trim(),
+    club: $('clubName').value.trim(),
+    score: res.percent,
+    time: state.timeElapsed,
+    date: new Date().toISOString()
+  };
+
+  // Show score display
+  scoreValue.textContent = res.percent;
+  scoreDisplay.classList.remove('hidden');
+
+  // attempt sheet push
+  const push = await sendToSheet(payload);
+  console.log('sheet push:', push);
+}
+
+/* ================== Build + UI wiring ================== */
+async function initAndShowPuzzle(){
+  const questions = await fetchQuestionsFromCSV();
+  state.words = questions.slice();
+  // choose grid size adaptively: larger if many long words
+  const maxLen = Math.max(...questions.map(q=>q.word.length), 8);
+  state.N = Math.max(12, Math.min(18, maxLen + 4));
+  // build crossword
+  const cw = buildCrossword(state.words, state.N);
+  state.grid = cw.grid;
+  state.placements = cw.placements;
+  renderGrid(state.grid, state.placements);
+  renderSolution(state.grid);
+  startTimer();
+  // focus first cell
+  setTimeout(()=> {
+    const first = document.querySelector('input.cell');
+    if(first) first.focus();
+  }, 250);
+}
+
+/* login flow: on registration submit hide login and run puzzle setup */
+loginSubmitBtn.addEventListener('click', async ()=>{
+  const name = $('playerName').value.trim();
+  if(!name){ alert('Please enter your name'); return; }
+  // save registration to localStorage for persistence
+  const reg = {
+    name, email: $('email').value.trim(), contact: $('contact').value.trim(),
+    school: $('schoolName').value.trim(), class: $('className').value.trim(),
+    parentName: $('parentName').value.trim(), parentContact: $('parentContact').value.trim(),
+    club: $('clubName').value.trim(), date: new Date().toISOString()
+  };
+  localStorage.setItem('amr_player_reg', JSON.stringify(reg));
+  // show puzzle area and hide login
+  loginCard.classList.add('hidden');
+  puzzleArea.classList.remove('hidden');
+  // initialize puzzle (fetch CSV etc)
+  await initAndShowPuzzle();
 });
 
-// Initialize
-loadManualRows();
+/* check, submit, play again wiring */
+checkAnswersBtn.addEventListener('click', ()=> {
+  const r = checkAnswers(true);
+  alert(`Checked: ${r.correct}/${r.total} letters correct — ${r.percent}%`);
+});
+submitGameBtn.addEventListener('click', submitGame);
+
+/* simple admin: allow paste CSV or load defaults */
+adminBtn.addEventListener('click', async ()=>{
+  const choice = prompt('Admin options:\n1 = Reload questions from published CSV\n2 = Paste CSV text\n3 = Load default sample questions\nCancel to close', '1');
+  if(!choice) return;
+  if(choice.trim() === '1'){
+    // force refetch by removing cached QKEY then reload puzzle if currently visible
+    localStorage.removeItem(QKEY);
+    alert('Reloading from published CSV. If failure occurs, defaults will be used.');
+    if(!loginCard.classList.contains('hidden')) return;
+    await initAndShowPuzzle();
+  } else if(choice.trim()==='2'){
+    const csv = prompt('Paste CSV text (headers Word,Clue).');
+    if(!csv) return;
+    // parse and save
+    const lines = csv.split(/\r?\n/).filter(Boolean);
+    if(lines.length < 2){ alert('CSV looks too small'); return; }
+    const headers = lines[0].split(',').map(h=>h.trim().toLowerCase());
+    const wIdx = headers.findIndex(h=>h.includes('word'));
+    const cIdx = headers.findIndex(h=>h.includes('clue'));
+    if(wIdx<0 || cIdx<0){ alert('Missing Word/Clue headers'); return; }
+    const arr = [];
+    for(let i=1;i<lines.length;i++){
+      const cols = splitCsvRow(lines[i]);
+      const w = (cols[wIdx]||'').trim();
+      const c = (cols[cIdx]||'').trim();
+      if(w && c) arr.push({word: w.toUpperCase().replace(/[^A-Z]/g,''), clue: c});
+    }
+    if(arr.length === 0){ alert('No valid rows found'); return; }
+    localStorage.setItem(QKEY, JSON.stringify(arr));
+    alert('Questions saved locally. Reloading puzzle.');
+    if(!loginCard.classList.contains('hidden')) return;
+    await initAndShowPuzzle();
+  } else if(choice.trim()==='3'){
+    localStorage.setItem(QKEY, JSON.stringify(DEFAULT_QUESTIONS));
+    alert('Default questions loaded.');
+    if(!loginCard.classList.contains('hidden')) return;
+    await initAndShowPuzzle();
+  }
+});
+
+/* on load restore registration details */
+(function boot(){
+  const reg = localStorage.getItem('amr_player_reg');
+  if(reg){
+    try{
+      const r = JSON.parse(reg);
+      $('playerName').value = r.name || '';
+      $('email').value = r.email || '';
+      $('contact').value = r.contact || '';
+      $('schoolName').value = r.school || '';
+      $('className').value = r.class || '';
+      $('parentName').value = r.parentName || '';
+      $('parentContact').value = r.parentContact || '';
+      $('clubName').value = r.club || '';
+    }catch(e){}
+  }
+})();
 </script>
 </body>
 </html>
